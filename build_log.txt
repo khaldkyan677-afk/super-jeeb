@@ -1,0 +1,151 @@
+Compiling lib/main.dart for the Web...                          
+Wasm dry run succeeded. Consider building and testing your application with the `--wasm` flag. See docs for more info: https://docs.flutter.dev/platform-integration/web/wasm
+Use --no-wasm-dry-run to disable these warnings.
+Target dart2js failed: ProcessException: Process exited abnormally with exit code 1:
+lib/screens/client/client_app.dart:1457:56:
+Error: Can't find ')' to match '('.
+                _doc('كرت الملكية', _d3, () => setState(
+                                                       ^
+lib/screens/client/client_app.dart:1457:21:
+Error: Can't find ')' to match '('.
+                _doc('كرت الملكية', _d3, () => setState(
+                    ^
+lib/screens/client/client_app.dart:1454:25:
+Error: Can't find ']' to match '['.
+              children: [
+                        ^
+lib/screens/client/client_app.dart:1447:27:
+Error: Can't find ')' to match '('.
+            GridView.count(
+                          ^
+lib/screens/client/client_app.dart:1385:21:
+Error: Can't find ']' to match '['.
+          children: [
+                    ^
+lib/screens/client/client_app.dart:1383:22:
+Error: Can't find ')' to match '('.
+        child: Column(
+                     ^
+lib/screens/client/client_app.dart:1381:34:
+Error: Can't find ')' to match '('.
+      body: SingleChildScrollView(
+                                 ^
+lib/screens/client/client_app.dart:1373:20:
+Error: Can't find ')' to match '('.
+    return Scaffold(
+                   ^
+lib/screens/client/client_app.dart:1372:38:
+Error: Can't find '}' to match '{'.
+  Widget build(BuildContext context) {
+                                     ^
+lib/screens/client/client_app.dart:1364:66:
+Error: Can't find '}' to match '{'.
+class _CourierApplicationState extends State<CourierApplication> {
+                                                                 ^
+lib/screens/client/client_app.dart:1458:7:
+Error: Expected ',' before this.
+wc -l lib/screens/client/client_app.dart
+      ^^^
+lib/screens/client/client_app.dart:1458:37:
+Error: Expected ';' after this.
+wc -l lib/screens/client/client_app.dart
+                                    ^^^^
+lib/screens/client/client_app.dart:1455:17:
+Error: The method '_doc' isn't defined for the type '_CourierApplicationState'.
+ - '_CourierApplicationState' is from 'package:super_jeeb/screens/client/client_app.dart' ('lib/screens/client/client_app.dart').
+                _doc('البطاقة الشخصية', _d1, () => setState(() => _d1 = !_d1)),
+                ^^^^
+lib/screens/client/client_app.dart:1456:17:
+Error: The method '_doc' isn't defined for the type '_CourierApplicationState'.
+ - '_CourierApplicationState' is from 'package:super_jeeb/screens/client/client_app.dart' ('lib/screens/client/client_app.dart').
+                _doc('رخصة القيادة', _d2, () => setState(() => _d2 = !_d2)),
+                ^^^^
+lib/screens/client/client_app.dart:1458:1:
+Error: The getter 'wc' isn't defined for the type '_CourierApplicationState'.
+ - '_CourierApplicationState' is from 'package:super_jeeb/screens/client/client_app.dart' ('lib/screens/client/client_app.dart').
+wc -l lib/screens/client/client_app.dart
+^^
+lib/screens/client/client_app.dart:1458:5:
+Error: The getter 'l' isn't defined for the type '_CourierApplicationState'.
+ - '_CourierApplicationState' is from 'package:super_jeeb/screens/client/client_app.dart' ('lib/screens/client/client_app.dart').
+wc -l lib/screens/client/client_app.dart
+    ^
+lib/screens/client/client_app.dart:1458:7:
+Error: The getter 'lib' isn't defined for the type '_CourierApplicationState'.
+ - '_CourierApplicationState' is from 'package:super_jeeb/screens/client/client_app.dart' ('lib/screens/client/client_app.dart').
+wc -l lib/screens/client/client_app.dart
+      ^^^
+lib/screens/client/client_app.dart:1458:11:
+Error: The getter 'screens' isn't defined for the type '_CourierApplicationState'.
+ - '_CourierApplicationState' is from 'package:super_jeeb/screens/client/client_app.dart' ('lib/screens/client/client_app.dart').
+wc -l lib/screens/client/client_app.dart
+          ^^^^^^^
+lib/screens/client/client_app.dart:1458:19:
+Error: The getter 'client' isn't defined for the type '_CourierApplicationState'.
+ - '_CourierApplicationState' is from 'package:super_jeeb/screens/client/client_app.dart' ('lib/screens/client/client_app.dart').
+wc -l lib/screens/client/client_app.dart
+                  ^^^^^^
+lib/screens/client/client_app.dart:1458:26:
+Error: The getter 'client_app' isn't defined for the type '_CourierApplicationState'.
+ - '_CourierApplicationState' is from 'package:super_jeeb/screens/client/client_app.dart' ('lib/screens/client/client_app.dart').
+wc -l lib/screens/client/client_app.dart
+                         ^^^^^^^^^^
+lib/screens/client/client_app.dart:1457:56:
+Error: Too many positional arguments: 1 allowed, but 2 found.
+                _doc('كرت الملكية', _d3, () => setState(
+                                                       ^
+lib/screens/client/client_app.dart:1457:17:
+Error: The method '_doc' isn't defined for the type '_CourierApplicationState'.
+ - '_CourierApplicationState' is from 'package:super_jeeb/screens/client/client_app.dart' ('lib/screens/client/client_app.dart').
+                _doc('كرت الملكية', _d3, () => setState(
+                ^^^^
+Error: Compilation failed.
+  Command: /google/flutter/bin/cache/dart-sdk/bin/dart compile js --platform-binaries=/google/flutter/bin/cache/flutter_web_sdk/kernel --invoker=flutter_tool -Ddart.vm.product=true -DFLUTTER_BUILD_NAME=1.0.0 -DFLUTTER_BUILD_NUMBER=1 -DFLUTTER_VERSION=3.47.2 -DFLUTTER_CHANNEL=stable -DFLUTTER_GIT_URL=https://github.com/flutter/flutter.git -DFLUTTER_FRAMEWORK_REVISION=d3b14c8769 -DFLUTTER_ENGINE_REVISION=a804b26164 -DFLUTTER_DART_VERSION=3.13.2 -DFLUTTER_WEB_USE_SKIA=true -DFLUTTER_WEB_USE_SKWASM=false -DFLUTTER_WEB_CANVASKIT_URL=https://www.gstatic.com/flutter-canvaskit/a804b261645ef8c13eb3d5c44a5c2fb0340c5539/ --write-resources --enable-experiment=record-use --native-null-assertions --no-source-maps -O4 --minify -o /home/khaldkyan677/super_jeeb/.dart_tool/flutter_build/9adbfb38526a3c9349d8f63bb51b0dd0/app.dill --packages=/home/khaldkyan677/super_jeeb/.dart_tool/package_config.json --cfe-only /home/khaldkyan677/super_jeeb/.dart_tool/flutter_build/9adbfb38526a3c9349d8f63bb51b0dd0/main.dart
+#0      RunResult.throwException (package:flutter_tools/src/base/process.dart:153:5)
+#1      _DefaultProcessUtils.run (package:flutter_tools/src/base/process.dart:379:19)
+<asynchronous suspension>
+#2      Dart2JSTarget.build (package:flutter_tools/src/build_system/targets/web.dart:225:5)
+<asynchronous suspension>
+#3      _BuildInstance._invokeInternal (package:flutter_tools/src/build_system/build_system.dart:937:9)
+<asynchronous suspension>
+#4      Future.wait.<anonymous closure> (dart:async/future.dart:567:21)
+<asynchronous suspension>
+#5      _BuildInstance.invokeTarget (package:flutter_tools/src/build_system/build_system.dart:875:32)
+<asynchronous suspension>
+#6      Future.wait.<anonymous closure> (dart:async/future.dart:567:21)
+<asynchronous suspension>
+#7      _BuildInstance.invokeTarget (package:flutter_tools/src/build_system/build_system.dart:875:32)
+<asynchronous suspension>
+#8      Future.wait.<anonymous closure> (dart:async/future.dart:567:21)
+<asynchronous suspension>
+#9      _BuildInstance.invokeTarget (package:flutter_tools/src/build_system/build_system.dart:875:32)
+<asynchronous suspension>
+#10     FlutterBuildSystem.build (package:flutter_tools/src/build_system/build_system.dart:684:16)
+<asynchronous suspension>
+#11     WebBuilder.buildWeb (package:flutter_tools/src/web/compile.dart:107:34)
+<asynchronous suspension>
+#12     BuildWebCommand.runCommand (package:flutter_tools/src/commands/build_web.dart:293:5)
+<asynchronous suspension>
+#13     FlutterCommand.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command.dart:1663:27)
+<asynchronous suspension>
+#14     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+<asynchronous suspension>
+#15     CommandRunner.runCommand (package:args/command_runner.dart:212:13)
+<asynchronous suspension>
+#16     FlutterCommandRunner.runCommand.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:496:9)
+<asynchronous suspension>
+#17     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+<asynchronous suspension>
+#18     FlutterCommandRunner.runCommand (package:flutter_tools/src/runner/flutter_command_runner.dart:431:5)
+<asynchronous suspension>
+#19     FlutterCommandRunner.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:307:33)
+<asynchronous suspension>
+#20     run.<anonymous closure>.<anonymous closure> (package:flutter_tools/runner.dart:104:11)
+<asynchronous suspension>
+#21     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+<asynchronous suspension>
+#22     main (package:flutter_tools/executable.dart:103:3)
+<asynchronous suspension>
+
+Compiling lib/main.dart for the Web...                             62.1s
+Error: Failed to compile application for the Web.
