@@ -5,11 +5,7 @@ class SJLogo extends StatelessWidget {
   final double size;
   final bool withShadow;
 
-  const SJLogo({
-    super.key,
-    this.size = 120,
-    this.withShadow = true,
-  });
+  const SJLogo({super.key, this.size = 120, this.withShadow = true});
 
   @override
   Widget build(BuildContext context) {
@@ -20,10 +16,7 @@ class SJLogo extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.white,
-            Color(0xFFF0F0F0),
-          ],
+          colors: [Colors.white, Color(0xFFF0F0F0)],
         ),
         borderRadius: BorderRadius.circular(size * 0.25),
         boxShadow: withShadow
@@ -112,17 +105,10 @@ class StoreAvatar extends StatelessWidget {
           ],
         ),
         borderRadius: BorderRadius.circular(size * 0.25),
-        border: Border.all(
-          color: color.withValues(alpha: 0.2),
-          width: 1.5,
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1.5),
       ),
       child: Center(
-        child: Icon(
-          icon,
-          size: size * 0.5,
-          color: color,
-        ),
+        child: Icon(icon, size: size * 0.5, color: color),
       ),
     );
   }
@@ -136,10 +122,7 @@ class PremiumGradient extends StatelessWidget {
   const PremiumGradient({
     super.key,
     required this.child,
-    this.colors = const [
-      Color(0xFF2B2D42),
-      Color(0xFF1B1C2A),
-    ],
+    this.colors = const [Color(0xFF2B2D42), Color(0xFF1B1C2A)],
   });
 
   @override

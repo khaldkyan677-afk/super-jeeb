@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'chat_screen.dart';
 
 class HelpScreen extends StatefulWidget {
@@ -48,9 +49,11 @@ class _HelpScreenState extends State<HelpScreen> {
   List<Map<String, dynamic>> get _filtered {
     if (_query.isEmpty) return _faqs;
     return _faqs
-        .where((f) =>
-            f['q'].toString().contains(_query) ||
-            f['a'].toString().contains(_query))
+        .where(
+          (f) =>
+              f['q'].toString().contains(_query) ||
+              f['a'].toString().contains(_query),
+        )
         .toList();
   }
 
@@ -60,11 +63,14 @@ class _HelpScreenState extends State<HelpScreen> {
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2D42),
-        title: const Text('المساعدة والدعم',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold)),
+        title: const Text(
+          'المساعدة والدعم',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
       ),
       body: SingleChildScrollView(
@@ -75,13 +81,15 @@ class _HelpScreenState extends State<HelpScreen> {
             // زر الدردشة المباشرة
             GestureDetector(
               onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => const ChatScreen(
-                            name: 'الدعم الفني',
-                            icon: Icons.support_agent,
-                            color: Color(0xFFEF233C),
-                          ))),
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ChatScreen(
+                    name: 'الدعم الفني',
+                    icon: Icons.support_agent,
+                    color: Color(0xFFEF233C),
+                  ),
+                ),
+              ),
               child: Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
@@ -92,27 +100,36 @@ class _HelpScreenState extends State<HelpScreen> {
                 ),
                 child: const Row(
                   children: [
-                    Icon(Icons.support_agent,
-                        color: Colors.white, size: 40),
+                    Icon(Icons.support_agent, color: Colors.white, size: 40),
                     SizedBox(width: 15),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('تحدث مع الدعم',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold)),
+                          Text(
+                            'تحدث مع الدعم',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           SizedBox(height: 4),
-                          Text('نحن هنا لمساعدتك على مدار الساعة',
-                              style: TextStyle(
-                                  color: Colors.white70, fontSize: 11)),
+                          Text(
+                            'نحن هنا لمساعدتك على مدار الساعة',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 11,
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                    Icon(Icons.arrow_forward_ios,
-                        color: Colors.white70, size: 18),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.white70,
+                      size: 18,
+                    ),
                   ],
                 ),
               ),
@@ -150,8 +167,7 @@ class _HelpScreenState extends State<HelpScreen> {
                     'إيميل',
                     const Color(0xFFEF233C),
                     () => ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('📧 support@superjeeb.com')),
+                      const SnackBar(content: Text('📧 support@superjeeb.com')),
                     ),
                   ),
                 ),
@@ -167,7 +183,9 @@ class _HelpScreenState extends State<HelpScreen> {
                 borderRadius: BorderRadius.circular(15),
                 boxShadow: [
                   BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 8,
+                  ),
                 ],
               ),
               child: TextField(
@@ -176,8 +194,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 decoration: const InputDecoration(
                   hintText: 'ابحث عن سؤال...',
                   hintStyle: TextStyle(fontSize: 13),
-                  prefixIcon:
-                      Icon(Icons.search, color: Color(0xFFEF233C)),
+                  prefixIcon: Icon(Icons.search, color: Color(0xFFEF233C)),
                   border: InputBorder.none,
                 ),
               ),
@@ -185,11 +202,14 @@ class _HelpScreenState extends State<HelpScreen> {
             const SizedBox(height: 25),
 
             // الأسئلة الشائعة
-            const Text('الأسئلة الشائعة',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2B2D42))),
+            const Text(
+              'الأسئلة الشائعة',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2B2D42),
+              ),
+            ),
             const SizedBox(height: 12),
             ..._filtered.map((f) => _faqCard(f)),
             const SizedBox(height: 25),
@@ -200,15 +220,18 @@ class _HelpScreenState extends State<HelpScreen> {
                 minimumSize: const Size(double.infinity, 50),
                 side: const BorderSide(color: Color(0xFFEF233C)),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
+                  borderRadius: BorderRadius.circular(15),
+                ),
               ),
               onPressed: () => _showReportDialog(),
-              icon: const Icon(Icons.report_problem,
-                  color: Color(0xFFEF233C)),
-              label: const Text('الإبلاغ عن مشكلة',
-                  style: TextStyle(
-                      color: Color(0xFFEF233C),
-                      fontWeight: FontWeight.bold)),
+              icon: const Icon(Icons.report_problem, color: Color(0xFFEF233C)),
+              label: const Text(
+                'الإبلاغ عن مشكلة',
+                style: TextStyle(
+                  color: Color(0xFFEF233C),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             const SizedBox(height: 20),
           ],
@@ -218,7 +241,11 @@ class _HelpScreenState extends State<HelpScreen> {
   }
 
   Widget _contactBtn(
-      IconData icon, String label, Color color, VoidCallback onTap) {
+    IconData icon,
+    String label,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(15),
@@ -233,11 +260,14 @@ class _HelpScreenState extends State<HelpScreen> {
           children: [
             Icon(icon, color: color, size: 26),
             const SizedBox(height: 6),
-            Text(label,
-                style: TextStyle(
-                    color: color,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold)),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),
@@ -251,27 +281,32 @@ class _HelpScreenState extends State<HelpScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
-          BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Theme(
-        data: Theme.of(context)
-            .copyWith(dividerColor: Colors.transparent),
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          leading: Icon(f['icon'] as IconData,
-              color: const Color(0xFFEF233C), size: 22),
-          title: Text(f['q'],
-              style: const TextStyle(
-                  fontSize: 13, fontWeight: FontWeight.bold)),
+          leading: Icon(
+            f['icon'] as IconData,
+            color: const Color(0xFFEF233C),
+            size: 22,
+          ),
+          title: Text(
+            f['q'],
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+          ),
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              child: Text(f['a'],
-                  style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.black54,
-                      height: 1.5)),
+              child: Text(
+                f['a'],
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.black54,
+                  height: 1.5,
+                ),
+              ),
             ),
           ],
         ),
@@ -284,14 +319,12 @@ class _HelpScreenState extends State<HelpScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
             Icon(Icons.report_problem, color: Color(0xFFEF233C)),
             SizedBox(width: 10),
-            Text('الإبلاغ عن مشكلة',
-                style: TextStyle(fontSize: 16)),
+            Text('الإبلاغ عن مشكلة', style: TextStyle(fontSize: 16)),
           ],
         ),
         content: TextField(
@@ -299,8 +332,7 @@ class _HelpScreenState extends State<HelpScreen> {
           maxLines: 4,
           decoration: InputDecoration(
             hintText: 'اشرح المشكلة بالتفصيل...',
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
         actions: [
@@ -310,17 +342,18 @@ class _HelpScreenState extends State<HelpScreen> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFEF233C)),
+              backgroundColor: const Color(0xFFEF233C),
+            ),
             onPressed: () {
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                    content: Text('✅ تم استلام بلاغك'),
-                    backgroundColor: Color(0xFF25D366)),
+                  content: Text('✅ تم استلام بلاغك'),
+                  backgroundColor: Color(0xFF25D366),
+                ),
               );
             },
-            child: const Text('إرسال',
-                style: TextStyle(color: Colors.white)),
+            child: const Text('إرسال', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

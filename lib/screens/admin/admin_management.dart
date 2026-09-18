@@ -29,11 +29,14 @@ class _AdminManagementScreenState extends State<AdminManagementScreen>
       backgroundColor: const Color(0xFF2B0013),
       appBar: AppBar(
         backgroundColor: const Color(0xFF660F24),
-        title: const Text('إدارة النظام',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.bold)),
+        title: const Text(
+          'إدارة النظام',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
         bottom: TabBar(
           controller: _tab,
@@ -41,7 +44,9 @@ class _AdminManagementScreenState extends State<AdminManagementScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white60,
           labelStyle: const TextStyle(
-              fontSize: 11, fontWeight: FontWeight.bold),
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+          ),
           tabs: const [
             Tab(text: 'المستخدمون'),
             Tab(text: 'الأقسام'),
@@ -144,8 +149,7 @@ class _UsersTabState extends State<_UsersTab> {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 15, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
           color: Colors.white.withValues(alpha: 0.02),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -158,19 +162,23 @@ class _UsersTabState extends State<_UsersTab> {
                     onTap: () => setState(() => _filter = f),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: sel
                             ? const Color(0xFFEF233C)
                             : Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Text(f,
-                          style: TextStyle(
-                              color:
-                                  sel ? Colors.white : Colors.white60,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold)),
+                      child: Text(
+                        f,
+                        style: TextStyle(
+                          color: sel ? Colors.white : Colors.white60,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 );
@@ -200,10 +208,11 @@ class _UsersTabState extends State<_UsersTab> {
         color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-            color: isBanned
-                ? const Color(0xFFEF233C).withValues(alpha: 0.5)
-                : Colors.white10,
-            width: isBanned ? 1.5 : 1),
+          color: isBanned
+              ? const Color(0xFFEF233C).withValues(alpha: 0.5)
+              : Colors.white10,
+          width: isBanned ? 1.5 : 1,
+        ),
       ),
       child: Row(
         children: [
@@ -216,11 +225,14 @@ class _UsersTabState extends State<_UsersTab> {
               border: Border.all(color: color, width: 1.5),
             ),
             child: Center(
-              child: Text(u['avatar'],
-                  style: TextStyle(
-                      color: color,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold)),
+              child: Text(
+                u['avatar'],
+                style: TextStyle(
+                  color: color,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -231,61 +243,78 @@ class _UsersTabState extends State<_UsersTab> {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(u['name'],
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold)),
+                      child: Text(
+                        u['name'],
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     if (isBanned)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFEF233C)
                               .withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Text('محظور',
-                            style: TextStyle(
-                                color: Color(0xFFEF233C),
-                                fontSize: 9,
-                                fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          'محظور',
+                          style: TextStyle(
+                            color: Color(0xFFEF233C),
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                   ],
                 ),
                 const SizedBox(height: 3),
-                Text(u['email'],
-                    style: const TextStyle(
-                        color: Colors.white54, fontSize: 10)),
+                Text(
+                  u['email'],
+                  style: const TextStyle(color: Colors.white54, fontSize: 10),
+                ),
                 const SizedBox(height: 5),
                 Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: color.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Text(u['role'],
-                          style: TextStyle(
-                              color: color,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold)),
+                      child: Text(
+                        u['role'],
+                        style: TextStyle(
+                          color: color,
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 8),
-                    Text('${u['orders']} طلب',
-                        style: const TextStyle(
-                            color: Colors.white54, fontSize: 10)),
+                    Text(
+                      '${u['orders']} طلب',
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 10,
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert,
-                color: Colors.white54, size: 20),
+            icon: const Icon(Icons.more_vert, color: Colors.white54, size: 20),
             color: const Color(0xFF2B0013),
             onSelected: (v) {
               if (v == 'view') {
@@ -301,11 +330,9 @@ class _UsersTabState extends State<_UsersTab> {
                 value: 'view',
                 child: Row(
                   children: [
-                    Icon(Icons.visibility,
-                        color: Colors.white, size: 18),
+                    Icon(Icons.visibility, color: Colors.white, size: 18),
                     SizedBox(width: 8),
-                    Text('عرض التفاصيل',
-                        style: TextStyle(color: Colors.white)),
+                    Text('عرض التفاصيل', style: TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
@@ -314,17 +341,21 @@ class _UsersTabState extends State<_UsersTab> {
                 child: Row(
                   children: [
                     Icon(
-                        isBanned ? Icons.check : Icons.block,
+                      isBanned ? Icons.check : Icons.block,
+                      color: isBanned
+                          ? const Color(0xFF25D366)
+                          : const Color(0xFFEF233C),
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      isBanned ? 'إلغاء الحظر' : 'حظر',
+                      style: TextStyle(
                         color: isBanned
                             ? const Color(0xFF25D366)
                             : const Color(0xFFEF233C),
-                        size: 18),
-                    const SizedBox(width: 8),
-                    Text(isBanned ? 'إلغاء الحظر' : 'حظر',
-                        style: TextStyle(
-                            color: isBanned
-                                ? const Color(0xFF25D366)
-                                : const Color(0xFFEF233C))),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -363,17 +394,19 @@ class _UsersTabState extends State<_UsersTab> {
               ),
             ),
             const SizedBox(height: 20),
-            Text(u['name'],
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold)),
+            Text(
+              u['name'],
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 15),
             _detailRow('البريد', u['email']),
             _detailRow('الدور', u['role']),
             _detailRow('عدد الطلبات', '${u['orders']}'),
-            _detailRow('الحالة',
-                u['status'] == 'active' ? 'نشط' : 'محظور'),
+            _detailRow('الحالة', u['status'] == 'active' ? 'نشط' : 'محظور'),
             const SizedBox(height: 20),
           ],
         ),
@@ -387,12 +420,14 @@ class _UsersTabState extends State<_UsersTab> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
-              style: const TextStyle(
-                  color: Colors.white54, fontSize: 12)),
-          Text(value,
-              style: const TextStyle(
-                  color: Colors.white, fontSize: 12)),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white54, fontSize: 12),
+          ),
+          Text(
+            value,
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+          ),
         ],
       ),
     );
@@ -412,10 +447,25 @@ class _CategoriesTab extends StatefulWidget {
 class _CategoriesTabState extends State<_CategoriesTab> {
   final List<Map<String, dynamic>> _categories = [
     {'name': 'مطاعم', 'icon': Icons.restaurant, 'count': 45, 'active': true},
-    {'name': 'سوبرماركت', 'icon': Icons.shopping_cart, 'count': 32, 'active': true},
-    {'name': 'صيدليات', 'icon': Icons.local_pharmacy, 'count': 28, 'active': true},
+    {
+      'name': 'سوبرماركت',
+      'icon': Icons.shopping_cart,
+      'count': 32,
+      'active': true,
+    },
+    {
+      'name': 'صيدليات',
+      'icon': Icons.local_pharmacy,
+      'count': 28,
+      'active': true,
+    },
     {'name': 'ملابس', 'icon': Icons.checkroom, 'count': 67, 'active': true},
-    {'name': 'إلكترونيات', 'icon': Icons.phone_android, 'count': 51, 'active': true},
+    {
+      'name': 'إلكترونيات',
+      'icon': Icons.phone_android,
+      'count': 51,
+      'active': true,
+    },
     {'name': 'عطور', 'icon': Icons.spa, 'count': 24, 'active': true},
     {'name': 'مكسرات', 'icon': Icons.eco, 'count': 18, 'active': false},
   ];
@@ -433,14 +483,18 @@ class _CategoriesTabState extends State<_CategoriesTab> {
                 backgroundColor: const Color(0xFF25D366),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onPressed: _addCategory,
               icon: const Icon(Icons.add, color: Colors.white),
-              label: const Text('إضافة قسم جديد',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold)),
+              label: const Text(
+                'إضافة قسم جديد',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ),
@@ -472,23 +526,30 @@ class _CategoriesTabState extends State<_CategoriesTab> {
               color: const Color(0xFFEF233C).withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(c['icon'] as IconData,
-                color: const Color(0xFFEF233C), size: 22),
+            child: Icon(
+              c['icon'] as IconData,
+              color: const Color(0xFFEF233C),
+              size: 22,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(c['name'],
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold)),
+                Text(
+                  c['name'],
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 3),
-                Text('${c['count']} متجر',
-                    style: const TextStyle(
-                        color: Colors.white54, fontSize: 10)),
+                Text(
+                  '${c['count']} متجر',
+                  style: const TextStyle(color: Colors.white54, fontSize: 10),
+                ),
               ],
             ),
           ),
@@ -498,8 +559,7 @@ class _CategoriesTabState extends State<_CategoriesTab> {
             onChanged: (v) => setState(() => c['active'] = v),
           ),
           IconButton(
-            icon: const Icon(Icons.delete,
-                color: Color(0xFFEF233C), size: 20),
+            icon: const Icon(Icons.delete, color: Color(0xFFEF233C), size: 20),
             onPressed: () {
               setState(() => _categories.removeAt(i));
             },
@@ -515,10 +575,11 @@ class _CategoriesTabState extends State<_CategoriesTab> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF2B0013),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
-        title: const Text('إضافة قسم',
-            style: TextStyle(color: Colors.white, fontSize: 15)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'إضافة قسم',
+          style: TextStyle(color: Colors.white, fontSize: 15),
+        ),
         content: TextField(
           controller: ctrl,
           style: const TextStyle(color: Colors.white),
@@ -526,18 +587,19 @@ class _CategoriesTabState extends State<_CategoriesTab> {
             labelText: 'اسم القسم',
             labelStyle: TextStyle(color: Colors.white60),
             enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white24)),
+              borderSide: BorderSide(color: Colors.white24),
+            ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء',
-                style: TextStyle(color: Colors.white60)),
+            child: const Text('إلغاء', style: TextStyle(color: Colors.white60)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF25D366)),
+              backgroundColor: const Color(0xFF25D366),
+            ),
             onPressed: () {
               if (ctrl.text.isNotEmpty) {
                 setState(() {
@@ -551,8 +613,7 @@ class _CategoriesTabState extends State<_CategoriesTab> {
               }
               Navigator.pop(context);
             },
-            child: const Text('إضافة',
-                style: TextStyle(color: Colors.white)),
+            child: const Text('إضافة', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -572,11 +633,41 @@ class _ZonesTab extends StatefulWidget {
 
 class _ZonesTabState extends State<_ZonesTab> {
   final List<Map<String, dynamic>> _zones = [
-    {'name': 'صنعاء - المركز', 'city': 'صنعاء', 'fee': 1500, 'eta': 30, 'active': true},
-    {'name': 'صنعاء - حدة', 'city': 'صنعاء', 'fee': 1200, 'eta': 25, 'active': true},
-    {'name': 'عدن - كريتر', 'city': 'عدن', 'fee': 1800, 'eta': 40, 'active': true},
-    {'name': 'تعز - المظفر', 'city': 'تعز', 'fee': 2000, 'eta': 45, 'active': true},
-    {'name': 'الحديدة - المدينة', 'city': 'الحديدة', 'fee': 2200, 'eta': 50, 'active': false},
+    {
+      'name': 'صنعاء - المركز',
+      'city': 'صنعاء',
+      'fee': 1500,
+      'eta': 30,
+      'active': true,
+    },
+    {
+      'name': 'صنعاء - حدة',
+      'city': 'صنعاء',
+      'fee': 1200,
+      'eta': 25,
+      'active': true,
+    },
+    {
+      'name': 'عدن - كريتر',
+      'city': 'عدن',
+      'fee': 1800,
+      'eta': 40,
+      'active': true,
+    },
+    {
+      'name': 'تعز - المظفر',
+      'city': 'تعز',
+      'fee': 2000,
+      'eta': 45,
+      'active': true,
+    },
+    {
+      'name': 'الحديدة - المدينة',
+      'city': 'الحديدة',
+      'fee': 2200,
+      'eta': 50,
+      'active': false,
+    },
   ];
 
   @override
@@ -592,14 +683,18 @@ class _ZonesTabState extends State<_ZonesTab> {
                 backgroundColor: const Color(0xFF25D366),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onPressed: _addZone,
               icon: const Icon(Icons.add_location, color: Colors.white),
-              label: const Text('إضافة منطقة',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold)),
+              label: const Text(
+                'إضافة منطقة',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ),
@@ -634,23 +729,33 @@ class _ZonesTabState extends State<_ZonesTab> {
                   color: const Color(0xFF25D366).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.location_city,
-                    color: Color(0xFF25D366), size: 22),
+                child: const Icon(
+                  Icons.location_city,
+                  color: Color(0xFF25D366),
+                  size: 22,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(z['name'],
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold)),
+                    Text(
+                      z['name'],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 3),
-                    Text('${z['city']} - ${z['eta']} دقيقة',
-                        style: const TextStyle(
-                            color: Colors.white54, fontSize: 10)),
+                    Text(
+                      '${z['city']} - ${z['eta']} دقيقة',
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 10,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -664,16 +769,19 @@ class _ZonesTabState extends State<_ZonesTab> {
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.attach_money,
-                  color: Colors.amber, size: 16),
+              const Icon(Icons.attach_money, color: Colors.amber, size: 16),
               const SizedBox(width: 4),
-              Text('رسوم التوصيل: ${z['fee']} YER',
-                  style: const TextStyle(
-                      color: Colors.white70, fontSize: 11)),
+              Text(
+                'رسوم التوصيل: ${z['fee']} YER',
+                style: const TextStyle(color: Colors.white70, fontSize: 11),
+              ),
               const Spacer(),
               IconButton(
-                icon: const Icon(Icons.delete,
-                    color: Color(0xFFEF233C), size: 20),
+                icon: const Icon(
+                  Icons.delete,
+                  color: Color(0xFFEF233C),
+                  size: 20,
+                ),
                 onPressed: () {
                   setState(() => _zones.removeAt(i));
                 },
@@ -691,10 +799,11 @@ class _ZonesTabState extends State<_ZonesTab> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF2B0013),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
-        title: const Text('إضافة منطقة',
-            style: TextStyle(color: Colors.white, fontSize: 15)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'إضافة منطقة',
+          style: TextStyle(color: Colors.white, fontSize: 15),
+        ),
         content: TextField(
           controller: ctrl,
           style: const TextStyle(color: Colors.white),
@@ -702,18 +811,19 @@ class _ZonesTabState extends State<_ZonesTab> {
             labelText: 'اسم المنطقة',
             labelStyle: TextStyle(color: Colors.white60),
             enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white24)),
+              borderSide: BorderSide(color: Colors.white24),
+            ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء',
-                style: TextStyle(color: Colors.white60)),
+            child: const Text('إلغاء', style: TextStyle(color: Colors.white60)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF25D366)),
+              backgroundColor: const Color(0xFF25D366),
+            ),
             onPressed: () {
               if (ctrl.text.isNotEmpty) {
                 setState(() {
@@ -728,8 +838,7 @@ class _ZonesTabState extends State<_ZonesTab> {
               }
               Navigator.pop(context);
             },
-            child: const Text('إضافة',
-                style: TextStyle(color: Colors.white)),
+            child: const Text('إضافة', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -855,30 +964,39 @@ class _ComplaintsTabState extends State<_ComplaintsTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('شكوى #${c['id']}',
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold)),
+                    Text(
+                      'شكوى #${c['id']}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 3),
-                    Text(c['date'],
-                        style: const TextStyle(
-                            color: Colors.white38, fontSize: 10)),
+                    Text(
+                      c['date'],
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 10,
+                      ),
+                    ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: priorityColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: Text(priorityText,
-                    style: TextStyle(
-                        color: priorityColor,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold)),
+                child: Text(
+                  priorityText,
+                  style: TextStyle(
+                    color: priorityColor,
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
@@ -894,17 +1012,22 @@ class _ComplaintsTabState extends State<_ComplaintsTab> {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Center(
-                    child: Text(statusText,
-                        style: TextStyle(
-                            color: statusColor,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold)),
+                    child: Text(
+                      statusText,
+                      style: TextStyle(
+                        color: statusColor,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -916,19 +1039,22 @@ class _ComplaintsTabState extends State<_ComplaintsTab> {
                       backgroundColor: const Color(0xFF25D366),
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     onPressed: () {
                       setState(() => c['status'] = 'resolved');
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text('✅ تم حل الشكوى'),
-                            backgroundColor: Color(0xFF25D366)),
+                          content: Text('✅ تم حل الشكوى'),
+                          backgroundColor: Color(0xFF25D366),
+                        ),
                       );
                     },
-                    child: const Text('حل',
-                        style: TextStyle(
-                            color: Colors.white, fontSize: 11)),
+                    child: const Text(
+                      'حل',
+                      style: TextStyle(color: Colors.white, fontSize: 11),
+                    ),
                   ),
                 ),
               ],
@@ -944,15 +1070,17 @@ class _ComplaintsTabState extends State<_ComplaintsTab> {
       children: [
         SizedBox(
           width: 60,
-          child: Text('$label:',
-              style: const TextStyle(
-                  color: Colors.white38, fontSize: 11)),
+          child: Text(
+            '$label:',
+            style: const TextStyle(color: Colors.white38, fontSize: 11),
+          ),
         ),
         Expanded(
-          child: Text(value,
-              style: const TextStyle(
-                  color: Colors.white70, fontSize: 11),
-              overflow: TextOverflow.ellipsis),
+          child: Text(
+            value,
+            style: const TextStyle(color: Colors.white70, fontSize: 11),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );

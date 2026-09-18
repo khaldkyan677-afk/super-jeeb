@@ -29,11 +29,14 @@ class _DriverEarningsScreenState extends State<DriverEarningsScreen>
       backgroundColor: const Color(0xFF1B1C2A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2D42),
-        title: const Text('أرباحي',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.bold)),
+        title: const Text(
+          'أرباحي',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
         bottom: TabBar(
           controller: _tab,
@@ -41,7 +44,9 @@ class _DriverEarningsScreenState extends State<DriverEarningsScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white60,
           labelStyle: const TextStyle(
-              fontSize: 12, fontWeight: FontWeight.bold),
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
           tabs: const [
             Tab(text: 'اليوم'),
             Tab(text: 'الأسبوع'),
@@ -85,7 +90,15 @@ class _EarningsTab extends StatelessWidget {
           'tips': 3500,
           'bonus': 5000,
           'chart': [12000, 15000, 11000, 18000, 10000, 12500, 9000],
-          'chartLabels': ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
+          'chartLabels': [
+            'السبت',
+            'الأحد',
+            'الاثنين',
+            'الثلاثاء',
+            'الأربعاء',
+            'الخميس',
+            'الجمعة',
+          ],
         };
       default:
         return {
@@ -131,38 +144,48 @@ class _EarningsTab extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.attach_money,
-                        color: Colors.white70, size: 22),
+                    const Icon(
+                      Icons.attach_money,
+                      color: Colors.white70,
+                      size: 22,
+                    ),
                     const SizedBox(width: 8),
-                    Text('إجمالي الأرباح',
-                        style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            fontSize: 13)),
+                    Text(
+                      'إجمالي الأرباح',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 13,
+                      ),
+                    ),
                     const Spacer(),
                     Text(
                       period == 'today'
                           ? 'اليوم'
                           : period == 'week'
-                              ? 'هذا الأسبوع'
-                              : 'هذا الشهر',
+                          ? 'هذا الأسبوع'
+                          : 'هذا الشهر',
                       style: const TextStyle(
-                          color: Colors.white60, fontSize: 11),
+                        color: Colors.white60,
+                        fontSize: 11,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 10),
-                Text('${d['total']} YER',
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold)),
+                Text(
+                  '${d['total']} YER',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 20),
                 Row(
                   children: [
                     _miniStat('${d['trips']}', 'رحلة', Icons.local_shipping),
                     const SizedBox(width: 15),
-                    _miniStat('${d['hours']}',
-                        'ساعة', Icons.access_time),
+                    _miniStat('${d['hours']}', 'ساعة', Icons.access_time),
                   ],
                 ),
               ],
@@ -195,11 +218,14 @@ class _EarningsTab extends StatelessWidget {
           const SizedBox(height: 25),
 
           // رسم بياني
-          const Text('تفصيل الأرباح',
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
+          const Text(
+            'تفصيل الأرباح',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
           const SizedBox(height: 15),
           Container(
             height: 200,
@@ -217,9 +243,13 @@ class _EarningsTab extends StatelessWidget {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text('${e.value ~/ 1000}K',
-                        style: const TextStyle(
-                            color: Colors.white38, fontSize: 8)),
+                    Text(
+                      '${e.value ~/ 1000}K',
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 8,
+                      ),
+                    ),
                     const SizedBox(height: 4),
                     Container(
                       width: 22,
@@ -239,7 +269,9 @@ class _EarningsTab extends StatelessWidget {
                       child: Text(
                         (d['chartLabels'] as List)[e.key].toString(),
                         style: const TextStyle(
-                            color: Colors.white54, fontSize: 8),
+                          color: Colors.white54,
+                          fontSize: 8,
+                        ),
                         textAlign: TextAlign.center,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -252,11 +284,14 @@ class _EarningsTab extends StatelessWidget {
           const SizedBox(height: 25),
 
           // سجل الرحلات
-          const Text('سجل الرحلات الأخيرة',
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
+          const Text(
+            'سجل الرحلات الأخيرة',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
           const SizedBox(height: 15),
           _tripRow('طلب #5021', '2.5 كم', 1500, '10:30 ص'),
           _tripRow('طلب #5020', '4.2 كم', 2200, '09:15 ص'),
@@ -275,14 +310,18 @@ class _EarningsTab extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(value,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold)),
-            Text(label,
-                style: const TextStyle(
-                    color: Colors.white60, fontSize: 10)),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white60, fontSize: 10),
+            ),
           ],
         ),
       ],
@@ -309,15 +348,19 @@ class _EarningsTab extends StatelessWidget {
             child: Icon(icon, color: color, size: 18),
           ),
           const SizedBox(height: 10),
-          Text(title,
-              style: const TextStyle(
-                  color: Colors.white54, fontSize: 11)),
+          Text(
+            title,
+            style: const TextStyle(color: Colors.white54, fontSize: 11),
+          ),
           const SizedBox(height: 4),
-          Text(value,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
@@ -334,44 +377,63 @@ class _EarningsTab extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.local_shipping,
-              color: Color(0xFFEF233C), size: 20),
+          const Icon(Icons.local_shipping, color: Color(0xFFEF233C), size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(id,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold)),
+                Text(
+                  id,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 3),
                 Row(
                   children: [
-                    const Icon(Icons.straighten,
-                        color: Colors.white38, size: 11),
+                    const Icon(
+                      Icons.straighten,
+                      color: Colors.white38,
+                      size: 11,
+                    ),
                     const SizedBox(width: 3),
-                    Text(distance,
-                        style: const TextStyle(
-                            color: Colors.white38, fontSize: 10)),
+                    Text(
+                      distance,
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 10,
+                      ),
+                    ),
                     const SizedBox(width: 10),
-                    const Icon(Icons.access_time,
-                        color: Colors.white38, size: 11),
+                    const Icon(
+                      Icons.access_time,
+                      color: Colors.white38,
+                      size: 11,
+                    ),
                     const SizedBox(width: 3),
-                    Text(time,
-                        style: const TextStyle(
-                            color: Colors.white38, fontSize: 10)),
+                    Text(
+                      time,
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 10,
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
           ),
-          Text('+$amount',
-              style: const TextStyle(
-                  color: Color(0xFF25D366),
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            '+$amount',
+            style: const TextStyle(
+              color: Color(0xFF25D366),
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );

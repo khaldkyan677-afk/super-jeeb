@@ -15,10 +15,7 @@ class CacheService {
     final expiresAt = ttl != null
         ? DateTime.now().add(ttl)
         : DateTime.now().add(const Duration(hours: 24));
-    _memory[key] = _CacheEntry(
-      value: jsonEncode(value),
-      expiresAt: expiresAt,
-    );
+    _memory[key] = _CacheEntry(value: jsonEncode(value), expiresAt: expiresAt);
   }
 
   // ---------- القراءة ----------
@@ -76,8 +73,10 @@ class CacheService {
 
   // ---------- أنواع مساعدة ----------
   void cacheSearch(String query) {
-    set('search_$query', {'query': query, 'ts': DateTime.now().toIso8601String()},
-        ttl: const Duration(minutes: 30));
+    set('search_$query', {
+      'query': query,
+      'ts': DateTime.now().toIso8601String(),
+    }, ttl: const Duration(minutes: 30));
   }
 
   void cacheApi(String endpoint, dynamic data) {

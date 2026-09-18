@@ -33,7 +33,8 @@ class SJButton extends StatelessWidget {
             side: BorderSide(color: color, width: 1.5),
             padding: const EdgeInsets.symmetric(vertical: 15),
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15)),
+              borderRadius: BorderRadius.circular(15),
+            ),
           ),
           onPressed: loading ? null : onPressed,
           icon: icon != null
@@ -44,13 +45,18 @@ class SJButton extends StatelessWidget {
                   width: 18,
                   height: 18,
                   child: CircularProgressIndicator(
-                      strokeWidth: 2, color: color),
+                    strokeWidth: 2,
+                    color: color,
+                  ),
                 )
-              : Text(text,
+              : Text(
+                  text,
                   style: TextStyle(
-                      color: color,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold)),
+                    color: color,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ),
       );
     }
@@ -62,7 +68,8 @@ class SJButton extends StatelessWidget {
           backgroundColor: color,
           padding: const EdgeInsets.symmetric(vertical: 15),
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15)),
+            borderRadius: BorderRadius.circular(15),
+          ),
         ),
         onPressed: loading ? null : onPressed,
         icon: icon != null
@@ -73,13 +80,18 @@ class SJButton extends StatelessWidget {
                 width: 18,
                 height: 18,
                 child: CircularProgressIndicator(
-                    strokeWidth: 2, color: Colors.white),
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
               )
-            : Text(text,
+            : Text(
+                text,
                 style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold)),
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
       ),
     );
   }
@@ -177,12 +189,14 @@ class SJTextField extends StatelessWidget {
         labelText: label,
         hintText: hint,
         labelStyle: TextStyle(
-            color: textColor.withValues(alpha: 0.5), fontSize: 13),
-        hintStyle:
-            TextStyle(color: textColor.withValues(alpha: 0.3), fontSize: 13),
-        prefixIcon: icon != null
-            ? Icon(icon, color: accent, size: 20)
-            : null,
+          color: textColor.withValues(alpha: 0.5),
+          fontSize: 13,
+        ),
+        hintStyle: TextStyle(
+          color: textColor.withValues(alpha: 0.3),
+          fontSize: 13,
+        ),
+        prefixIcon: icon != null ? Icon(icon, color: accent, size: 20) : null,
         filled: true,
         fillColor: darkMode
             ? Colors.white.withValues(alpha: 0.03)
@@ -194,7 +208,8 @@ class SJTextField extends StatelessWidget {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: BorderSide(
-              color: darkMode ? Colors.white24 : Colors.grey.shade300),
+            color: darkMode ? Colors.white24 : Colors.grey.shade300,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
@@ -240,26 +255,26 @@ class SJEmptyState extends StatelessWidget {
           children: [
             Icon(icon, size: 90, color: color),
             const SizedBox(height: 20),
-            Text(title,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
             if (subtitle != null) ...[
               const SizedBox(height: 10),
-              Text(subtitle!,
-                  style: const TextStyle(
-                      color: Colors.white54, fontSize: 12),
-                  textAlign: TextAlign.center),
+              Text(
+                subtitle!,
+                style: const TextStyle(color: Colors.white54, fontSize: 12),
+                textAlign: TextAlign.center,
+              ),
             ],
             if (actionText != null && onAction != null) ...[
               const SizedBox(height: 25),
-              SJButton(
-                text: actionText!,
-                onPressed: onAction,
-                width: 200,
-              ),
+              SJButton(text: actionText!, onPressed: onAction, width: 200),
             ],
           ],
         ),
@@ -290,16 +305,14 @@ class SJLoading extends StatelessWidget {
           SizedBox(
             width: 50,
             height: 50,
-            child: CircularProgressIndicator(
-              color: color,
-              strokeWidth: 3,
-            ),
+            child: CircularProgressIndicator(color: color, strokeWidth: 3),
           ),
           if (message != null) ...[
             const SizedBox(height: 20),
-            Text(message!,
-                style: const TextStyle(
-                    color: Colors.white54, fontSize: 13)),
+            Text(
+              message!,
+              style: const TextStyle(color: Colors.white54, fontSize: 13),
+            ),
           ],
         ],
       ),
@@ -334,15 +347,17 @@ class SJRatingStars extends StatelessWidget {
         final half = !filled && rating >= starValue - 0.5;
 
         return GestureDetector(
-          onTap: interactive ? () => onRating?.call(starValue.toDouble()) : null,
+          onTap: interactive
+              ? () => onRating?.call(starValue.toDouble())
+              : null,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 2),
             child: Icon(
               filled
                   ? Icons.star
                   : half
-                      ? Icons.star_half
-                      : Icons.star_border,
+                  ? Icons.star_half
+                  : Icons.star_border,
               color: Colors.amber,
               size: size,
             ),
@@ -378,35 +393,38 @@ class SJConfirmDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: const Color(0xFF2B2D42),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       title: Row(
         children: [
           Icon(icon, color: confirmColor, size: 24),
           const SizedBox(width: 10),
-          Text(title,
-              style: const TextStyle(
-                  color: Colors.white, fontSize: 15)),
+          Text(
+            title,
+            style: const TextStyle(color: Colors.white, fontSize: 15),
+          ),
         ],
       ),
-      content: Text(message,
-          style:
-              const TextStyle(color: Colors.white70, fontSize: 13)),
+      content: Text(
+        message,
+        style: const TextStyle(color: Colors.white70, fontSize: 13),
+      ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: Text(cancelText,
-              style: const TextStyle(color: Colors.white60)),
+          child: Text(
+            cancelText,
+            style: const TextStyle(color: Colors.white60),
+          ),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: confirmColor,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10)),
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
           onPressed: () => Navigator.pop(context, true),
-          child: Text(confirmText,
-              style: const TextStyle(color: Colors.white)),
+          child: Text(confirmText, style: const TextStyle(color: Colors.white)),
         ),
       ],
     );
@@ -417,8 +435,12 @@ class SJConfirmDialog extends StatelessWidget {
 // 8. تنبيه Toast
 // ============================================================
 class SJToast {
-  static void show(BuildContext context, String message,
-      {Color color = const Color(0xFF25D366), IconData icon = Icons.check_circle}) {
+  static void show(
+    BuildContext context,
+    String message, {
+    Color color = const Color(0xFF25D366),
+    IconData icon = Icons.check_circle,
+  }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -426,15 +448,13 @@ class SJToast {
             Icon(icon, color: Colors.white, size: 20),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(message,
-                  style: const TextStyle(color: Colors.white)),
+              child: Text(message, style: const TextStyle(color: Colors.white)),
             ),
           ],
         ),
         backgroundColor: color,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(10),
       ),
     );
@@ -473,33 +493,36 @@ class SJProgressSteps extends StatelessWidget {
                   color: done
                       ? const Color(0xFF25D366)
                       : active
-                          ? color
-                          : Colors.grey.shade700,
+                      ? color
+                      : Colors.grey.shade700,
                   shape: BoxShape.circle,
                 ),
                 child: Center(
                   child: done
-                      ? const Icon(Icons.check,
-                          color: Colors.white, size: 16)
-                      : Text('${i + 1}',
+                      ? const Icon(Icons.check, color: Colors.white, size: 16)
+                      : Text(
+                          '${i + 1}',
                           style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold)),
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(width: 6),
               Expanded(
-                child: Text(e.value,
-                    style: TextStyle(
-                        color: (done || active)
-                            ? Colors.white
-                            : Colors.white38,
-                        fontSize: 10,
-                        fontWeight: (done || active)
-                            ? FontWeight.bold
-                            : FontWeight.normal),
-                    overflow: TextOverflow.ellipsis),
+                child: Text(
+                  e.value,
+                  style: TextStyle(
+                    color: (done || active) ? Colors.white : Colors.white38,
+                    fontSize: 10,
+                    fontWeight: (done || active)
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               if (i < steps.length - 1)
                 Expanded(
@@ -566,36 +589,46 @@ class SJStatCard extends StatelessWidget {
               if (change != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 6, vertical: 2),
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
-                    color: (positive
-                            ? const Color(0xFF25D366)
-                            : const Color(0xFFEF233C))
-                        .withValues(alpha: 0.15),
+                    color:
+                        (positive
+                                ? const Color(0xFF25D366)
+                                : const Color(0xFFEF233C))
+                            .withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: Text(change!,
-                      style: TextStyle(
-                          color: positive
-                              ? const Color(0xFF25D366)
-                              : const Color(0xFFEF233C),
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold)),
+                  child: Text(
+                    change!,
+                    style: TextStyle(
+                      color: positive
+                          ? const Color(0xFF25D366)
+                          : const Color(0xFFEF233C),
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
             ],
           ),
           const SizedBox(height: 12),
-          Text(value,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 3),
-          Text(label,
-              style: const TextStyle(
-                  color: Colors.white54, fontSize: 10),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white54, fontSize: 10),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
@@ -626,14 +659,18 @@ class SJLinearProgress extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label!,
-                  style: const TextStyle(
-                      color: Colors.white70, fontSize: 12)),
-              Text('${(value * 100).toInt()}%',
-                  style: TextStyle(
-                      color: color,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold)),
+              Text(
+                label!,
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
+              Text(
+                '${(value * 100).toInt()}%',
+                style: TextStyle(
+                  color: color,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 6),
@@ -683,11 +720,14 @@ class SJBadge extends StatelessWidget {
             Icon(icon, color: color, size: 12),
             const SizedBox(width: 4),
           ],
-          Text(text,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            text,
+            style: TextStyle(
+              color: color,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );

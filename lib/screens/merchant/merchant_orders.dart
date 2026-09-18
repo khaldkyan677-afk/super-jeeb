@@ -4,8 +4,7 @@ class MerchantOrdersScreen extends StatefulWidget {
   const MerchantOrdersScreen({super.key});
 
   @override
-  State<MerchantOrdersScreen> createState() =>
-      _MerchantOrdersScreenState();
+  State<MerchantOrdersScreen> createState() => _MerchantOrdersScreenState();
 }
 
 class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
@@ -89,11 +88,14 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
       backgroundColor: const Color(0xFF1B1C2A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2D42),
-        title: const Text('إدارة الطلبات',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.bold)),
+        title: const Text(
+          'إدارة الطلبات',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
         bottom: TabBar(
           controller: _tab,
@@ -101,7 +103,9 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white60,
           labelStyle: const TextStyle(
-              fontSize: 11, fontWeight: FontWeight.bold),
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+          ),
           tabs: [
             Tab(text: 'جديدة (${_newOrders.length})'),
             Tab(text: 'تحضير (${_preparingOrders.length})'),
@@ -116,10 +120,11 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
           _buildList(_newOrders, 'new'),
           _buildList(_preparingOrders, 'preparing'),
           _buildList(_doneOrders, 'done'),
-          _buildList(
-            [..._newOrders, ..._preparingOrders, ..._doneOrders],
-            'all',
-          ),
+          _buildList([
+            ..._newOrders,
+            ..._preparingOrders,
+            ..._doneOrders,
+          ], 'all'),
         ],
       ),
     );
@@ -131,11 +136,12 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.receipt_long_outlined,
-                size: 80, color: Colors.white24),
+            Icon(Icons.receipt_long_outlined, size: 80, color: Colors.white24),
             SizedBox(height: 15),
-            Text('لا توجد طلبات',
-                style: TextStyle(color: Colors.white54, fontSize: 14)),
+            Text(
+              'لا توجد طلبات',
+              style: TextStyle(color: Colors.white54, fontSize: 14),
+            ),
           ],
         ),
       );
@@ -206,30 +212,42 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('طلب #${o['id']}',
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold)),
+                    Text(
+                      'طلب #${o['id']}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 3),
-                    Text(o['time'],
-                        style: const TextStyle(
-                            color: Colors.white38, fontSize: 10)),
+                    Text(
+                      o['time'],
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 10,
+                      ),
+                    ),
                   ],
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 4),
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(statusText,
-                    style: TextStyle(
-                        color: color,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold)),
+                child: Text(
+                  statusText,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
@@ -240,8 +258,11 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
           const SizedBox(height: 6),
           _row(Icons.location_on, 'العنوان', o['address']),
           const SizedBox(height: 6),
-          _row(Icons.shopping_bag, 'المنتجات',
-              '${o['items']} منتج - ${o['total']} YER'),
+          _row(
+            Icons.shopping_bag,
+            'المنتجات',
+            '${o['items']} منتج - ${o['total']} YER',
+          ),
           if (status == 'new') ...[
             const SizedBox(height: 15),
             Row(
@@ -252,7 +273,8 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
                       backgroundColor: const Color(0xFF25D366),
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                     onPressed: () {
                       setState(() {
@@ -262,17 +284,24 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text('✅ تم قبول الطلب'),
-                            backgroundColor: Color(0xFF25D366)),
+                          content: Text('✅ تم قبول الطلب'),
+                          backgroundColor: Color(0xFF25D366),
+                        ),
                       );
                     },
-                    icon: const Icon(Icons.check,
-                        color: Colors.white, size: 16),
-                    label: const Text('قبول',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold)),
+                    icon: const Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                    label: const Text(
+                      'قبول',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -282,16 +311,23 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
                       side: const BorderSide(color: Color(0xFFEF233C)),
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                     onPressed: () => _showRejectDialog(o),
-                    icon: const Icon(Icons.close,
-                        color: Color(0xFFEF233C), size: 16),
-                    label: const Text('رفض',
-                        style: TextStyle(
-                            color: Color(0xFFEF233C),
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold)),
+                    icon: const Icon(
+                      Icons.close,
+                      color: Color(0xFFEF233C),
+                      size: 16,
+                    ),
+                    label: const Text(
+                      'رفض',
+                      style: TextStyle(
+                        color: Color(0xFFEF233C),
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -306,7 +342,8 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
                   backgroundColor: const Color(0xFFEF233C),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
                 onPressed: () {
                   setState(() {
@@ -316,17 +353,24 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                        content: Text('🏁 تم تسليم الطلب للمندوب'),
-                        backgroundColor: Color(0xFF25D366)),
+                      content: Text('🏁 تم تسليم الطلب للمندوب'),
+                      backgroundColor: Color(0xFF25D366),
+                    ),
                   );
                 },
-                icon: const Icon(Icons.local_shipping,
-                    color: Colors.white, size: 16),
-                label: const Text('تسليم للمندوب',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold)),
+                icon: const Icon(
+                  Icons.local_shipping,
+                  color: Colors.white,
+                  size: 16,
+                ),
+                label: const Text(
+                  'تسليم للمندوب',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
           ],
@@ -340,14 +384,16 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
       children: [
         Icon(icon, color: Colors.white38, size: 14),
         const SizedBox(width: 6),
-        Text('$label: ',
-            style: const TextStyle(
-                color: Colors.white38, fontSize: 11)),
+        Text(
+          '$label: ',
+          style: const TextStyle(color: Colors.white38, fontSize: 11),
+        ),
         Expanded(
-          child: Text(value,
-              style: const TextStyle(
-                  color: Colors.white70, fontSize: 11),
-              overflow: TextOverflow.ellipsis),
+          child: Text(
+            value,
+            style: const TextStyle(color: Colors.white70, fontSize: 11),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
@@ -358,10 +404,11 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF2B2D42),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
-        title: const Text('سبب الرفض',
-            style: TextStyle(color: Colors.white, fontSize: 15)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'سبب الرفض',
+          style: TextStyle(color: Colors.white, fontSize: 15),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -376,17 +423,23 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
 
   Widget _reason(BuildContext context, Map<String, dynamic> o, String reason) {
     return ListTile(
-      title: Text(reason,
-          style: const TextStyle(color: Colors.white, fontSize: 13)),
-      trailing: const Icon(Icons.arrow_forward_ios,
-          color: Colors.white30, size: 14),
+      title: Text(
+        reason,
+        style: const TextStyle(color: Colors.white, fontSize: 13),
+      ),
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
+        color: Colors.white30,
+        size: 14,
+      ),
       onTap: () {
         setState(() => _newOrders.remove(o));
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('❌ تم رفض الطلب: $reason'),
-              backgroundColor: const Color(0xFFEF233C)),
+            content: Text('❌ تم رفض الطلب: $reason'),
+            backgroundColor: const Color(0xFFEF233C),
+          ),
         );
       },
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'screen_simulator.dart';
 
 class AdminSettingsScreen extends StatefulWidget {
@@ -32,19 +33,25 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => ScreenSimulator()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => ScreenSimulator()),
+          );
         },
-        child: const Icon(Icons.phonelink_setup),
         tooltip: 'محاكي الشاشات',
+        child: const Icon(Icons.phonelink_setup),
       ),
       backgroundColor: const Color(0xFF2B0013),
       appBar: AppBar(
         backgroundColor: const Color(0xFF660F24),
-        title: const Text('إعدادات النظام',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.bold)),
+        title: const Text(
+          'إعدادات النظام',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
       ),
       body: SingleChildScrollView(
@@ -75,8 +82,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
                 0,
                 20,
                 Colors.purple,
-                (v) =>
-                    setState(() => _deliveryCompanyCommission = v),
+                (v) => setState(() => _deliveryCompanyCommission = v),
               ),
             ]),
             _section('⚙️ إعدادات عامة', [
@@ -171,8 +177,9 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
                 () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                        content: Text('💾 جاري إنشاء نسخة احتياطية...'),
-                        backgroundColor: Color(0xFF25D366)),
+                      content: Text('💾 جاري إنشاء نسخة احتياطية...'),
+                      backgroundColor: Color(0xFF25D366),
+                    ),
                   );
                 },
               ),
@@ -184,10 +191,12 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
                 Icons.language,
                 Colors.cyan,
                 () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('سيتم تفعيل ميزة اللغة قريباً')),
-            );
-          },
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('سيتم تفعيل ميزة اللغة قريباً'),
+                    ),
+                  );
+                },
               ),
               _actionTile(
                 'العملات',
@@ -195,10 +204,12 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
                 Icons.attach_money,
                 const Color(0xFFD4AF37),
                 () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('سيتم تفعيل ميزة العملات قريباً')),
-            );
-          },
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('سيتم تفعيل ميزة العملات قريباً'),
+                    ),
+                  );
+                },
               ),
               _actionTile(
                 'أسعار الصرف',
@@ -206,10 +217,12 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
                 Icons.currency_exchange,
                 Colors.amber,
                 () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('سيتم تفعيل ميزة أسعار الصرف قريباً')),
-            );
-          },
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('سيتم تفعيل ميزة أسعار الصرف قريباً'),
+                    ),
+                  );
+                },
               ),
               _actionTile(
                 'المحافظات والمدن',
@@ -217,10 +230,12 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
                 Icons.location_city,
                 Colors.blue,
                 () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('سيتم تفعيل ميزة المحافظات قريباً')),
-            );
-          },
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('سيتم تفعيل ميزة المحافظات قريباً'),
+                    ),
+                  );
+                },
               ),
             ]),
             const SizedBox(height: 20),
@@ -231,21 +246,26 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
                   backgroundColor: const Color(0xFFEF233C),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                 ),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                        content: Text('✅ تم حفظ الإعدادات'),
-                        backgroundColor: Color(0xFF25D366)),
+                      content: Text('✅ تم حفظ الإعدادات'),
+                      backgroundColor: Color(0xFF25D366),
+                    ),
                   );
                 },
                 icon: const Icon(Icons.save, color: Colors.white),
-                label: const Text('حفظ كل الإعدادات',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold)),
+                label: const Text(
+                  'حفظ كل الإعدادات',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 30),
@@ -261,11 +281,14 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(5, 15, 5, 12),
-          child: Text(title,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold)),
+          child: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
         ...children,
         const SizedBox(height: 5),
@@ -295,24 +318,32 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
           Row(
             children: [
               Expanded(
-                child: Text(title,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold)),
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 4),
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text('${value.toStringAsFixed(0)}%',
-                    style: TextStyle(
-                        color: color,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold)),
+                child: Text(
+                  '${value.toStringAsFixed(0)}%',
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
@@ -354,14 +385,18 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
           ),
           child: Icon(icon, color: color, size: 20),
         ),
-        title: Text(title,
-            style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle,
-            style: const TextStyle(
-                color: Colors.white54, fontSize: 10)),
+        title: Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: const TextStyle(color: Colors.white54, fontSize: 10),
+        ),
         trailing: Switch(
           value: value,
           activeThumbColor: color,
@@ -395,16 +430,23 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
           ),
           child: Icon(icon, color: color, size: 20),
         ),
-        title: Text(title,
-            style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle,
-            style: const TextStyle(
-                color: Colors.white54, fontSize: 10)),
-        trailing: const Icon(Icons.arrow_forward_ios,
-            size: 14, color: Colors.white30),
+        title: Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: const TextStyle(color: Colors.white54, fontSize: 10),
+        ),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: Colors.white30,
+        ),
       ),
     );
   }

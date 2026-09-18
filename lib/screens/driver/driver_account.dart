@@ -17,53 +17,79 @@ class DriverAccountScreen extends StatelessWidget {
             _quickStats(),
             const SizedBox(height: 20),
             _menuSection('حسابي', [
-              _menu(context, Icons.person, 'تعديل الملف الشخصي',
-                  'الاسم والصورة'),
-              _menu(context, Icons.description, 'وثائقي',
-                  'الرخصة، الهوية', color: Colors.blue),
-              _menu(context, Icons.directions_car, 'مركبتي',
-                  'النوع واللوحة'),
-              _menu(context, Icons.star, 'تقييماتي',
-                  '4.9 من 5', color: Colors.amber),
-              _menu(context, Icons.emoji_events, 'إنجازاتي',
-                  'الشارات والمكافآت', color: const Color(0xFFD4AF37)),
+              _menu(
+                context,
+                Icons.person,
+                'تعديل الملف الشخصي',
+                'الاسم والصورة',
+              ),
+              _menu(
+                context,
+                Icons.description,
+                'وثائقي',
+                'الرخصة، الهوية',
+                color: Colors.blue,
+              ),
+              _menu(context, Icons.directions_car, 'مركبتي', 'النوع واللوحة'),
+              _menu(
+                context,
+                Icons.star,
+                'تقييماتي',
+                '4.9 من 5',
+                color: Colors.amber,
+              ),
+              _menu(
+                context,
+                Icons.emoji_events,
+                'إنجازاتي',
+                'الشارات والمكافآت',
+                color: const Color(0xFFD4AF37),
+              ),
             ]),
             _menuSection('المحفظة', [
-              _menu(context, Icons.account_balance_wallet, 'المحفظة',
-                  'الرصيد والمديونية',
-                  color: const Color(0xFF25D366)),
-              _menu(context, Icons.payment, 'طرق السحب',
-                  'الكريمي، جيب'),
-              _menu(context, Icons.history, 'سجل الأرباح',
-                  'كل المعاملات'),
-              _menu(context, Icons.request_quote, 'طلب سحب',
-                  'تحويل للبنك'),
+              _menu(
+                context,
+                Icons.account_balance_wallet,
+                'المحفظة',
+                'الرصيد والمديونية',
+                color: const Color(0xFF25D366),
+              ),
+              _menu(context, Icons.payment, 'طرق السحب', 'الكريمي، جيب'),
+              _menu(context, Icons.history, 'سجل الأرباح', 'كل المعاملات'),
+              _menu(context, Icons.request_quote, 'طلب سحب', 'تحويل للبنك'),
             ]),
             _menuSection('العمل', [
-              _menu(context, Icons.map, 'مناطق العمل',
-                  'المناطق المفضلة'),
-              _menu(context, Icons.schedule, 'جدول التوفر',
-                  'الأيام والساعات'),
-              _menu(context, Icons.category, 'أنواع الخدمة',
-                  'تاكسي، فرزة، طرود'),
-              _menu(context, Icons.pause_circle, 'وضع الراحة',
-                  'إيقاف مؤقت', color: Colors.orange),
+              _menu(context, Icons.map, 'مناطق العمل', 'المناطق المفضلة'),
+              _menu(context, Icons.schedule, 'جدول التوفر', 'الأيام والساعات'),
+              _menu(
+                context,
+                Icons.category,
+                'أنواع الخدمة',
+                'تاكسي، فرزة، طرود',
+              ),
+              _menu(
+                context,
+                Icons.pause_circle,
+                'وضع الراحة',
+                'إيقاف مؤقت',
+                color: Colors.orange,
+              ),
             ]),
             _menuSection('الإعدادات', [
-              _menu(context, Icons.notifications, 'الإشعارات',
-                  'تخصيص'),
-              _menu(context, Icons.settings, 'الإعدادات',
-                  'عامة'),
-              _menu(context, Icons.lock, 'الأمان',
-                  'كلمة السر'),
-              _menu(context, Icons.emergency, 'جهات الطوارئ',
-                  'SOS', color: const Color(0xFFEF233C)),
+              _menu(context, Icons.notifications, 'الإشعارات', 'تخصيص'),
+              _menu(context, Icons.settings, 'الإعدادات', 'عامة'),
+              _menu(context, Icons.lock, 'الأمان', 'كلمة السر'),
+              _menu(
+                context,
+                Icons.emergency,
+                'جهات الطوارئ',
+                'SOS',
+                color: const Color(0xFFEF233C),
+              ),
             ]),
             _menuSection('المساعدة', [
-              _menu(context, Icons.support_agent, 'الدعم الفني',
-                  'تواصل مباشر'),
-              _menu(context, Icons.info, 'عن التطبيق',
-                  'الإصدار'),
+              _menu(context, Icons.support_agent, 'الدعم الفني', 'تواصل مباشر'),
+              _menu(context, Icons.info, 'عن التطبيق', 'الإصدار'),
             ]),
             const SizedBox(height: 20),
             _logoutButton(context),
@@ -101,11 +127,13 @@ class DriverAccountScreen extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      Icon(Icons.directions_car,
-                          color: Colors.white, size: 80),
+                      Icon(Icons.directions_car, color: Colors.white, size: 80),
                       SizedBox(width: 30),
-                      Icon(Icons.delivery_dining,
-                          color: Colors.white, size: 80),
+                      Icon(
+                        Icons.delivery_dining,
+                        color: Colors.white,
+                        size: 80,
+                      ),
                     ],
                   ),
                 ),
@@ -118,22 +146,27 @@ class DriverAccountScreen extends StatelessWidget {
                   child: const CircleAvatar(
                     radius: 45,
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.person,
-                        size: 48, color: Color(0xFF2B2D42)),
+                    child: Icon(
+                      Icons.person,
+                      size: 48,
+                      color: Color(0xFF2B2D42),
+                    ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            const Text('الكابتن خالد وليد',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold)),
+            const Text(
+              'الكابتن خالد وليد',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 5),
             Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
                 color: const Color(0xFF25D366).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
@@ -141,14 +174,16 @@ class DriverAccountScreen extends StatelessWidget {
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.verified,
-                      color: Color(0xFF25D366), size: 14),
+                  Icon(Icons.verified, color: Color(0xFF25D366), size: 14),
                   SizedBox(width: 5),
-                  Text('كابتن موثق',
-                      style: TextStyle(
-                          color: Color(0xFF25D366),
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold)),
+                  Text(
+                    'كابتن موثق',
+                    style: TextStyle(
+                      color: Color(0xFF25D366),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -174,20 +209,27 @@ class DriverAccountScreen extends StatelessWidget {
           children: [
             const Row(
               children: [
-                Icon(Icons.warning_amber_rounded,
-                    color: Colors.white70, size: 22),
+                Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.white70,
+                  size: 22,
+                ),
                 SizedBox(width: 8),
-                Text('المديونية الحالية',
-                    style: TextStyle(
-                        color: Colors.white70, fontSize: 13)),
+                Text(
+                  'المديونية الحالية',
+                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                ),
               ],
             ),
             const SizedBox(height: 10),
-            const Text('-3,500 YER',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold)),
+            const Text(
+              '-3,500 YER',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 15),
             Row(
               children: [
@@ -198,14 +240,18 @@ class DriverAccountScreen extends StatelessWidget {
                       foregroundColor: const Color(0xFFEF233C),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     onPressed: () {},
                     icon: const Icon(Icons.payments, size: 18),
-                    label: const Text('تصفية',
-                        style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold)),
+                    label: const Text(
+                      'تصفية',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -215,16 +261,23 @@ class DriverAccountScreen extends StatelessWidget {
                       backgroundColor: Colors.white.withValues(alpha: 0.2),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     onPressed: () {},
-                    icon: const Icon(Icons.receipt_long,
-                        color: Colors.white, size: 18),
-                    label: const Text('الكشف',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold)),
+                    icon: const Icon(
+                      Icons.receipt_long,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    label: const Text(
+                      'الكشف',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -241,17 +294,23 @@ class DriverAccountScreen extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: _stat('85', 'رحلة', const Color(0xFFEF233C),
-                Icons.local_shipping),
+            child: _stat(
+              '85',
+              'رحلة',
+              const Color(0xFFEF233C),
+              Icons.local_shipping,
+            ),
           ),
           const SizedBox(width: 10),
-          Expanded(
-            child: _stat('4.9', 'تقييم', Colors.amber, Icons.star),
-          ),
+          Expanded(child: _stat('4.9', 'تقييم', Colors.amber, Icons.star)),
           const SizedBox(width: 10),
           Expanded(
-            child: _stat('3', 'سنوات', const Color(0xFF25D366),
-                Icons.emoji_events),
+            child: _stat(
+              '3',
+              'سنوات',
+              const Color(0xFF25D366),
+              Icons.emoji_events,
+            ),
           ),
         ],
       ),
@@ -270,16 +329,20 @@ class DriverAccountScreen extends StatelessWidget {
         children: [
           Icon(icon, color: color, size: 22),
           const SizedBox(height: 8),
-          Text(value,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 3),
-          Text(label,
-              style: const TextStyle(
-                  fontSize: 9, color: Colors.white54),
-              textAlign: TextAlign.center),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 9, color: Colors.white54),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );
@@ -291,20 +354,28 @@ class DriverAccountScreen extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(25, 15, 25, 8),
-          child: Text(title,
-              style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.white54,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1)),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.white54,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+          ),
         ),
         ...items,
       ],
     );
   }
 
-  Widget _menu(BuildContext context, IconData icon, String title,
-      String subtitle, {Color? color}) {
+  Widget _menu(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String subtitle, {
+    Color? color,
+  }) {
     final c = color ?? const Color(0xFFEF233C);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
@@ -315,9 +386,8 @@ class DriverAccountScreen extends StatelessWidget {
       ),
       child: ListTile(
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('فتح: $title')),
-          );
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('فتح: $title')));
         },
         leading: Container(
           padding: const EdgeInsets.all(8),
@@ -327,16 +397,23 @@ class DriverAccountScreen extends StatelessWidget {
           ),
           child: Icon(icon, color: c, size: 20),
         ),
-        title: Text(title,
-            style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: Colors.white)),
-        subtitle: Text(subtitle,
-            style: const TextStyle(
-                fontSize: 10, color: Colors.white54)),
-        trailing: const Icon(Icons.arrow_forward_ios,
-            size: 14, color: Colors.white30),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: const TextStyle(fontSize: 10, color: Colors.white54),
+        ),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: Colors.white30,
+        ),
       ),
     );
   }
@@ -351,16 +428,19 @@ class DriverAccountScreen extends StatelessWidget {
             side: const BorderSide(color: Color(0xFFEF233C)),
             minimumSize: const Size(0, 55),
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15)),
+              borderRadius: BorderRadius.circular(15),
+            ),
           ),
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.logout,
-              color: Color(0xFFEF233C), size: 20),
-          label: const Text('تسجيل الخروج',
-              style: TextStyle(
-                  color: Color(0xFFEF233C),
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold)),
+          icon: const Icon(Icons.logout, color: Color(0xFFEF233C), size: 20),
+          label: const Text(
+            'تسجيل الخروج',
+            style: TextStyle(
+              color: Color(0xFFEF233C),
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ),
     );

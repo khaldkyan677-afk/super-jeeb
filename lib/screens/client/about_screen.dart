@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../widgets/sj_logo.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -10,11 +11,14 @@ class AboutScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2D42),
-        title: const Text('عن التطبيق',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold)),
+        title: const Text(
+          'عن التطبيق',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
       ),
       body: SingleChildScrollView(
@@ -24,14 +28,19 @@ class AboutScreen extends StatelessWidget {
             const SizedBox(height: 20),
             const SJLogo(size: 130),
             const SizedBox(height: 20),
-            const Text('Super Jeeb',
-                style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2B2D42))),
+            const Text(
+              'Super Jeeb',
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2B2D42),
+              ),
+            ),
             const SizedBox(height: 5),
-            const Text('الإصدار 1.0.0',
-                style: TextStyle(color: Colors.grey, fontSize: 13)),
+            const Text(
+              'الإصدار 1.0.0',
+              style: TextStyle(color: Colors.grey, fontSize: 13),
+            ),
             const SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.all(20),
@@ -42,7 +51,10 @@ class AboutScreen extends StatelessWidget {
               child: const Text(
                 'تطبيق سوبر جيب هو منصة يمنية تربط العميل والتاجر والمندوب.',
                 style: TextStyle(
-                    fontSize: 13, height: 1.6, color: Colors.black87),
+                  fontSize: 13,
+                  height: 1.6,
+                  color: Colors.black87,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -64,11 +76,15 @@ class AboutScreen extends StatelessWidget {
             _policyTile(context, 'سياسة الخصوصية'),
             _policyTile(context, 'إخلاء المسؤولية'),
             const SizedBox(height: 30),
-            const Text('© 2026 Super Jeeb',
-                style: TextStyle(color: Colors.grey, fontSize: 11)),
+            const Text(
+              '© 2026 Super Jeeb',
+              style: TextStyle(color: Colors.grey, fontSize: 11),
+            ),
             const SizedBox(height: 10),
-            const Text('صُنع بحب في اليمن 🇾🇪',
-                style: TextStyle(color: Colors.grey, fontSize: 11)),
+            const Text(
+              'صُنع بحب في اليمن 🇾🇪',
+              style: TextStyle(color: Colors.grey, fontSize: 11),
+            ),
           ],
         ),
       ),
@@ -80,11 +96,14 @@ class AboutScreen extends StatelessWidget {
       alignment: Alignment.centerRight,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: Text(t,
-            style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2B2D42))),
+        child: Text(
+          t,
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2B2D42),
+          ),
+        ),
       ),
     );
   }
@@ -119,13 +138,15 @@ class AboutScreen extends StatelessWidget {
         children: [
           Icon(icon, color: const Color(0xFF25D366), size: 22),
           const SizedBox(width: 12),
-          Expanded(
-              child: Text(title, style: const TextStyle(fontSize: 13))),
-          Text(value,
-              style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                  fontWeight: FontWeight.w600)),
+          Expanded(child: Text(title, style: const TextStyle(fontSize: 13))),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -139,11 +160,17 @@ class AboutScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
-        leading:
-            const Icon(Icons.description, color: Color(0xFFEF233C), size: 22),
+        leading: const Icon(
+          Icons.description,
+          color: Color(0xFFEF233C),
+          size: 22,
+        ),
         title: Text(title, style: const TextStyle(fontSize: 13)),
-        trailing: const Icon(Icons.arrow_forward_ios,
-            size: 16, color: Colors.grey),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: Colors.grey,
+        ),
         onTap: () {
           showModalBottomSheet(
             context: context,
@@ -171,9 +198,13 @@ class AboutScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Text(title,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 15),
                   const Expanded(
                     child: SingleChildScrollView(
@@ -183,7 +214,10 @@ class AboutScreen extends StatelessWidget {
                         '• البند الثاني\n'
                         '• البند الثالث',
                         style: TextStyle(
-                            fontSize: 13, height: 1.8, color: Colors.black87),
+                          fontSize: 13,
+                          height: 1.8,
+                          color: Colors.black87,
+                        ),
                       ),
                     ),
                   ),

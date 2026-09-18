@@ -23,15 +23,25 @@ class MerchantAccountScreen extends StatelessWidget {
               _menu(context, Icons.qr_code, 'QR المتجر', 'مشاركة'),
             ]),
             _menuSection('المحفظة', [
-              _menu(context, Icons.account_balance_wallet, 'المحفظة',
-                  'الرصيد', color: const Color(0xFF25D366)),
+              _menu(
+                context,
+                Icons.account_balance_wallet,
+                'المحفظة',
+                'الرصيد',
+                color: const Color(0xFF25D366),
+              ),
               _menu(context, Icons.request_quote, 'طلب سحب', 'تحويل'),
               _menu(context, Icons.history, 'سجل المعاملات', 'العمليات'),
             ]),
             _menuSection('الإعدادات', [
               _menu(context, Icons.notifications, 'الإشعارات', 'التنبيهات'),
-              _menu(context, Icons.message, 'الدردشة', 'العملاء',
-                  color: const Color(0xFF25D366)),
+              _menu(
+                context,
+                Icons.message,
+                'الدردشة',
+                'العملاء',
+                color: const Color(0xFF25D366),
+              ),
               _menu(context, Icons.settings, 'الإعدادات', 'التطبيق'),
               _menu(context, Icons.lock, 'الأمان', 'كلمة السر'),
             ]),
@@ -77,20 +87,25 @@ class MerchantAccountScreen extends StatelessWidget {
               child: const CircleAvatar(
                 radius: 45,
                 backgroundColor: Colors.white,
-                child: Icon(Icons.storefront,
-                    size: 48, color: Color(0xFF2B2D42)),
+                child: Icon(
+                  Icons.storefront,
+                  size: 48,
+                  color: Color(0xFF2B2D42),
+                ),
               ),
             ),
             const SizedBox(height: 12),
-            const Text('متجر الأناقة',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold)),
+            const Text(
+              'متجر الأناقة',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 5),
             Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
                 color: const Color(0xFF25D366).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
@@ -98,14 +113,16 @@ class MerchantAccountScreen extends StatelessWidget {
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.check_circle,
-                      color: Color(0xFF25D366), size: 14),
+                  Icon(Icons.check_circle, color: Color(0xFF25D366), size: 14),
                   SizedBox(width: 5),
-                  Text('متجر موثق',
-                      style: TextStyle(
-                          color: Color(0xFF25D366),
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold)),
+                  Text(
+                    'متجر موثق',
+                    style: TextStyle(
+                      color: Color(0xFF25D366),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -131,20 +148,27 @@ class MerchantAccountScreen extends StatelessWidget {
           children: [
             const Row(
               children: [
-                Icon(Icons.account_balance_wallet,
-                    color: Colors.white70, size: 22),
+                Icon(
+                  Icons.account_balance_wallet,
+                  color: Colors.white70,
+                  size: 22,
+                ),
                 SizedBox(width: 8),
-                Text('رصيد المبيعات',
-                    style: TextStyle(
-                        color: Colors.white70, fontSize: 13)),
+                Text(
+                  'رصيد المبيعات',
+                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                ),
               ],
             ),
             const SizedBox(height: 10),
-            const Text('75,000 YER',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold)),
+            const Text(
+              '75,000 YER',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 15),
             Row(
               children: [
@@ -155,14 +179,18 @@ class MerchantAccountScreen extends StatelessWidget {
                       foregroundColor: const Color(0xFF25D366),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     onPressed: () {},
                     icon: const Icon(Icons.download, size: 18),
-                    label: const Text('سحب',
-                        style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold)),
+                    label: const Text(
+                      'سحب',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -172,16 +200,23 @@ class MerchantAccountScreen extends StatelessWidget {
                       backgroundColor: Colors.white.withValues(alpha: 0.2),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     onPressed: () {},
-                    icon: const Icon(Icons.receipt_long,
-                        color: Colors.white, size: 18),
-                    label: const Text('التقرير',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold)),
+                    icon: const Icon(
+                      Icons.receipt_long,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    label: const Text(
+                      'التقرير',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -198,18 +233,24 @@ class MerchantAccountScreen extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: _stat('142', 'طلب', const Color(0xFFEF233C),
-                Icons.receipt_long),
+            child: _stat(
+              '142',
+              'طلب',
+              const Color(0xFFEF233C),
+              Icons.receipt_long,
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: _stat('38', 'منتج', const Color(0xFF25D366),
-                Icons.inventory),
+            child: _stat(
+              '38',
+              'منتج',
+              const Color(0xFF25D366),
+              Icons.inventory,
+            ),
           ),
           const SizedBox(width: 10),
-          Expanded(
-            child: _stat('4.8', 'تقييم', Colors.amber, Icons.star),
-          ),
+          Expanded(child: _stat('4.8', 'تقييم', Colors.amber, Icons.star)),
         ],
       ),
     );
@@ -227,16 +268,20 @@ class MerchantAccountScreen extends StatelessWidget {
         children: [
           Icon(icon, color: color, size: 22),
           const SizedBox(height: 8),
-          Text(value,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 3),
-          Text(label,
-              style: const TextStyle(
-                  fontSize: 9, color: Colors.white54),
-              textAlign: TextAlign.center),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 9, color: Colors.white54),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );
@@ -248,20 +293,28 @@ class MerchantAccountScreen extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(25, 15, 25, 8),
-          child: Text(title,
-              style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.white54,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1)),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.white54,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+          ),
         ),
         ...items,
       ],
     );
   }
 
-  Widget _menu(BuildContext context, IconData icon, String title,
-      String subtitle, {Color? color}) {
+  Widget _menu(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String subtitle, {
+    Color? color,
+  }) {
     final c = color ?? const Color(0xFFEF233C);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
@@ -272,9 +325,8 @@ class MerchantAccountScreen extends StatelessWidget {
       ),
       child: ListTile(
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('فتح: $title')),
-          );
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('فتح: $title')));
         },
         leading: Container(
           padding: const EdgeInsets.all(8),
@@ -284,16 +336,23 @@ class MerchantAccountScreen extends StatelessWidget {
           ),
           child: Icon(icon, color: c, size: 20),
         ),
-        title: Text(title,
-            style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: Colors.white)),
-        subtitle: Text(subtitle,
-            style: const TextStyle(
-                fontSize: 10, color: Colors.white54)),
-        trailing: const Icon(Icons.arrow_forward_ios,
-            size: 14, color: Colors.white30),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: const TextStyle(fontSize: 10, color: Colors.white54),
+        ),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: Colors.white30,
+        ),
       ),
     );
   }
@@ -308,16 +367,19 @@ class MerchantAccountScreen extends StatelessWidget {
             side: const BorderSide(color: Color(0xFFEF233C)),
             minimumSize: const Size(0, 55),
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15)),
+              borderRadius: BorderRadius.circular(15),
+            ),
           ),
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.logout,
-              color: Color(0xFFEF233C), size: 20),
-          label: const Text('تسجيل الخروج',
-              style: TextStyle(
-                  color: Color(0xFFEF233C),
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold)),
+          icon: const Icon(Icons.logout, color: Color(0xFFEF233C), size: 20),
+          label: const Text(
+            'تسجيل الخروج',
+            style: TextStyle(
+              color: Color(0xFFEF233C),
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ),
     );

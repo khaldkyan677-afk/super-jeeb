@@ -52,23 +52,26 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         backgroundColor: const Color(0xFF2B2D42),
         title: Row(
           children: [
-            const Text('الإشعارات',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold)),
+            const Text(
+              'الإشعارات',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             if (unread > 0) ...[
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: const Color(0xFFEF233C),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Text('$unread',
-                    style: const TextStyle(
-                        color: Colors.white, fontSize: 10)),
+                child: Text(
+                  '$unread',
+                  style: const TextStyle(color: Colors.white, fontSize: 10),
+                ),
               ),
             ],
           ],
@@ -85,8 +88,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               });
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                    content: Text('✅ تم تحديد الكل كمقروء'),
-                    backgroundColor: Color(0xFF25D366)),
+                  content: Text('✅ تم تحديد الكل كمقروء'),
+                  backgroundColor: Color(0xFF25D366),
+                ),
               );
             },
           ),
@@ -97,11 +101,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.notifications_off,
-                      size: 80, color: Colors.grey),
+                  Icon(Icons.notifications_off, size: 80, color: Colors.grey),
                   SizedBox(height: 15),
-                  Text('لا توجد إشعارات',
-                      style: TextStyle(color: Colors.grey)),
+                  Text('لا توجد إشعارات', style: TextStyle(color: Colors.grey)),
                 ],
               ),
             )
@@ -122,12 +124,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: read ? Colors.white : const Color(0xFFEF233C).withValues(alpha: 0.05),
+          color: read
+              ? Colors.white
+              : const Color(0xFFEF233C).withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
-              color: read
-                  ? Colors.grey.shade200
-                  : const Color(0xFFEF233C).withValues(alpha: 0.3)),
+            color: read
+                ? Colors.grey.shade200
+                : const Color(0xFFEF233C).withValues(alpha: 0.3),
+          ),
         ),
         child: Row(
           children: [
@@ -137,28 +142,35 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 color: (n['color'] as Color).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(n['icon'] as IconData,
-                  color: n['color'] as Color, size: 24),
+              child: Icon(
+                n['icon'] as IconData,
+                color: n['color'] as Color,
+                size: 24,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(n['title'],
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight:
-                              read ? FontWeight.w500 : FontWeight.bold,
-                          color: const Color(0xFF2B2D42))),
+                  Text(
+                    n['title'],
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: read ? FontWeight.w500 : FontWeight.bold,
+                      color: const Color(0xFF2B2D42),
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text(n['body'],
-                      style: const TextStyle(
-                          fontSize: 12, color: Colors.black54)),
+                  Text(
+                    n['body'],
+                    style: const TextStyle(fontSize: 12, color: Colors.black54),
+                  ),
                   const SizedBox(height: 4),
-                  Text(n['time'],
-                      style: const TextStyle(
-                          fontSize: 10, color: Colors.grey)),
+                  Text(
+                    n['time'],
+                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
                 ],
               ),
             ),

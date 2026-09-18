@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'order_tracking_screen.dart';
 
 class MyOrdersScreen extends StatefulWidget {
@@ -65,11 +66,14 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2D42),
-        title: const Text('طلباتي',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold)),
+        title: const Text(
+          'طلباتي',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
         bottom: TabBar(
           controller: _tab,
@@ -77,7 +81,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white60,
           labelStyle: const TextStyle(
-              fontSize: 12, fontWeight: FontWeight.bold),
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
           tabs: const [
             Tab(text: 'الكل'),
             Tab(text: 'جارية'),
@@ -110,8 +116,10 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
           children: [
             Icon(Icons.receipt_long, size: 80, color: Colors.grey),
             SizedBox(height: 15),
-            Text('لا توجد طلبات',
-                style: TextStyle(color: Colors.grey, fontSize: 14)),
+            Text(
+              'لا توجد طلبات',
+              style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),
           ],
         ),
       );
@@ -162,7 +170,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 8,
+            ),
           ],
         ),
         child: Column(
@@ -170,18 +180,26 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
           children: [
             Row(
               children: [
-                const Icon(Icons.receipt_long,
-                    color: Color(0xFF2B2D42), size: 20),
+                const Icon(
+                  Icons.receipt_long,
+                  color: Color(0xFF2B2D42),
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
-                Text('طلب #${o['id']}',
-                    style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2B2D42))),
+                Text(
+                  'طلب #${o['id']}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2B2D42),
+                  ),
+                ),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
@@ -190,11 +208,14 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
                     children: [
                       Icon(statusIcon, color: color, size: 12),
                       const SizedBox(width: 4),
-                      Text(statusText,
-                          style: TextStyle(
-                              color: color,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold)),
+                      Text(
+                        statusText,
+                        style: TextStyle(
+                          color: color,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -203,31 +224,43 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
             const Divider(height: 20),
             Row(
               children: [
-                const Icon(Icons.storefront,
-                    color: Color(0xFFEF233C), size: 16),
+                const Icon(
+                  Icons.storefront,
+                  color: Color(0xFFEF233C),
+                  size: 16,
+                ),
                 const SizedBox(width: 6),
-                Text(o['merchant'],
-                    style: const TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.w600)),
+                Text(
+                  o['merchant'],
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 8),
-            Text(o['items'].join(' • '),
-                style: const TextStyle(
-                    fontSize: 12, color: Colors.black54),
-                overflow: TextOverflow.ellipsis),
+            Text(
+              o['items'].join(' • '),
+              style: const TextStyle(fontSize: 12, color: Colors.black54),
+              overflow: TextOverflow.ellipsis,
+            ),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(o['date'],
-                    style: const TextStyle(
-                        fontSize: 11, color: Colors.grey)),
-                Text('${o['total']} YER',
-                    style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFEF233C))),
+                Text(
+                  o['date'],
+                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                ),
+                Text(
+                  '${o['total']} YER',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFEF233C),
+                  ),
+                ),
               ],
             ),
           ],
@@ -264,11 +297,14 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
               ),
             ),
             const SizedBox(height: 20),
-            Text('طلب #${o['id']}',
-                style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2B2D42))),
+            Text(
+              'طلب #${o['id']}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2B2D42),
+              ),
+            ),
             const SizedBox(height: 20),
             _detailRow('المتجر', o['merchant']),
             _detailRow('التاريخ', o['date']),
@@ -282,24 +318,27 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
                   backgroundColor: const Color(0xFFEF233C),
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 onPressed: () {
                   Navigator.pop(context);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => OrderTrackingScreen(
-                        orderId: o['id'] as String,
-                      ),
+                      builder: (_) =>
+                          OrderTrackingScreen(orderId: o['id'] as String),
                     ),
                   );
                 },
                 icon: const Icon(Icons.track_changes, color: Colors.white),
-                label: const Text('تتبع الطلب',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
+                label: const Text(
+                  'تتبع الطلب',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
           ],
@@ -314,14 +353,13 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
-              style: const TextStyle(
-                  color: Colors.grey, fontSize: 13)),
+          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
           Flexible(
-            child: Text(value,
-                style: const TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.w600),
-                textAlign: TextAlign.right),
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              textAlign: TextAlign.right,
+            ),
           ),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 import 'api_service.dart';
 
 /// خدمة المصادقة - تدير تسجيل الدخول والخروج والأدوار
@@ -184,7 +185,8 @@ class AuthService extends ChangeNotifier {
 
       final e1 = email1.trim().toLowerCase();
       final e2 = email2.trim().toLowerCase();
-      final validEmail = (e1 == adminEmail1 && e2 == adminEmail2) ||
+      final validEmail =
+          (e1 == adminEmail1 && e2 == adminEmail2) ||
           (e1 == adminEmail2 && e2 == adminEmail1);
 
       if (validEmail && password == adminPass) {

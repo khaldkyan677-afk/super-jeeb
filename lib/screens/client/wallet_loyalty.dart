@@ -29,11 +29,14 @@ class _WalletLoyaltyScreenState extends State<WalletLoyaltyScreen>
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2D42),
-        title: const Text('المحفظة والمكافآت',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold)),
+        title: const Text(
+          'المحفظة والمكافآت',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
         bottom: TabBar(
           controller: _tab,
@@ -41,7 +44,9 @@ class _WalletLoyaltyScreenState extends State<WalletLoyaltyScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white60,
           labelStyle: const TextStyle(
-              fontSize: 12, fontWeight: FontWeight.bold),
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
           tabs: const [
             Tab(text: 'المحفظة'),
             Tab(text: 'النقاط'),
@@ -51,11 +56,7 @@ class _WalletLoyaltyScreenState extends State<WalletLoyaltyScreen>
       ),
       body: TabBarView(
         controller: _tab,
-        children: const [
-          _WalletTab(),
-          _LoyaltyTab(),
-          _ReferralTab(),
-        ],
+        children: const [_WalletTab(), _LoyaltyTab(), _ReferralTab()],
       ),
     );
   }
@@ -129,34 +130,46 @@ class _WalletTab extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.account_balance_wallet,
-                        color: Colors.white70, size: 24),
+                    const Icon(
+                      Icons.account_balance_wallet,
+                      color: Colors.white70,
+                      size: 24,
+                    ),
                     const SizedBox(width: 10),
-                    const Text('رصيد المحفظة',
-                        style: TextStyle(
-                            color: Colors.white70, fontSize: 14)),
+                    const Text(
+                      'رصيد المحفظة',
+                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                    ),
                     const Spacer(),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Text('YER',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold)),
+                      child: const Text(
+                        'YER',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
-                const Text('8,500',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold)),
+                const Text(
+                  '8,500',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 25),
                 Row(
                   children: [
@@ -167,13 +180,18 @@ class _WalletTab extends StatelessWidget {
                           foregroundColor: const Color(0xFFEF233C),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         onPressed: () => _showTopup(context),
                         icon: const Icon(Icons.add, size: 20),
-                        label: const Text('شحن',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 13)),
+                        label: const Text(
+                          'شحن',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -183,16 +201,23 @@ class _WalletTab extends StatelessWidget {
                           backgroundColor: Colors.white.withValues(alpha: 0.2),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         onPressed: () => _showWithdraw(context),
-                        icon: const Icon(Icons.arrow_upward,
-                            color: Colors.white, size: 20),
-                        label: const Text('سحب',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13)),
+                        icon: const Icon(
+                          Icons.arrow_upward,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        label: const Text(
+                          'سحب',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -206,16 +231,20 @@ class _WalletTab extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('سجل المعاملات',
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2B2D42))),
+              const Text(
+                'سجل المعاملات',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2B2D42),
+                ),
+              ),
               TextButton(
                 onPressed: () {},
-                child: const Text('عرض الكل',
-                    style: TextStyle(
-                        color: Color(0xFFEF233C), fontSize: 12)),
+                child: const Text(
+                  'عرض الكل',
+                  style: TextStyle(color: Color(0xFFEF233C), fontSize: 12),
+                ),
               ),
             ],
           ),
@@ -256,13 +285,18 @@ class _WalletTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(t['title'],
-                    style: const TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.bold)),
+                Text(
+                  t['title'],
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(t['date'],
-                    style: const TextStyle(
-                        fontSize: 11, color: Colors.grey)),
+                Text(
+                  t['date'],
+                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                ),
               ],
             ),
           ),
@@ -293,7 +327,8 @@ class _WalletTab extends StatelessWidget {
       ),
       builder: (_) => Padding(
         padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom),
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
         child: Container(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -308,9 +343,10 @@ class _WalletTab extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text('شحن المحفظة',
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text(
+                'شحن المحفظة',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 20),
               TextField(
                 controller: ctrl,
@@ -318,10 +354,13 @@ class _WalletTab extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'المبلغ',
                   hintText: '5000',
-                  prefixIcon: const Icon(Icons.attach_money,
-                      color: Color(0xFFEF233C)),
+                  prefixIcon: const Icon(
+                    Icons.attach_money,
+                    color: Color(0xFFEF233C),
+                  ),
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
               const SizedBox(height: 15),
@@ -342,20 +381,25 @@ class _WalletTab extends StatelessWidget {
                     backgroundColor: const Color(0xFF25D366),
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   onPressed: () {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content: Text('✅ سيتم تأكيد الشحن قريباً'),
-                          backgroundColor: Color(0xFF25D366)),
+                        content: Text('✅ سيتم تأكيد الشحن قريباً'),
+                        backgroundColor: Color(0xFF25D366),
+                      ),
                     );
                   },
-                  child: const Text('شحن الآن',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    'شحن الآن',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -368,8 +412,9 @@ class _WalletTab extends StatelessWidget {
   void _showWithdraw(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-          content: Text('🏦 طلب سحب - سيتم التواصل معك'),
-          backgroundColor: Color(0xFFEF233C)),
+        content: Text('🏦 طلب سحب - سيتم التواصل معك'),
+        backgroundColor: Color(0xFFEF233C),
+      ),
     );
   }
 }
@@ -403,19 +448,24 @@ class _LoyaltyTab extends StatelessWidget {
             ),
             child: Column(
               children: [
-                const Icon(Icons.stars,
-                    color: Colors.white, size: 50),
+                const Icon(Icons.stars, color: Colors.white, size: 50),
                 const SizedBox(height: 15),
-                const Text('1,250 نقطة',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold)),
+                const Text(
+                  '1,250 نقطة',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text('100 نقطة = 500 YER خصم',
-                    style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 13)),
+                Text(
+                  '100 نقطة = 500 YER خصم',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    fontSize: 13,
+                  ),
+                ),
                 const SizedBox(height: 20),
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -425,14 +475,12 @@ class _LoyaltyTab extends StatelessWidget {
                   ),
                   child: const Row(
                     children: [
-                      Icon(Icons.info_outline,
-                          color: Colors.white, size: 18),
+                      Icon(Icons.info_outline, color: Colors.white, size: 18),
                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'تحصل على نقطة لكل 1000 YER تشتريها',
-                          style: TextStyle(
-                              color: Colors.white, fontSize: 11),
+                          style: TextStyle(color: Colors.white, fontSize: 11),
                         ),
                       ),
                     ],
@@ -444,29 +492,55 @@ class _LoyaltyTab extends StatelessWidget {
           const SizedBox(height: 25),
           const Align(
             alignment: Alignment.centerRight,
-            child: Text('استبدال النقاط',
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2B2D42))),
+            child: Text(
+              'استبدال النقاط',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2B2D42),
+              ),
+            ),
           ),
           const SizedBox(height: 12),
-          _reward(context, 'خصم 500 YER', 100, Icons.local_offer,
-              const Color(0xFF25D366)),
-          _reward(context, 'خصم 1,000 YER', 200, Icons.local_offer,
-              const Color(0xFFEF233C)),
-          _reward(context, 'توصيل مجاني', 150, Icons.local_shipping,
-              Colors.orange),
-          _reward(context, 'خصم 5,000 YER', 1000, Icons.celebration,
-              const Color(0xFFD4AF37)),
+          _reward(
+            context,
+            'خصم 500 YER',
+            100,
+            Icons.local_offer,
+            const Color(0xFF25D366),
+          ),
+          _reward(
+            context,
+            'خصم 1,000 YER',
+            200,
+            Icons.local_offer,
+            const Color(0xFFEF233C),
+          ),
+          _reward(
+            context,
+            'توصيل مجاني',
+            150,
+            Icons.local_shipping,
+            Colors.orange,
+          ),
+          _reward(
+            context,
+            'خصم 5,000 YER',
+            1000,
+            Icons.celebration,
+            const Color(0xFFD4AF37),
+          ),
           const SizedBox(height: 20),
           const Align(
             alignment: Alignment.centerRight,
-            child: Text('كيفية الحصول على النقاط',
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2B2D42))),
+            child: Text(
+              'كيفية الحصول على النقاط',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2B2D42),
+              ),
+            ),
           ),
           const SizedBox(height: 12),
           _howTo('🛒', 'الشراء من التطبيق', 'نقطة لكل 1000 YER'),
@@ -478,8 +552,13 @@ class _LoyaltyTab extends StatelessWidget {
     );
   }
 
-  Widget _reward(BuildContext context, String title, int points,
-      IconData icon, Color color) {
+  Widget _reward(
+    BuildContext context,
+    String title,
+    int points,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(15),
@@ -499,43 +578,49 @@ class _LoyaltyTab extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(title,
-                style: const TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.bold)),
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+            ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 10, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Text('$points نقطة',
-                style: TextStyle(
-                    color: color,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold)),
+            child: Text(
+              '$points نقطة',
+              style: TextStyle(
+                color: color,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           const SizedBox(width: 8),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: color,
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 14, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               minimumSize: const Size(0, 32),
             ),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                    content: Text('✅ تم استبدال $points نقطة'),
-                    backgroundColor: color),
+                  content: Text('✅ تم استبدال $points نقطة'),
+                  backgroundColor: color,
+                ),
               );
             },
-            child: const Text('استبدال',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold)),
+            child: const Text(
+              'استبدال',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -558,13 +643,18 @@ class _LoyaltyTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.bold)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(sub,
-                    style: const TextStyle(
-                        fontSize: 11, color: Colors.grey)),
+                Text(
+                  sub,
+                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                ),
               ],
             ),
           ),
@@ -606,18 +696,21 @@ class _ReferralTab extends StatelessWidget {
             ),
             child: Column(
               children: [
-                const Icon(Icons.card_giftcard,
-                    color: Colors.white, size: 50),
+                const Icon(Icons.card_giftcard, color: Colors.white, size: 50),
                 const SizedBox(height: 15),
-                const Text('اكسب 500 YER',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold)),
+                const Text(
+                  'اكسب 500 YER',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                const Text('لكل صديق ينضم ويطلب',
-                    style: TextStyle(
-                        color: Colors.white70, fontSize: 13)),
+                const Text(
+                  'لكل صديق ينضم ويطلب',
+                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                ),
                 const SizedBox(height: 20),
                 Container(
                   padding: const EdgeInsets.all(15),
@@ -627,34 +720,44 @@ class _ReferralTab extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.confirmation_number,
-                          color: Color(0xFFEF233C), size: 24),
+                      const Icon(
+                        Icons.confirmation_number,
+                        color: Color(0xFFEF233C),
+                        size: 24,
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('كود الإحالة الخاص بك',
-                                style: TextStyle(
-                                    fontSize: 11, color: Colors.grey)),
+                            const Text(
+                              'كود الإحالة الخاص بك',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey,
+                              ),
+                            ),
                             const SizedBox(height: 4),
-                            const Text('KHALED2026',
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF2B2D42),
-                                    letterSpacing: 2)),
+                            const Text(
+                              'KHALED2026',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF2B2D42),
+                                letterSpacing: 2,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.copy,
-                            color: Color(0xFFEF233C)),
+                        icon: const Icon(Icons.copy, color: Color(0xFFEF233C)),
                         onPressed: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text('📋 تم نسخ الكود'),
-                                backgroundColor: Color(0xFF25D366)),
+                              content: Text('📋 تم نسخ الكود'),
+                              backgroundColor: Color(0xFF25D366),
+                            ),
                           );
                         },
                       ),
@@ -671,13 +774,18 @@ class _ReferralTab extends StatelessWidget {
                           foregroundColor: const Color(0xFF25D366),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         onPressed: () {},
                         icon: const Icon(Icons.share, size: 18),
-                        label: const Text('شارك',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 13)),
+                        label: const Text(
+                          'شارك',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -687,16 +795,23 @@ class _ReferralTab extends StatelessWidget {
                           backgroundColor: Colors.white.withValues(alpha: 0.2),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         onPressed: () {},
-                        icon: const Icon(Icons.message,
-                            color: Colors.white, size: 18),
-                        label: const Text('واتساب',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13)),
+                        icon: const Icon(
+                          Icons.message,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                        label: const Text(
+                          'واتساب',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -708,24 +823,35 @@ class _ReferralTab extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _statCard('3', 'إحالات ناجحة',
-                    const Color(0xFF25D366), Icons.people),
+                child: _statCard(
+                  '3',
+                  'إحالات ناجحة',
+                  const Color(0xFF25D366),
+                  Icons.people,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _statCard('1,500', 'مكافآت YER',
-                    const Color(0xFFEF233C), Icons.attach_money),
+                child: _statCard(
+                  '1,500',
+                  'مكافآت YER',
+                  const Color(0xFFEF233C),
+                  Icons.attach_money,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 25),
           const Align(
             alignment: Alignment.centerRight,
-            child: Text('الإحالات السابقة',
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2B2D42))),
+            child: Text(
+              'الإحالات السابقة',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2B2D42),
+              ),
+            ),
           ),
           const SizedBox(height: 12),
           _referralItem('أحمد م.', 'مكافأة مستلمة', 500),
@@ -747,14 +873,16 @@ class _ReferralTab extends StatelessWidget {
         children: [
           Icon(icon, color: color, size: 28),
           const SizedBox(height: 8),
-          Text(value,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(label,
-              style: const TextStyle(fontSize: 11, color: Colors.grey)),
+          Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
         ],
       ),
     );
@@ -780,25 +908,33 @@ class _ReferralTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name,
-                    style: const TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.bold)),
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 3),
-                Text(status,
-                    style: TextStyle(
-                        fontSize: 11,
-                        color: reward > 0
-                            ? const Color(0xFF25D366)
-                            : Colors.orange)),
+                Text(
+                  status,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: reward > 0 ? const Color(0xFF25D366) : Colors.orange,
+                  ),
+                ),
               ],
             ),
           ),
           if (reward > 0)
-            Text('+$reward',
-                style: const TextStyle(
-                    color: Color(0xFF25D366),
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold)),
+            Text(
+              '+$reward',
+              style: const TextStyle(
+                color: Color(0xFF25D366),
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
         ],
       ),
     );

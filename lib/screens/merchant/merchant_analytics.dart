@@ -30,11 +30,14 @@ class _MerchantAnalyticsScreenState extends State<MerchantAnalyticsScreen>
       backgroundColor: const Color(0xFF1B1C2A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2D42),
-        title: const Text('التحليلات',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.bold)),
+        title: const Text(
+          'التحليلات',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
         bottom: TabBar(
           controller: _tab,
@@ -42,7 +45,9 @@ class _MerchantAnalyticsScreenState extends State<MerchantAnalyticsScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white60,
           labelStyle: const TextStyle(
-              fontSize: 12, fontWeight: FontWeight.bold),
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
           tabs: const [
             Tab(text: 'نظرة عامة'),
             Tab(text: 'المنتجات'),
@@ -52,11 +57,7 @@ class _MerchantAnalyticsScreenState extends State<MerchantAnalyticsScreen>
       ),
       body: TabBarView(
         controller: _tab,
-        children: const [
-          _OverviewTab(),
-          _ProductsTab(),
-          _InvoicesTab(),
-        ],
+        children: const [_OverviewTab(), _ProductsTab(), _InvoicesTab()],
       ),
     );
   }
@@ -77,8 +78,7 @@ class _OverviewTab extends StatelessWidget {
         children: [
           // فلتر الفترة
           Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 15, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.02),
               borderRadius: BorderRadius.circular(15),
@@ -86,22 +86,28 @@ class _OverviewTab extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.calendar_today,
-                    color: Color(0xFFEF233C), size: 18),
+                const Icon(
+                  Icons.calendar_today,
+                  color: Color(0xFFEF233C),
+                  size: 18,
+                ),
                 const SizedBox(width: 10),
-                const Text('الفترة:',
-                    style: TextStyle(
-                        color: Colors.white70, fontSize: 13)),
+                const Text(
+                  'الفترة:',
+                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                ),
                 const SizedBox(width: 10),
-                const Text('آخر 7 أيام',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold)),
+                const Text(
+                  'آخر 7 أيام',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.arrow_drop_down,
-                      color: Colors.white),
+                  icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
                   onPressed: () {},
                 ),
               ],
@@ -164,11 +170,14 @@ class _OverviewTab extends StatelessWidget {
           const SizedBox(height: 25),
 
           // رسم بياني
-          const Text('المبيعات خلال الأسبوع',
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
+          const Text(
+            'المبيعات خلال الأسبوع',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
           const SizedBox(height: 15),
           Container(
             height: 200,
@@ -195,11 +204,14 @@ class _OverviewTab extends StatelessWidget {
           const SizedBox(height: 25),
 
           // مصادر المبيعات
-          const Text('مصادر المبيعات',
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
+          const Text(
+            'مصادر المبيعات',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
           const SizedBox(height: 15),
           _sourceBar('تطبيق الجوال', 0.75, const Color(0xFFEF233C)),
           _sourceBar('الويب', 0.15, const Color(0xFF25D366)),
@@ -209,8 +221,14 @@ class _OverviewTab extends StatelessWidget {
     );
   }
 
-  Widget _statCard(String value, String label, IconData icon,
-      Color color, String change, bool positive) {
+  Widget _statCard(
+    String value,
+    String label,
+    IconData icon,
+    Color color,
+    String change,
+    bool positive,
+  ) {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -233,33 +251,42 @@ class _OverviewTab extends StatelessWidget {
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: (positive ? const Color(0xFF25D366) : const Color(0xFFEF233C))
-                      .withValues(alpha: 0.15),
+                  color:
+                      (positive
+                              ? const Color(0xFF25D366)
+                              : const Color(0xFFEF233C))
+                          .withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: Text(change,
-                    style: TextStyle(
-                        color: positive
-                            ? const Color(0xFF25D366)
-                            : const Color(0xFFEF233C),
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold)),
+                child: Text(
+                  change,
+                  style: TextStyle(
+                    color: positive
+                        ? const Color(0xFF25D366)
+                        : const Color(0xFFEF233C),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          Text(value,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 3),
-          Text(label,
-              style: const TextStyle(
-                  color: Colors.white54, fontSize: 11)),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white54, fontSize: 11),
+          ),
         ],
       ),
     );
@@ -269,9 +296,10 @@ class _OverviewTab extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Text('${value ~/ 1000}K',
-            style: const TextStyle(
-                color: Colors.white38, fontSize: 8)),
+        Text(
+          '${value ~/ 1000}K',
+          style: const TextStyle(color: Colors.white38, fontSize: 8),
+        ),
         const SizedBox(height: 4),
         Container(
           width: 25,
@@ -286,9 +314,7 @@ class _OverviewTab extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        Text(day,
-            style: const TextStyle(
-                color: Colors.white54, fontSize: 9)),
+        Text(day, style: const TextStyle(color: Colors.white54, fontSize: 9)),
       ],
     );
   }
@@ -302,14 +328,18 @@ class _OverviewTab extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label,
-                  style: const TextStyle(
-                      color: Colors.white70, fontSize: 12)),
-              Text('${(percent * 100).toInt()}%',
-                  style: TextStyle(
-                      color: color,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold)),
+              Text(
+                label,
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
+              Text(
+                '${(percent * 100).toInt()}%',
+                style: TextStyle(
+                  color: color,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 6),
@@ -349,20 +379,26 @@ class _ProductsTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('الأكثر مبيعاً',
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
+          const Text(
+            'الأكثر مبيعاً',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
           const SizedBox(height: 15),
           ...topProducts.map((p) => _productRow(p)),
 
           const SizedBox(height: 25),
-          const Text('المنتجات الراكدة',
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
+          const Text(
+            'المنتجات الراكدة',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
           const SizedBox(height: 15),
           _stagnantProduct(context, 'حزام جلد', 5, 'منذ 30 يوم'),
           _stagnantProduct(context, 'ربطة عنق', 100, 'منذ 45 يوم'),
@@ -403,11 +439,14 @@ class _ProductsTab extends StatelessWidget {
               border: Border.all(color: rankColor, width: 1.5),
             ),
             child: Center(
-              child: Text('#$rank',
-                  style: TextStyle(
-                      color: rankColor,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold)),
+              child: Text(
+                '#$rank',
+                style: TextStyle(
+                  color: rankColor,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -415,29 +454,41 @@ class _ProductsTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(p['name'],
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold)),
+                Text(
+                  p['name'],
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 3),
-                Text('${p['sold']} عملية بيع',
-                    style: const TextStyle(
-                        color: Colors.white54, fontSize: 10)),
+                Text(
+                  '${p['sold']} عملية بيع',
+                  style: const TextStyle(color: Colors.white54, fontSize: 10),
+                ),
               ],
             ),
           ),
-          Text('${p['revenue']} YER',
-              style: const TextStyle(
-                  color: Color(0xFF25D366),
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            '${p['revenue']} YER',
+            style: const TextStyle(
+              color: Color(0xFF25D366),
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _stagnantProduct(BuildContext context, String name, int stock, String lastSold) {
+  Widget _stagnantProduct(
+    BuildContext context,
+    String name,
+    int stock,
+    String lastSold,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
@@ -445,37 +496,45 @@ class _ProductsTab extends StatelessWidget {
         color: const Color(0xFFEF233C).withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-            color: const Color(0xFFEF233C).withValues(alpha: 0.3)),
+          color: const Color(0xFFEF233C).withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.warning_amber,
-              color: Color(0xFFEF233C), size: 22),
+          const Icon(Icons.warning_amber, color: Color(0xFFEF233C), size: 22),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold)),
+                Text(
+                  name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 3),
-                Text('$stock قطعة • آخر بيع: $lastSold',
-                    style: const TextStyle(
-                        color: Colors.white54, fontSize: 10)),
+                Text(
+                  '$stock قطعة • آخر بيع: $lastSold',
+                  style: const TextStyle(color: Colors.white54, fontSize: 10),
+                ),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.local_offer,
-                color: Color(0xFF25D366), size: 20),
+            icon: const Icon(
+              Icons.local_offer,
+              color: Color(0xFF25D366),
+              size: 20,
+            ),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                    content: Text('🏷️ أنشئ عرضاً لهذا المنتج'),
-                    backgroundColor: Color(0xFF25D366)),
+                  content: Text('🏷️ أنشئ عرضاً لهذا المنتج'),
+                  backgroundColor: Color(0xFF25D366),
+                ),
               );
             },
           ),
@@ -545,14 +604,10 @@ class _InvoicesTab extends StatelessWidget {
             ),
             child: Row(
               children: [
-                _summaryItem(
-                    '120,500', 'إجمالي', const Color(0xFF25D366)),
-                Container(
-                    width: 1, height: 40, color: Colors.white10),
-                _summaryItem(
-                    '98,000', 'مدفوع', const Color(0xFFEF233C)),
-                Container(
-                    width: 1, height: 40, color: Colors.white10),
+                _summaryItem('120,500', 'إجمالي', const Color(0xFF25D366)),
+                Container(width: 1, height: 40, color: Colors.white10),
+                _summaryItem('98,000', 'مدفوع', const Color(0xFFEF233C)),
+                Container(width: 1, height: 40, color: Colors.white10),
                 _summaryItem('22,500', 'معلق', Colors.orange),
               ],
             ),
@@ -568,15 +623,19 @@ class _InvoicesTab extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
-          Text(value,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 3),
-          Text(label,
-              style: const TextStyle(
-                  color: Colors.white54, fontSize: 10)),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white54, fontSize: 10),
+          ),
         ],
       ),
     );
@@ -636,43 +695,59 @@ class _InvoicesTab extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(inv['id'],
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold)),
+                      child: Text(
+                        inv['id'],
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: color.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Text(label,
-                          style: TextStyle(
-                              color: color,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold)),
+                      child: Text(
+                        label,
+                        style: TextStyle(
+                          color: color,
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(inv['customer'],
-                    style: const TextStyle(
-                        color: Colors.white70, fontSize: 11)),
+                Text(
+                  inv['customer'],
+                  style: const TextStyle(color: Colors.white70, fontSize: 11),
+                ),
                 const SizedBox(height: 3),
                 Row(
                   children: [
-                    Text(inv['date'],
-                        style: const TextStyle(
-                            color: Colors.white38, fontSize: 10)),
+                    Text(
+                      inv['date'],
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 10,
+                      ),
+                    ),
                     const Spacer(),
-                    Text('${inv['total']} YER',
-                        style: const TextStyle(
-                            color: Color(0xFF25D366),
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold)),
+                    Text(
+                      '${inv['total']} YER',
+                      style: const TextStyle(
+                        color: Color(0xFF25D366),
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
               ],

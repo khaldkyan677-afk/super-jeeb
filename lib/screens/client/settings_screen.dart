@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../services/settings_service.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -17,11 +18,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         backgroundColor: const Color(0xFFF8F9FA),
         appBar: AppBar(
           backgroundColor: const Color(0xFF2B2D42),
-          title: const Text('الإعدادات',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold)),
+          title: const Text(
+            'الإعدادات',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           leading: const BackButton(color: Colors.white),
         ),
         body: SingleChildScrollView(
@@ -45,8 +49,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ? 'العربية'
                     : 'English',
                 ['العربية', 'English'],
-                (v) => SettingsService.instance
-                    .setLanguage(v == 'العربية' ? 'ar' : 'en'),
+                (v) => SettingsService.instance.setLanguage(
+                  v == 'العربية' ? 'ar' : 'en',
+                ),
               ),
               const SizedBox(height: 15),
               _sectionTitle('العملة'),
@@ -78,8 +83,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _actionTile(context, Icons.location_on, 'العناوين المحفوظة'),
               _actionTile(context, Icons.payment, 'طرق الدفع'),
               _actionTile(context, Icons.lock, 'الأمان والخصوصية'),
-              _actionTile(context, Icons.delete_forever, 'حذف الحساب',
-                  color: Colors.red),
+              _actionTile(
+                context,
+                Icons.delete_forever,
+                'حذف الحساب',
+                color: Colors.red,
+              ),
               const SizedBox(height: 30),
             ],
           ),
@@ -93,17 +102,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
       alignment: Alignment.centerRight,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-        child: Text(t,
-            style: const TextStyle(
-                color: Color(0xFF2B2D42),
-                fontSize: 13,
-                fontWeight: FontWeight.bold)),
+        child: Text(
+          t,
+          style: const TextStyle(
+            color: Color(0xFF2B2D42),
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }
 
-  Widget _switchTile(IconData icon, String title, String subtitle,
-      bool value, ValueChanged<bool> onChanged) {
+  Widget _switchTile(
+    IconData icon,
+    String title,
+    String subtitle,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
       decoration: BoxDecoration(
@@ -113,8 +130,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: ListTile(
         leading: Icon(icon, color: const Color(0xFFEF233C), size: 22),
         title: Text(title, style: const TextStyle(fontSize: 14)),
-        subtitle: Text(subtitle,
-            style: const TextStyle(fontSize: 11, color: Colors.grey)),
+        subtitle: Text(
+          subtitle,
+          style: const TextStyle(fontSize: 11, color: Colors.grey),
+        ),
         trailing: Switch(
           value: value,
           activeThumbColor: const Color(0xFF25D366),
@@ -124,8 +143,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _selectTile(IconData icon, String title, String current,
-      List<String> options, ValueChanged<String> onChanged) {
+  Widget _selectTile(
+    IconData icon,
+    String title,
+    String current,
+    List<String> options,
+    ValueChanged<String> onChanged,
+  ) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
       decoration: BoxDecoration(
@@ -139,9 +163,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           value: current,
           underline: const SizedBox(),
           style: const TextStyle(
-              color: Color(0xFF2B2D42),
-              fontSize: 13,
-              fontWeight: FontWeight.bold),
+            color: Color(0xFF2B2D42),
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+          ),
           items: options
               .map((o) => DropdownMenuItem(value: o, child: Text(o)))
               .toList(),
@@ -151,8 +176,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _actionTile(BuildContext context, IconData icon, String title,
-      {Color? color}) {
+  Widget _actionTile(
+    BuildContext context,
+    IconData icon,
+    String title, {
+    Color? color,
+  }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
       decoration: BoxDecoration(
@@ -160,17 +189,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
         borderRadius: BorderRadius.circular(15),
       ),
       child: ListTile(
-        leading:
-            Icon(icon, color: color ?? const Color(0xFFEF233C), size: 22),
-        title: Text(title,
-            style: TextStyle(
-                fontSize: 14, color: color ?? const Color(0xFF2B2D42))),
-        trailing: const Icon(Icons.arrow_forward_ios,
-            size: 16, color: Colors.grey),
+        leading: Icon(icon, color: color ?? const Color(0xFFEF233C), size: 22),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontSize: 14,
+            color: color ?? const Color(0xFF2B2D42),
+          ),
+        ),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: Colors.grey,
+        ),
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('فتح: $title')),
-          );
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('فتح: $title')));
         },
       ),
     );

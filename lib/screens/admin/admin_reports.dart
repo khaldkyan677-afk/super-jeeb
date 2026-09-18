@@ -29,21 +29,28 @@ class _AdminReportsScreenState extends State<AdminReportsScreen>
       backgroundColor: const Color(0xFF2B0013),
       appBar: AppBar(
         backgroundColor: const Color(0xFF660F24),
-        title: const Text('التقارير والإحصائيات',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.bold)),
+        title: const Text(
+          'التقارير والإحصائيات',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
         actions: [
           IconButton(
-            icon: const Icon(Icons.file_download,
-                color: Color(0xFF25D366), size: 22),
+            icon: const Icon(
+              Icons.file_download,
+              color: Color(0xFF25D366),
+              size: 22,
+            ),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                    content: Text('📥 جاري تصدير التقرير كـ Excel...'),
-                    backgroundColor: Color(0xFF25D366)),
+                  content: Text('📥 جاري تصدير التقرير كـ Excel...'),
+                  backgroundColor: Color(0xFF25D366),
+                ),
               );
             },
           ),
@@ -54,7 +61,9 @@ class _AdminReportsScreenState extends State<AdminReportsScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white60,
           labelStyle: const TextStyle(
-              fontSize: 11, fontWeight: FontWeight.bold),
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+          ),
           tabs: const [
             Tab(text: 'عام'),
             Tab(text: 'المبيعات'),
@@ -65,12 +74,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen>
       ),
       body: TabBarView(
         controller: _tab,
-        children: const [
-          _GeneralTab(),
-          _SalesTab(),
-          _UsersTab(),
-          _ProfitTab(),
-        ],
+        children: const [_GeneralTab(), _SalesTab(), _UsersTab(), _ProfitTab()],
       ),
     );
   }
@@ -91,11 +95,14 @@ class _GeneralTab extends StatelessWidget {
         children: [
           _periodFilter(),
           const SizedBox(height: 20),
-          const Text('مؤشرات رئيسية',
-              style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold)),
+          const Text(
+            'مؤشرات رئيسية',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 12),
           GridView.count(
             crossAxisCount: 2,
@@ -105,26 +112,53 @@ class _GeneralTab extends StatelessWidget {
             crossAxisSpacing: 12,
             childAspectRatio: 1.3,
             children: [
-              _kpiCard('إجمالي الطلبات', '1,428', '+18%',
-                  const Color(0xFFEF233C), Icons.receipt_long),
-              _kpiCard('المستخدمون النشطون', '385', '+12%',
-                  const Color(0xFF25D366), Icons.people),
-              _kpiCard('المتاجر النشطة', '142', '+5%',
-                  Colors.amber, Icons.storefront),
-              _kpiCard('الكباتن', '85', '+8%',
-                  Colors.purple, Icons.delivery_dining),
-              _kpiCard('إجمالي المبيعات', '2.4M', '+24%',
-                  const Color(0xFFD4AF37), Icons.attach_money),
-              _kpiCard('متوسط التقييم', '4.8', '+0.2',
-                  Colors.cyan, Icons.star),
+              _kpiCard(
+                'إجمالي الطلبات',
+                '1,428',
+                '+18%',
+                const Color(0xFFEF233C),
+                Icons.receipt_long,
+              ),
+              _kpiCard(
+                'المستخدمون النشطون',
+                '385',
+                '+12%',
+                const Color(0xFF25D366),
+                Icons.people,
+              ),
+              _kpiCard(
+                'المتاجر النشطة',
+                '142',
+                '+5%',
+                Colors.amber,
+                Icons.storefront,
+              ),
+              _kpiCard(
+                'الكباتن',
+                '85',
+                '+8%',
+                Colors.purple,
+                Icons.delivery_dining,
+              ),
+              _kpiCard(
+                'إجمالي المبيعات',
+                '2.4M',
+                '+24%',
+                const Color(0xFFD4AF37),
+                Icons.attach_money,
+              ),
+              _kpiCard('متوسط التقييم', '4.8', '+0.2', Colors.cyan, Icons.star),
             ],
           ),
           const SizedBox(height: 20),
-          const Text('رسم بياني للنمو',
-              style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold)),
+          const Text(
+            'رسم بياني للنمو',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 12),
           Container(
             height: 180,
@@ -162,21 +196,24 @@ class _GeneralTab extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.calendar_today,
-              color: Color(0xFFEF233C), size: 18),
+          const Icon(Icons.calendar_today, color: Color(0xFFEF233C), size: 18),
           const SizedBox(width: 10),
-          const Text('الفترة:',
-              style: TextStyle(color: Colors.white70, fontSize: 12)),
+          const Text(
+            'الفترة:',
+            style: TextStyle(color: Colors.white70, fontSize: 12),
+          ),
           const SizedBox(width: 8),
-          const Text('آخر 6 أشهر',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold)),
+          const Text(
+            'آخر 6 أشهر',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const Spacer(),
           IconButton(
-            icon: const Icon(Icons.arrow_drop_down,
-                color: Colors.white),
+            icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
             onPressed: () {},
           ),
         ],
@@ -184,8 +221,13 @@ class _GeneralTab extends StatelessWidget {
     );
   }
 
-  Widget _kpiCard(String title, String value, String change,
-      Color color, IconData icon) {
+  Widget _kpiCard(
+    String title,
+    String value,
+    String change,
+    Color color,
+    IconData icon,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -207,25 +249,32 @@ class _GeneralTab extends StatelessWidget {
                 child: Icon(icon, color: color, size: 16),
               ),
               const Spacer(),
-              Text(change,
-                  style: const TextStyle(
-                      color: Color(0xFF25D366),
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold)),
+              Text(
+                change,
+                style: const TextStyle(
+                  color: Color(0xFF25D366),
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
-          Text(value,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 2),
-          Text(title,
-              style: const TextStyle(
-                  color: Colors.white54, fontSize: 10),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis),
+          Text(
+            title,
+            style: const TextStyle(color: Colors.white54, fontSize: 10),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
@@ -235,9 +284,10 @@ class _GeneralTab extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Text('$value',
-            style: const TextStyle(
-                color: Colors.white38, fontSize: 9)),
+        Text(
+          '$value',
+          style: const TextStyle(color: Colors.white38, fontSize: 9),
+        ),
         const SizedBox(height: 4),
         Container(
           width: 28,
@@ -252,9 +302,7 @@ class _GeneralTab extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        Text(label,
-            style: const TextStyle(
-                color: Colors.white54, fontSize: 9)),
+        Text(label, style: const TextStyle(color: Colors.white54, fontSize: 9)),
       ],
     );
   }
@@ -295,40 +343,46 @@ class _SalesTab extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.trending_up,
-                        color: Colors.white70, size: 22),
+                    Icon(Icons.trending_up, color: Colors.white70, size: 22),
                     SizedBox(width: 8),
-                    Text('إجمالي المبيعات',
-                        style: TextStyle(
-                            color: Colors.white70, fontSize: 13)),
+                    Text(
+                      'إجمالي المبيعات',
+                      style: TextStyle(color: Colors.white70, fontSize: 13),
+                    ),
                   ],
                 ),
                 SizedBox(height: 10),
-                Text('2,400,000 YER',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold)),
+                Text(
+                  '2,400,000 YER',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(Icons.arrow_upward,
-                        color: Colors.white70, size: 14),
+                    Icon(Icons.arrow_upward, color: Colors.white70, size: 14),
                     SizedBox(width: 4),
-                    Text('+24% عن الفترة السابقة',
-                        style: TextStyle(
-                            color: Colors.white70, fontSize: 11)),
+                    Text(
+                      '+24% عن الفترة السابقة',
+                      style: TextStyle(color: Colors.white70, fontSize: 11),
+                    ),
                   ],
                 ),
               ],
             ),
           ),
           const SizedBox(height: 25),
-          const Text('المبيعات حسب القسم',
-              style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold)),
+          const Text(
+            'المبيعات حسب القسم',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 12),
           ...categories.map((c) => _categoryRow(c)),
         ],
@@ -351,21 +405,28 @@ class _SalesTab extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(c['name'],
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold)),
+                child: Text(
+                  c['name'],
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-              Text('${c['orders']} طلب',
-                  style: const TextStyle(
-                      color: Colors.white54, fontSize: 11)),
+              Text(
+                '${c['orders']} طلب',
+                style: const TextStyle(color: Colors.white54, fontSize: 11),
+              ),
               const SizedBox(width: 10),
-              Text('${c['revenue']} YER',
-                  style: const TextStyle(
-                      color: Color(0xFF25D366),
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold)),
+              Text(
+                '${c['revenue']} YER',
+                style: const TextStyle(
+                  color: Color(0xFF25D366),
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -376,7 +437,8 @@ class _SalesTab extends StatelessWidget {
               minHeight: 6,
               backgroundColor: Colors.white10,
               valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color(0xFFEF233C)),
+                Color(0xFFEF233C),
+              ),
             ),
           ),
         ],
@@ -401,13 +463,23 @@ class _UsersTab extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _userCard('العملاء', '12,450', '+8%',
-                    const Color(0xFFEF233C), Icons.people),
+                child: _userCard(
+                  'العملاء',
+                  '12,450',
+                  '+8%',
+                  const Color(0xFFEF233C),
+                  Icons.people,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _userCard('التجار', '142', '+5%',
-                    const Color(0xFF25D366), Icons.storefront),
+                child: _userCard(
+                  'التجار',
+                  '142',
+                  '+5%',
+                  const Color(0xFF25D366),
+                  Icons.storefront,
+                ),
               ),
             ],
           ),
@@ -415,22 +487,35 @@ class _UsersTab extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _userCard('المناديب', '85', '+12%',
-                    Colors.orange, Icons.delivery_dining),
+                child: _userCard(
+                  'المناديب',
+                  '85',
+                  '+12%',
+                  Colors.orange,
+                  Icons.delivery_dining,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _userCard('موظفو الأدمن', '5', 'ثابت',
-                    Colors.purple, Icons.admin_panel_settings),
+                child: _userCard(
+                  'موظفو الأدمن',
+                  '5',
+                  'ثابت',
+                  Colors.purple,
+                  Icons.admin_panel_settings,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 25),
-          const Text('نمو المستخدمين',
-              style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold)),
+          const Text(
+            'نمو المستخدمين',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(15),
@@ -441,21 +526,31 @@ class _UsersTab extends StatelessWidget {
             ),
             child: Column(
               children: [
-                _growthRow('هذا الشهر', '+485', '+8%',
-                    const Color(0xFF25D366)),
-                _growthRow('الشهر الماضي', '+412', '+6%',
-                    const Color(0xFF25D366)),
-                _growthRow('منذ 3 أشهر', '+380', '+5%',
-                    const Color(0xFF25D366)),
+                _growthRow('هذا الشهر', '+485', '+8%', const Color(0xFF25D366)),
+                _growthRow(
+                  'الشهر الماضي',
+                  '+412',
+                  '+6%',
+                  const Color(0xFF25D366),
+                ),
+                _growthRow(
+                  'منذ 3 أشهر',
+                  '+380',
+                  '+5%',
+                  const Color(0xFF25D366),
+                ),
               ],
             ),
           ),
           const SizedBox(height: 25),
-          const Text('أعلى المناطق',
-              style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold)),
+          const Text(
+            'أعلى المناطق',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 12),
           _regionRow('صنعاء', 5420, 0.42),
           _regionRow('عدن', 3150, 0.24),
@@ -467,8 +562,13 @@ class _UsersTab extends StatelessWidget {
     );
   }
 
-  Widget _userCard(String title, String value, String change,
-      Color color, IconData icon) {
+  Widget _userCard(
+    String title,
+    String value,
+    String change,
+    Color color,
+    IconData icon,
+  ) {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -488,24 +588,31 @@ class _UsersTab extends StatelessWidget {
             child: Icon(icon, color: color, size: 18),
           ),
           const SizedBox(height: 10),
-          Text(value,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 3),
           Row(
             children: [
               Expanded(
-                child: Text(title,
-                    style: const TextStyle(
-                        color: Colors.white54, fontSize: 10)),
+                child: Text(
+                  title,
+                  style: const TextStyle(color: Colors.white54, fontSize: 10),
+                ),
               ),
-              Text(change,
-                  style: const TextStyle(
-                      color: Color(0xFF25D366),
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold)),
+              Text(
+                change,
+                style: const TextStyle(
+                  color: Color(0xFF25D366),
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
         ],
@@ -513,35 +620,40 @@ class _UsersTab extends StatelessWidget {
     );
   }
 
-  Widget _growthRow(String period, String value, String change,
-      Color color) {
+  Widget _growthRow(String period, String value, String change, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
           Expanded(
-            child: Text(period,
-                style: const TextStyle(
-                    color: Colors.white70, fontSize: 12)),
+            child: Text(
+              period,
+              style: const TextStyle(color: Colors.white70, fontSize: 12),
+            ),
           ),
-          Text(value,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(width: 10),
           Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 8, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(6),
             ),
-            child: Text(change,
-                style: TextStyle(
-                    color: color,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold)),
+            child: Text(
+              change,
+              style: TextStyle(
+                color: color,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -563,15 +675,19 @@ class _UsersTab extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(name,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold)),
-              ),
-              Text('$users مستخدم',
+                child: Text(
+                  name,
                   style: const TextStyle(
-                      color: Colors.white54, fontSize: 11)),
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Text(
+                '$users مستخدم',
+                style: const TextStyle(color: Colors.white54, fontSize: 11),
+              ),
             ],
           ),
           const SizedBox(height: 6),
@@ -582,7 +698,8 @@ class _UsersTab extends StatelessWidget {
               minHeight: 5,
               backgroundColor: Colors.white10,
               valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color(0xFFD4AF37)),
+                Color(0xFFD4AF37),
+              ),
             ),
           ),
         ],
@@ -617,47 +734,64 @@ class _ProfitTab extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.diamond,
-                        color: Colors.white70, size: 22),
+                    Icon(Icons.diamond, color: Colors.white70, size: 22),
                     SizedBox(width: 8),
-                    Text('صافي أرباح المنصة',
-                        style: TextStyle(
-                            color: Colors.white70, fontSize: 13)),
+                    Text(
+                      'صافي أرباح المنصة',
+                      style: TextStyle(color: Colors.white70, fontSize: 13),
+                    ),
                   ],
                 ),
                 SizedBox(height: 10),
-                Text('360,000 YER',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold)),
+                Text(
+                  '360,000 YER',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 SizedBox(height: 8),
-                Text('+18% عن الشهر الماضي',
-                    style: TextStyle(
-                        color: Colors.white70, fontSize: 11)),
+                Text(
+                  '+18% عن الشهر الماضي',
+                  style: TextStyle(color: Colors.white70, fontSize: 11),
+                ),
               ],
             ),
           ),
           const SizedBox(height: 25),
-          const Text('تفصيل الأرباح',
-              style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold)),
+          const Text(
+            'تفصيل الأرباح',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 12),
-          _profitRow('عمولة المبيعات', '240,000 YER', 0.67,
-              const Color(0xFFEF233C)),
-          _profitRow('عمولة التوصيل', '72,000 YER', 0.20,
-              const Color(0xFF25D366)),
-          _profitRow('الإعلانات', '36,000 YER', 0.10,
-              const Color(0xFFD4AF37)),
+          _profitRow(
+            'عمولة المبيعات',
+            '240,000 YER',
+            0.67,
+            const Color(0xFFEF233C),
+          ),
+          _profitRow(
+            'عمولة التوصيل',
+            '72,000 YER',
+            0.20,
+            const Color(0xFF25D366),
+          ),
+          _profitRow('الإعلانات', '36,000 YER', 0.10, const Color(0xFFD4AF37)),
           _profitRow('الاشتراكات', '12,000 YER', 0.03, Colors.purple),
           const SizedBox(height: 25),
-          const Text('أعلى العملولات',
-              style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold)),
+          const Text(
+            'أعلى العملولات',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 12),
           _topRow('متجر الأناقة', '45,000', 1),
           _topRow('متجر الإلكترونيات', '38,000', 2),
@@ -669,8 +803,7 @@ class _ProfitTab extends StatelessWidget {
     );
   }
 
-  Widget _profitRow(String label, String value, double percent,
-      Color color) {
+  Widget _profitRow(String label, String value, double percent, Color color) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(15),
@@ -685,15 +818,19 @@ class _ProfitTab extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(label,
-                    style: const TextStyle(
-                        color: Colors.white, fontSize: 12)),
+                child: Text(
+                  label,
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
               ),
-              Text(value,
-                  style: TextStyle(
-                      color: color,
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold)),
+              Text(
+                value,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -707,9 +844,10 @@ class _ProfitTab extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text('${(percent * 100).toInt()}% من الإجمالي',
-              style: const TextStyle(
-                  color: Colors.white38, fontSize: 10)),
+          Text(
+            '${(percent * 100).toInt()}% من الإجمالي',
+            style: const TextStyle(color: Colors.white38, fontSize: 10),
+          ),
         ],
       ),
     );
@@ -746,24 +884,31 @@ class _ProfitTab extends StatelessWidget {
               border: Border.all(color: rankColor, width: 1.5),
             ),
             child: Center(
-              child: Text('#$rank',
-                  style: TextStyle(
-                      color: rankColor,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold)),
+              child: Text(
+                '#$rank',
+                style: TextStyle(
+                  color: rankColor,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(name,
-                style: const TextStyle(
-                    color: Colors.white, fontSize: 12)),
+            child: Text(
+              name,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+            ),
           ),
-          Text('$amount YER',
-              style: const TextStyle(
-                  color: Color(0xFF25D366),
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            '$amount YER',
+            style: const TextStyle(
+              color: Color(0xFF25D366),
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );

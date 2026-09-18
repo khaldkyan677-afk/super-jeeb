@@ -57,16 +57,22 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
       backgroundColor: const Color(0xFF2B0013),
       appBar: AppBar(
         backgroundColor: const Color(0xFF660F24),
-        title: const Text('إدارة الموظفين',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.bold)),
+        title: const Text(
+          'إدارة الموظفين',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_add,
-                color: Color(0xFF25D366), size: 24),
+            icon: const Icon(
+              Icons.person_add,
+              color: Color(0xFF25D366),
+              size: 24,
+            ),
             onPressed: () => _showHireDialog(),
           ),
         ],
@@ -78,31 +84,54 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
           children: [
             _statsBar(),
             const SizedBox(height: 20),
-            const Text('فريق العمل',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold)),
+            const Text(
+              'فريق العمل',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 12),
             ..._staff.map((s) => _staffCard(s)),
             const SizedBox(height: 20),
-            const Text('الأدوار والصلاحيات',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold)),
+            const Text(
+              'الأدوار والصلاحيات',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 12),
-            _roleCard('المالك العام', 'صلاحيات مطلقة', Colors.red,
-                Icons.shield, ['كل الصلاحيات']),
-            _roleCard('نائب آدمن', 'إدارة يومية',
-                const Color(0xFFD4AF37), Icons.admin_panel_settings,
-                ['قبول التجار', 'قبول المناديب', 'الرد على الشكاوى']),
-            _roleCard('مسؤول مالي', 'الشؤون المالية',
-                const Color(0xFF25D366), Icons.account_balance,
-                ['صرف المستحقات', 'التقارير المالية', 'إدارة المحافظ']),
-            _roleCard('مسؤول تنفيذي', 'المهام التنفيذية',
-                const Color(0xFF2196F3), Icons.work_outline,
-                ['متابعة الطلبات', 'الدعم الفني', 'المراقبة']),
+            _roleCard(
+              'المالك العام',
+              'صلاحيات مطلقة',
+              Colors.red,
+              Icons.shield,
+              ['كل الصلاحيات'],
+            ),
+            _roleCard(
+              'نائب آدمن',
+              'إدارة يومية',
+              const Color(0xFFD4AF37),
+              Icons.admin_panel_settings,
+              ['قبول التجار', 'قبول المناديب', 'الرد على الشكاوى'],
+            ),
+            _roleCard(
+              'مسؤول مالي',
+              'الشؤون المالية',
+              const Color(0xFF25D366),
+              Icons.account_balance,
+              ['صرف المستحقات', 'التقارير المالية', 'إدارة المحافظ'],
+            ),
+            _roleCard(
+              'مسؤول تنفيذي',
+              'المهام التنفيذية',
+              const Color(0xFF2196F3),
+              Icons.work_outline,
+              ['متابعة الطلبات', 'الدعم الفني', 'المراقبة'],
+            ),
           ],
         ),
       ),
@@ -119,20 +148,26 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
       ),
       child: Row(
         children: [
-          _stat('${_staff.length}', 'إجمالي', const Color(0xFFEF233C),
-              Icons.groups),
+          _stat(
+            '${_staff.length}',
+            'إجمالي',
+            const Color(0xFFEF233C),
+            Icons.groups,
+          ),
           Container(width: 1, height: 40, color: Colors.white10),
           _stat(
-              '${_staff.where((s) => s['status'] == 'active').length}',
-              'نشط',
-              const Color(0xFF25D366),
-              Icons.check_circle),
+            '${_staff.where((s) => s['status'] == 'active').length}',
+            'نشط',
+            const Color(0xFF25D366),
+            Icons.check_circle,
+          ),
           Container(width: 1, height: 40, color: Colors.white10),
           _stat(
-              '${_staff.where((s) => s['status'] == 'inactive').length}',
-              'موقوف',
-              Colors.orange,
-              Icons.pause_circle),
+            '${_staff.where((s) => s['status'] == 'inactive').length}',
+            'موقوف',
+            Colors.orange,
+            Icons.pause_circle,
+          ),
         ],
       ),
     );
@@ -144,15 +179,19 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
         children: [
           Icon(icon, color: color, size: 22),
           const SizedBox(height: 6),
-          Text(value,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 2),
-          Text(label,
-              style: const TextStyle(
-                  color: Colors.white54, fontSize: 10)),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white54, fontSize: 10),
+          ),
         ],
       ),
     );
@@ -169,7 +208,10 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
         color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-            color: isActive ? Colors.white10 : Colors.orange.withValues(alpha: 0.3)),
+          color: isActive
+              ? Colors.white10
+              : Colors.orange.withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         children: [
@@ -182,11 +224,14 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
               border: Border.all(color: roleColor, width: 1.5),
             ),
             child: Center(
-              child: Text(s['avatar'],
-                  style: TextStyle(
-                      color: roleColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold)),
+              child: Text(
+                s['avatar'],
+                style: TextStyle(
+                  color: roleColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -197,57 +242,69 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(s['name'],
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold)),
+                      child: Text(
+                        s['name'],
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     if (!isActive)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.orange.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Text('موقوف',
-                            style: TextStyle(
-                                color: Colors.orange,
-                                fontSize: 9,
-                                fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          'موقوف',
+                          style: TextStyle(
+                            color: Colors.orange,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(s['email'],
-                    style: const TextStyle(
-                        color: Colors.white54, fontSize: 10)),
+                Text(
+                  s['email'],
+                  style: const TextStyle(color: Colors.white54, fontSize: 10),
+                ),
                 const SizedBox(height: 5),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 3),
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: roleColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: Text(s['role'],
-                      style: TextStyle(
-                          color: roleColor,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold)),
+                  child: Text(
+                    s['role'],
+                    style: TextStyle(
+                      color: roleColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert,
-                color: Colors.white54, size: 20),
+            icon: const Icon(Icons.more_vert, color: Colors.white54, size: 20),
             color: const Color(0xFF2B0013),
             onSelected: (v) {
               if (v == 'toggle') {
-                setState(() => s['status'] =
-                    isActive ? 'inactive' : 'active');
+                setState(() => s['status'] = isActive ? 'inactive' : 'active');
               } else if (v == 'delete') {
                 _confirmDelete(s);
               } else if (v == 'permissions') {
@@ -259,11 +316,9 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
                 value: 'permissions',
                 child: Row(
                   children: [
-                    Icon(Icons.security,
-                        color: Colors.white, size: 18),
+                    Icon(Icons.security, color: Colors.white, size: 18),
                     SizedBox(width: 8),
-                    Text('الصلاحيات',
-                        style: TextStyle(color: Colors.white)),
+                    Text('الصلاحيات', style: TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
@@ -271,11 +326,9 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
                 value: 'toggle',
                 child: Row(
                   children: [
-                    Icon(Icons.toggle_on,
-                        color: Colors.white, size: 18),
+                    Icon(Icons.toggle_on, color: Colors.white, size: 18),
                     SizedBox(width: 8),
-                    Text('تفعيل/إيقاف',
-                        style: TextStyle(color: Colors.white)),
+                    Text('تفعيل/إيقاف', style: TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
@@ -283,12 +336,9 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
                 value: 'delete',
                 child: Row(
                   children: [
-                    Icon(Icons.delete,
-                        color: Color(0xFFEF233C), size: 18),
+                    Icon(Icons.delete, color: Color(0xFFEF233C), size: 18),
                     SizedBox(width: 8),
-                    Text('حذف',
-                        style: TextStyle(
-                            color: Color(0xFFEF233C))),
+                    Text('حذف', style: TextStyle(color: Color(0xFFEF233C))),
                   ],
                 ),
               ),
@@ -299,8 +349,13 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
     );
   }
 
-  Widget _roleCard(String title, String subtitle, Color color,
-      IconData icon, List<String> permissions) {
+  Widget _roleCard(
+    String title,
+    String subtitle,
+    Color color,
+    IconData icon,
+    List<String> permissions,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(15),
@@ -327,15 +382,22 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold)),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 3),
-                    Text(subtitle,
-                        style: const TextStyle(
-                            color: Colors.white54, fontSize: 11)),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 11,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -346,19 +408,26 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
             spacing: 6,
             runSpacing: 6,
             children: permissions
-                .map((p) => Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
+                .map(
+                  (p) => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      p,
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
                       ),
-                      child: Text(p,
-                          style: TextStyle(
-                              color: color,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600)),
-                    ))
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         ],
@@ -377,13 +446,16 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
         builder: (ctx, setS) => AlertDialog(
           backgroundColor: const Color(0xFF2B0013),
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20)),
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: const Row(
             children: [
               Icon(Icons.person_add, color: Color(0xFF25D366)),
               SizedBox(width: 8),
-              Text('توظيف موظف جديد',
-                  style: TextStyle(color: Colors.white, fontSize: 15)),
+              Text(
+                'توظيف موظف جديد',
+                style: TextStyle(color: Colors.white, fontSize: 15),
+              ),
             ],
           ),
           content: SingleChildScrollView(
@@ -397,8 +469,8 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
                     labelText: 'الاسم الكامل',
                     labelStyle: TextStyle(color: Colors.white60),
                     enabledBorder: UnderlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Colors.white24)),
+                      borderSide: BorderSide(color: Colors.white24),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 15),
@@ -409,28 +481,28 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
                     labelText: 'البريد الإلكتروني',
                     labelStyle: TextStyle(color: Colors.white60),
                     enabledBorder: UnderlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Colors.white24)),
+                      borderSide: BorderSide(color: Colors.white24),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 15),
                 DropdownButtonFormField<String>(
                   initialValue: role,
                   dropdownColor: const Color(0xFF2B0013),
-                  style: const TextStyle(
-                      color: Colors.white, fontSize: 12),
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
                   decoration: const InputDecoration(
                     labelText: 'الرتبة',
                     labelStyle: TextStyle(color: Colors.white60),
                     enabledBorder: UnderlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Colors.white24)),
+                      borderSide: BorderSide(color: Colors.white24),
+                    ),
                   ),
-                  items: ['نائب آدمن', 'مسؤول مالي', 'مسؤول تنفيذي',
-                          'مسؤول دعم']
-                      .map((r) =>
-                          DropdownMenuItem(value: r, child: Text(r)))
-                      .toList(),
+                  items:
+                      ['نائب آدمن', 'مسؤول مالي', 'مسؤول تنفيذي', 'مسؤول دعم']
+                          .map(
+                            (r) => DropdownMenuItem(value: r, child: Text(r)),
+                          )
+                          .toList(),
                   onChanged: (v) => setS(() => role = v!),
                 ),
               ],
@@ -439,12 +511,15 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('إلغاء',
-                  style: TextStyle(color: Colors.white60)),
+              child: const Text(
+                'إلغاء',
+                style: TextStyle(color: Colors.white60),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF25D366)),
+                backgroundColor: const Color(0xFF25D366),
+              ),
               onPressed: () {
                 if (nameCtrl.text.isEmpty) return;
                 setState(() {
@@ -465,12 +540,12 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                      content: Text('✅ تم توظيف الموظف بنجاح'),
-                      backgroundColor: Color(0xFF25D366)),
+                    content: Text('✅ تم توظيف الموظف بنجاح'),
+                    backgroundColor: Color(0xFF25D366),
+                  ),
                 );
               },
-              child: const Text('تثبيت',
-                  style: TextStyle(color: Colors.white)),
+              child: const Text('تثبيت', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -506,11 +581,14 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            Text('صلاحيات ${s['name']}',
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold)),
+            Text(
+              'صلاحيات ${s['name']}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 15),
             _permissionSwitch('قبول/رفض التجار', true),
             _permissionSwitch('قبول/رفض المناديب', true),
@@ -530,8 +608,10 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
       value: value,
       activeThumbColor: const Color(0xFF25D366),
       onChanged: (_) {},
-      title: Text(title,
-          style: const TextStyle(color: Colors.white, fontSize: 13)),
+      title: Text(
+        title,
+        style: const TextStyle(color: Colors.white, fontSize: 13),
+      ),
       contentPadding: EdgeInsets.zero,
     );
   }
@@ -541,27 +621,29 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF2B0013),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
-        title: const Text('حذف الموظف',
-            style: TextStyle(color: Colors.white, fontSize: 15)),
-        content: Text('هل تريد حذف ${s['name']}؟',
-            style: const TextStyle(color: Colors.white70)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'حذف الموظف',
+          style: TextStyle(color: Colors.white, fontSize: 15),
+        ),
+        content: Text(
+          'هل تريد حذف ${s['name']}؟',
+          style: const TextStyle(color: Colors.white70),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء',
-                style: TextStyle(color: Colors.white60)),
+            child: const Text('إلغاء', style: TextStyle(color: Colors.white60)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFEF233C)),
+              backgroundColor: const Color(0xFFEF233C),
+            ),
             onPressed: () {
               setState(() => _staff.remove(s));
               Navigator.pop(context);
             },
-            child: const Text('حذف',
-                style: TextStyle(color: Colors.white)),
+            child: const Text('حذف', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

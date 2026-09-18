@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -113,8 +114,9 @@ class SecurityService {
     rec.lastAttempt = DateTime.now();
 
     if (rec.count >= maxLoginAttempts) {
-      rec.lockedUntil =
-          DateTime.now().add(const Duration(minutes: lockDurationMinutes));
+      rec.lockedUntil = DateTime.now().add(
+        const Duration(minutes: lockDurationMinutes),
+      );
       debugPrint('🚫 $key مقفول لمدة $lockDurationMinutes دقيقة');
     }
 
@@ -126,7 +128,10 @@ class SecurityService {
   // ============================================================
   Map<String, dynamic> validatePassword(String password) {
     if (password.length < 8) {
-      return {'valid': false, 'error': 'كلمة السر يجب أن تكون 8 أحرف على الأقل'};
+      return {
+        'valid': false,
+        'error': 'كلمة السر يجب أن تكون 8 أحرف على الأقل',
+      };
     }
     if (!password.contains(RegExp(r'[A-Z]'))) {
       return {'valid': false, 'error': 'يجب أن تحتوي على حرف كبير واحد'};
@@ -223,7 +228,10 @@ class SecurityService {
       return {'valid': false, 'error': 'البريد المؤقت غير مدعوم'};
     }
     if (!isValidYemeniPhone(phone)) {
-      return {'valid': false, 'error': 'رقم الهاتف غير صحيح (يبدأ بـ 7، 9 أرقام)'};
+      return {
+        'valid': false,
+        'error': 'رقم الهاتف غير صحيح (يبدأ بـ 7، 9 أرقام)',
+      };
     }
     final passCheck = validatePassword(password);
     if (passCheck['valid'] == false) {
@@ -233,7 +241,10 @@ class SecurityService {
       return {'valid': false, 'error': 'هذا الجهاز محظور'};
     }
     if (isSuspiciousRegistration()) {
-      return {'valid': false, 'error': 'تم تسجيل حد أقصى من الحسابات من هذا الجهاز'};
+      return {
+        'valid': false,
+        'error': 'تم تسجيل حد أقصى من الحسابات من هذا الجهاز',
+      };
     }
     return {'valid': true};
   }

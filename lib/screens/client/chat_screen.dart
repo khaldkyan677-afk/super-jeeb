@@ -21,36 +21,16 @@ class _ChatScreenState extends State<ChatScreen> {
   final _scrollController = ScrollController();
 
   final List<Map<String, dynamic>> _messages = [
-    {
-      'text': 'السلام عليكم، أنا في طريقي إليك',
-      'me': false,
-      'time': '10:50 ص',
-    },
-    {
-      'text': 'وعليكم السلام، أنا في انتظارك',
-      'me': true,
-      'time': '10:51 ص',
-    },
-    {
-      'text': 'سأصل خلال 5 دقائق بإذن الله',
-      'me': false,
-      'time': '10:52 ص',
-    },
-    {
-      'text': 'تمام، في انتظارك',
-      'me': true,
-      'time': '10:52 ص',
-    },
+    {'text': 'السلام عليكم، أنا في طريقي إليك', 'me': false, 'time': '10:50 ص'},
+    {'text': 'وعليكم السلام، أنا في انتظارك', 'me': true, 'time': '10:51 ص'},
+    {'text': 'سأصل خلال 5 دقائق بإذن الله', 'me': false, 'time': '10:52 ص'},
+    {'text': 'تمام، في انتظارك', 'me': true, 'time': '10:52 ص'},
   ];
 
   void _sendMessage() {
     if (_msgController.text.trim().isEmpty) return;
     setState(() {
-      _messages.add({
-        'text': _msgController.text,
-        'me': true,
-        'time': _now(),
-      });
+      _messages.add({'text': _msgController.text, 'me': true, 'time': _now()});
     });
     _msgController.clear();
     Future.delayed(const Duration(milliseconds: 300), () {
@@ -98,14 +78,18 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(widget.name,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold)),
-                  const Text('متصل الآن',
-                      style: TextStyle(
-                          color: Color(0xFF25D366), fontSize: 10)),
+                  Text(
+                    widget.name,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Text(
+                    'متصل الآن',
+                    style: TextStyle(color: Color(0xFF25D366), fontSize: 10),
+                  ),
                 ],
               ),
             ),
@@ -117,8 +101,9 @@ class _ChatScreenState extends State<ChatScreen> {
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                    content: Text('📞 اتصال محمي'),
-                    backgroundColor: Color(0xFF25D366)),
+                  content: Text('📞 اتصال محمي'),
+                  backgroundColor: Color(0xFF25D366),
+                ),
               );
             },
           ),
@@ -142,12 +127,13 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.attach_file,
-                        color: Color(0xFFEF233C)),
+                    icon: const Icon(
+                      Icons.attach_file,
+                      color: Color(0xFFEF233C),
+                    ),
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('📎 إرفاق ملف')),
+                        const SnackBar(content: Text('📎 إرفاق ملف')),
                       );
                     },
                   ),
@@ -162,7 +148,9 @@ class _ChatScreenState extends State<ChatScreen> {
                         filled: true,
                         fillColor: const Color(0xFFF8F9FA),
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
+                          horizontal: 15,
+                          vertical: 10,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25),
                           borderSide: BorderSide.none,
@@ -175,8 +163,11 @@ class _ChatScreenState extends State<ChatScreen> {
                     radius: 22,
                     backgroundColor: const Color(0xFFEF233C),
                     child: IconButton(
-                      icon: const Icon(Icons.send,
-                          color: Colors.white, size: 20),
+                      icon: const Icon(
+                        Icons.send,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                       onPressed: _sendMessage,
                     ),
                   ),
@@ -195,8 +186,7 @@ class _ChatScreenState extends State<ChatScreen> {
       alignment: isMe ? Alignment.centerLeft : Alignment.centerRight,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(
-            horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
@@ -210,22 +200,30 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05), blurRadius: 5),
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 5,
+            ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(msg['text'],
-                style: TextStyle(
-                    color: isMe ? Colors.white : const Color(0xFF2B2D42),
-                    fontSize: 13,
-                    height: 1.4)),
+            Text(
+              msg['text'],
+              style: TextStyle(
+                color: isMe ? Colors.white : const Color(0xFF2B2D42),
+                fontSize: 13,
+                height: 1.4,
+              ),
+            ),
             const SizedBox(height: 4),
-            Text(msg['time'],
-                style: TextStyle(
-                    color: isMe ? Colors.white70 : Colors.grey,
-                    fontSize: 9)),
+            Text(
+              msg['time'],
+              style: TextStyle(
+                color: isMe ? Colors.white70 : Colors.grey,
+                fontSize: 9,
+              ),
+            ),
           ],
         ),
       ),

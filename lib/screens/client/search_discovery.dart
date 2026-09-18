@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'client_app.dart';
 
 class SearchDiscoveryScreen extends StatefulWidget {
@@ -30,11 +31,14 @@ class _SearchDiscoveryScreenState extends State<SearchDiscoveryScreen>
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2D42),
-        title: const Text('استكشف',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold)),
+        title: const Text(
+          'استكشف',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
         bottom: TabBar(
           controller: _tab,
@@ -43,7 +47,9 @@ class _SearchDiscoveryScreenState extends State<SearchDiscoveryScreen>
           unselectedLabelColor: Colors.white60,
           isScrollable: true,
           labelStyle: const TextStyle(
-              fontSize: 12, fontWeight: FontWeight.bold),
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
           tabs: const [
             Tab(text: 'الأقسام'),
             Tab(text: 'العروض'),
@@ -142,31 +148,34 @@ class _CategoriesTab extends StatelessWidget {
               borderRadius: BorderRadius.circular(15),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 8,
+                ),
               ],
             ),
             child: TextField(
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (_) => const SearchResultsScreen()),
+                MaterialPageRoute(builder: (_) => const SearchResultsScreen()),
               ),
               readOnly: true,
               decoration: const InputDecoration(
                 hintText: 'ابحث عن متجر أو منتج...',
                 hintStyle: TextStyle(fontSize: 13),
-                prefixIcon:
-                    Icon(Icons.search, color: Color(0xFFEF233C)),
+                prefixIcon: Icon(Icons.search, color: Color(0xFFEF233C)),
                 border: InputBorder.none,
               ),
             ),
           ),
           const SizedBox(height: 20),
-          const Text('تصفح الأقسام',
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2B2D42))),
+          const Text(
+            'تصفح الأقسام',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2B2D42),
+            ),
+          ),
           const SizedBox(height: 15),
           GridView.builder(
             shrinkWrap: true,
@@ -192,8 +201,7 @@ class _CategoriesTab extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
-          BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Column(
@@ -208,12 +216,15 @@ class _CategoriesTab extends StatelessWidget {
             child: Icon(cat['icon'] as IconData, color: color, size: 28),
           ),
           const SizedBox(height: 8),
-          Text(cat['name'],
-              style: const TextStyle(
-                  fontSize: 12, fontWeight: FontWeight.bold)),
+          Text(
+            cat['name'],
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 2),
-          Text('${cat['count']} متجر',
-              style: const TextStyle(fontSize: 10, color: Colors.grey)),
+          Text(
+            '${cat['count']} متجر',
+            style: const TextStyle(fontSize: 10, color: Colors.grey),
+          ),
         ],
       ),
     );
@@ -278,8 +289,7 @@ class _OffersTab extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
-          BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Column(
@@ -300,8 +310,11 @@ class _OffersTab extends StatelessWidget {
                 Positioned(
                   right: 20,
                   top: 20,
-                  child: Icon(o['image'] as IconData,
-                      color: Colors.white.withValues(alpha: 0.3), size: 100),
+                  child: Icon(
+                    o['image'] as IconData,
+                    color: Colors.white.withValues(alpha: 0.3),
+                    size: 100,
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(20),
@@ -311,27 +324,39 @@ class _OffersTab extends StatelessWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text('⏱️ ${o['expires']}',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold)),
+                        child: Text(
+                          '⏱️ ${o['expires']}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 10),
-                      Text(o['title'],
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold)),
+                      Text(
+                        o['title'],
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       const SizedBox(height: 4),
-                      Text(o['subtitle'],
-                          style: const TextStyle(
-                              color: Colors.white70, fontSize: 13)),
+                      Text(
+                        o['subtitle'],
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -342,29 +367,42 @@ class _OffersTab extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                const Icon(Icons.storefront,
-                    color: Color(0xFFEF233C), size: 18),
+                const Icon(
+                  Icons.storefront,
+                  color: Color(0xFFEF233C),
+                  size: 18,
+                ),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text(o['merchant'],
-                      style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w600)),
+                  child: Text(
+                    o['merchant'],
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: color,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 6),
+                      horizontal: 16,
+                      vertical: 6,
+                    ),
                     minimumSize: const Size(0, 32),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   onPressed: () {},
-                  child: const Text('استفد الآن',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    'استفد الآن',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -442,8 +480,7 @@ class _TopRatedTab extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
-          BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Row(
@@ -453,17 +490,18 @@ class _TopRatedTab extends StatelessWidget {
             width: 30,
             height: 30,
             decoration: BoxDecoration(
-              color: rank <= 3
-                  ? const Color(0xFFD4AF37)
-                  : Colors.grey.shade300,
+              color: rank <= 3 ? const Color(0xFFD4AF37) : Colors.grey.shade300,
               shape: BoxShape.circle,
             ),
             child: Center(
-              child: Text('#$rank',
-                  style: TextStyle(
-                      color: rank <= 3 ? Colors.white : Colors.black54,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold)),
+              child: Text(
+                '#$rank',
+                style: TextStyle(
+                  color: rank <= 3 ? Colors.white : Colors.black54,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -481,33 +519,41 @@ class _TopRatedTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(m['name'],
-                    style: const TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.bold)),
+                Text(
+                  m['name'],
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(m['category'],
-                    style: const TextStyle(
-                        fontSize: 11, color: Colors.grey)),
+                Text(
+                  m['category'],
+                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.star,
-                        color: Colors.amber, size: 14),
+                    const Icon(Icons.star, color: Colors.amber, size: 14),
                     const SizedBox(width: 3),
-                    Text('${m['rating']}',
-                        style: const TextStyle(
-                            fontSize: 11, fontWeight: FontWeight.bold)),
+                    Text(
+                      '${m['rating']}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(width: 6),
-                    Text('(${m['reviews']} تقييم)',
-                        style: const TextStyle(
-                            fontSize: 10, color: Colors.grey)),
+                    Text(
+                      '(${m['reviews']} تقييم)',
+                      style: const TextStyle(fontSize: 10, color: Colors.grey),
+                    ),
                   ],
                 ),
               ],
             ),
           ),
-          const Icon(Icons.arrow_forward_ios,
-              color: Colors.grey, size: 14),
+          const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 14),
         ],
       ),
     );
@@ -542,17 +588,19 @@ class _BrandsTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('تسوّق حسب الماركة',
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2B2D42))),
+          const Text(
+            'تسوّق حسب الماركة',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2B2D42),
+            ),
+          ),
           const SizedBox(height: 15),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate:
-                const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
@@ -572,19 +620,18 @@ class _BrandsTab extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
-          BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(b['icon'] as IconData,
-              color: const Color(0xFF2B2D42), size: 36),
+          Icon(b['icon'] as IconData, color: const Color(0xFF2B2D42), size: 36),
           const SizedBox(height: 8),
-          Text(b['name'],
-              style: const TextStyle(
-                  fontSize: 12, fontWeight: FontWeight.bold)),
+          Text(
+            b['name'],
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
@@ -607,12 +654,48 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   bool _filterOpen = false;
 
   final _products = [
-    {'name': 'قميص رجالي', 'price': 8000, 'rating': 4.8, 'merchant': 'متجر الأناقة', 'icon': Icons.checkroom},
-    {'name': 'بنطلون جينز', 'price': 12000, 'rating': 4.6, 'merchant': 'متجر الأناقة', 'icon': Icons.checkroom},
-    {'name': 'هاتف ذكي', 'price': 150000, 'rating': 4.9, 'merchant': 'متجر الإلكترونيات', 'icon': Icons.phone_android},
-    {'name': 'عطر فاخر', 'price': 12000, 'rating': 4.7, 'merchant': 'متجر العطور', 'icon': Icons.spa},
-    {'name': 'حقيبة نسائية', 'price': 18000, 'rating': 4.5, 'merchant': 'متجر الأناقة', 'icon': Icons.shopping_bag},
-    {'name': 'ساعة رقمية', 'price': 25000, 'rating': 4.4, 'merchant': 'متجر الإلكترونيات', 'icon': Icons.watch},
+    {
+      'name': 'قميص رجالي',
+      'price': 8000,
+      'rating': 4.8,
+      'merchant': 'متجر الأناقة',
+      'icon': Icons.checkroom,
+    },
+    {
+      'name': 'بنطلون جينز',
+      'price': 12000,
+      'rating': 4.6,
+      'merchant': 'متجر الأناقة',
+      'icon': Icons.checkroom,
+    },
+    {
+      'name': 'هاتف ذكي',
+      'price': 150000,
+      'rating': 4.9,
+      'merchant': 'متجر الإلكترونيات',
+      'icon': Icons.phone_android,
+    },
+    {
+      'name': 'عطر فاخر',
+      'price': 12000,
+      'rating': 4.7,
+      'merchant': 'متجر العطور',
+      'icon': Icons.spa,
+    },
+    {
+      'name': 'حقيبة نسائية',
+      'price': 18000,
+      'rating': 4.5,
+      'merchant': 'متجر الأناقة',
+      'icon': Icons.shopping_bag,
+    },
+    {
+      'name': 'ساعة رقمية',
+      'price': 25000,
+      'rating': 4.4,
+      'merchant': 'متجر الإلكترونيات',
+      'icon': Icons.watch,
+    },
   ];
 
   @override
@@ -635,10 +718,10 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
         actions: [
           IconButton(
             icon: Icon(
-                _filterOpen ? Icons.tune : Icons.tune_outlined,
-                color: Colors.white),
-            onPressed: () =>
-                setState(() => _filterOpen = !_filterOpen),
+              _filterOpen ? Icons.tune : Icons.tune_outlined,
+              color: Colors.white,
+            ),
+            onPressed: () => setState(() => _filterOpen = !_filterOpen),
           ),
         ],
       ),
@@ -649,8 +732,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(15),
-              gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
@@ -672,24 +754,27 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('الفئات',
-              style: TextStyle(
-                  fontSize: 12, fontWeight: FontWeight.bold)),
+          const Text(
+            'الفئات',
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             children: ['ملابس', 'إلكترونيات', 'عطور', 'منزل', 'صحة']
-                .map((c) => FilterChip(
-                      label: Text(c,
-                          style: const TextStyle(fontSize: 11)),
-                      onSelected: (_) {},
-                    ))
+                .map(
+                  (c) => FilterChip(
+                    label: Text(c, style: const TextStyle(fontSize: 11)),
+                    onSelected: (_) {},
+                  ),
+                )
                 .toList(),
           ),
           const SizedBox(height: 12),
-          const Text('نطاق السعر',
-              style: TextStyle(
-                  fontSize: 12, fontWeight: FontWeight.bold)),
+          const Text(
+            'نطاق السعر',
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -700,9 +785,12 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                     hintText: 'من',
                     hintStyle: const TextStyle(fontSize: 12),
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8),
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
               ),
@@ -717,9 +805,12 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                     hintText: 'إلى',
                     hintStyle: const TextStyle(fontSize: 12),
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8),
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
               ),
@@ -738,24 +829,32 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
         children: [
           const Icon(Icons.sort, color: Color(0xFFEF233C), size: 18),
           const SizedBox(width: 8),
-          const Text('الترتيب:',
-              style: TextStyle(fontSize: 12, color: Colors.grey)),
+          const Text(
+            'الترتيب:',
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
           const SizedBox(width: 8),
           DropdownButton<String>(
             value: _sortBy,
             underline: const SizedBox(),
             style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF2B2D42),
-                fontWeight: FontWeight.bold),
-            items: ['الأعلى تقييماً', 'الأقرب', 'الأقل سعراً', 'الأعلى سعراً']
-                .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                .toList(),
+              fontSize: 12,
+              color: Color(0xFF2B2D42),
+              fontWeight: FontWeight.bold,
+            ),
+            items: [
+              'الأعلى تقييماً',
+              'الأقرب',
+              'الأقل سعراً',
+              'الأعلى سعراً',
+            ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
             onChanged: (v) => setState(() => _sortBy = v!),
           ),
           const Spacer(),
-          Text('${_products.length} نتيجة',
-              style: const TextStyle(fontSize: 11, color: Colors.grey)),
+          Text(
+            '${_products.length} نتيجة',
+            style: const TextStyle(fontSize: 11, color: Colors.grey),
+          ),
         ],
       ),
     );
@@ -779,7 +878,9 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 8,
+            ),
           ],
         ),
         child: Column(
@@ -795,8 +896,11 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                   ),
                 ),
                 child: Center(
-                  child: Icon(p['icon'] as IconData,
-                      size: 60, color: const Color(0xFF2B2D42)),
+                  child: Icon(
+                    p['icon'] as IconData,
+                    size: 60,
+                    color: const Color(0xFF2B2D42),
+                  ),
                 ),
               ),
             ),
@@ -805,29 +909,38 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(p['name'],
-                      style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.ellipsis),
+                  Text(
+                    p['name'],
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   const SizedBox(height: 4),
-                  Text(p['merchant'],
-                      style: const TextStyle(
-                          fontSize: 10, color: Colors.grey),
-                      overflow: TextOverflow.ellipsis),
+                  Text(
+                    p['merchant'],
+                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.star,
-                          color: Colors.amber, size: 12),
+                      const Icon(Icons.star, color: Colors.amber, size: 12),
                       const SizedBox(width: 2),
-                      Text('${p['rating']}',
-                          style: const TextStyle(fontSize: 10)),
+                      Text(
+                        '${p['rating']}',
+                        style: const TextStyle(fontSize: 10),
+                      ),
                       const Spacer(),
-                      Text('${p['price']} YER',
-                          style: const TextStyle(
-                              color: Color(0xFFEF233C),
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold)),
+                      Text(
+                        '${p['price']} YER',
+                        style: const TextStyle(
+                          color: Color(0xFFEF233C),
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ],

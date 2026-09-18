@@ -22,13 +22,22 @@ class MerchantDelegateDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('التاريخ: ${now.year}-${now.month}-${now.day}', style: const TextStyle(fontSize: 18)),
+            Text(
+              'التاريخ: ${now.year}-${now.month}-${now.day}',
+              style: const TextStyle(fontSize: 18),
+            ),
             const SizedBox(height: 10),
-            Text('الوقت: ${now.hour}:${now.minute}', style: const TextStyle(fontSize: 18)),
+            Text(
+              'الوقت: ${now.hour}:${now.minute}',
+              style: const TextStyle(fontSize: 18),
+            ),
             const SizedBox(height: 10),
             Text('المدينة: $city', style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 10),
-            Text('المحافظة: $governorate', style: const TextStyle(fontSize: 18)),
+            Text(
+              'المحافظة: $governorate',
+              style: const TextStyle(fontSize: 18),
+            ),
           ],
         ),
       ),

@@ -102,11 +102,14 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
       backgroundColor: const Color(0xFF1B1C2A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2D42),
-        title: const Text('الطلبات',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.bold)),
+        title: const Text(
+          'الطلبات',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
         bottom: TabBar(
           controller: _tab,
@@ -114,7 +117,9 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white60,
           labelStyle: const TextStyle(
-              fontSize: 11, fontWeight: FontWeight.bold),
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+          ),
           tabs: [
             Tab(text: 'متاحة (${_available.length})'),
             Tab(text: 'جارية (${_active.length})'),
@@ -124,11 +129,7 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
       ),
       body: TabBarView(
         controller: _tab,
-        children: [
-          _availableList(),
-          _activeList(),
-          _completedList(),
-        ],
+        children: [_availableList(), _activeList(), _completedList()],
       ),
     );
   }
@@ -141,8 +142,10 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
           children: [
             Icon(Icons.search_off, size: 80, color: Colors.white24),
             SizedBox(height: 15),
-            Text('لا توجد طلبات متاحة',
-                style: TextStyle(color: Colors.white54, fontSize: 14)),
+            Text(
+              'لا توجد طلبات متاحة',
+              style: TextStyle(color: Colors.white54, fontSize: 14),
+            ),
           ],
         ),
       );
@@ -162,8 +165,9 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
         color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-            color: const Color(0xFF25D366).withValues(alpha: 0.3),
-            width: 1.5),
+          color: const Color(0xFF25D366).withValues(alpha: 0.3),
+          width: 1.5,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,55 +180,71 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
                   color: const Color(0xFF25D366).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.local_shipping,
-                    color: Color(0xFF25D366), size: 20),
+                child: const Icon(
+                  Icons.local_shipping,
+                  color: Color(0xFF25D366),
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(o['type'],
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold)),
+                    Text(
+                      o['type'],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 3),
-                    Text(o['time'],
-                        style: const TextStyle(
-                            color: Colors.white38, fontSize: 10)),
+                    Text(
+                      o['time'],
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 10,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              Text('${o['fee']} YER',
-                  style: const TextStyle(
-                      color: Color(0xFF25D366),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold)),
+              Text(
+                '${o['fee']} YER',
+                style: const TextStyle(
+                  color: Color(0xFF25D366),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           const Divider(color: Colors.white10, height: 20),
-          _routeRow(Icons.my_location, 'من', o['from'],
-              const Color(0xFF25D366)),
+          _routeRow(
+            Icons.my_location,
+            'من',
+            o['from'],
+            const Color(0xFF25D366),
+          ),
           const SizedBox(height: 6),
-          _routeRow(Icons.location_on, 'إلى', o['to'],
-              const Color(0xFFEF233C)),
+          _routeRow(Icons.location_on, 'إلى', o['to'], const Color(0xFFEF233C)),
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.straighten,
-                  color: Colors.white38, size: 12),
+              const Icon(Icons.straighten, color: Colors.white38, size: 12),
               const SizedBox(width: 4),
-              Text(o['distance'],
-                  style: const TextStyle(
-                      color: Colors.white54, fontSize: 11)),
+              Text(
+                o['distance'],
+                style: const TextStyle(color: Colors.white54, fontSize: 11),
+              ),
               const Spacer(),
-              const Icon(Icons.access_time,
-                  color: Colors.white38, size: 12),
+              const Icon(Icons.access_time, color: Colors.white38, size: 12),
               const SizedBox(width: 4),
-              const Text('التقدير: 15 د',
-                  style: TextStyle(
-                      color: Colors.white54, fontSize: 11)),
+              const Text(
+                'التقدير: 15 د',
+                style: TextStyle(color: Colors.white54, fontSize: 11),
+              ),
             ],
           ),
           const SizedBox(height: 15),
@@ -236,7 +256,8 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
                     backgroundColor: const Color(0xFF25D366),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   onPressed: () {
                     setState(() {
@@ -249,17 +270,20 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content: Text('✅ تم قبول الطلب'),
-                          backgroundColor: Color(0xFF25D366)),
+                        content: Text('✅ تم قبول الطلب'),
+                        backgroundColor: Color(0xFF25D366),
+                      ),
                     );
                   },
-                  icon: const Icon(Icons.check,
-                      color: Colors.white, size: 18),
-                  label: const Text('قبول',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold)),
+                  icon: const Icon(Icons.check, color: Colors.white, size: 18),
+                  label: const Text(
+                    'قبول',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
@@ -267,21 +291,26 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.white30),
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 12),
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
                 onPressed: () {
                   setState(() => _available.removeAt(i));
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                        content: Text('⏭️ تم تجاوز الطلب'),
-                        backgroundColor: Colors.orange),
+                      content: Text('⏭️ تم تجاوز الطلب'),
+                      backgroundColor: Colors.orange,
+                    ),
                   );
                 },
-                child: const Text('تجاوز',
-                    style: TextStyle(
-                        color: Colors.white70, fontSize: 12)),
+                child: const Text(
+                  'تجاوز',
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
               ),
             ],
           ),
@@ -298,8 +327,10 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
           children: [
             Icon(Icons.inbox, size: 80, color: Colors.white24),
             SizedBox(height: 15),
-            Text('لا توجد طلبات جارية',
-                style: TextStyle(color: Colors.white54, fontSize: 14)),
+            Text(
+              'لا توجد طلبات جارية',
+              style: TextStyle(color: Colors.white54, fontSize: 14),
+            ),
           ],
         ),
       );
@@ -319,8 +350,9 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
         color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-            color: const Color(0xFF25D366).withValues(alpha: 0.5),
-            width: 2),
+          color: const Color(0xFF25D366).withValues(alpha: 0.5),
+          width: 2,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,38 +365,52 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
                   color: const Color(0xFF25D366).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.local_shipping,
-                    color: Color(0xFF25D366), size: 20),
+                child: const Icon(
+                  Icons.local_shipping,
+                  color: Color(0xFF25D366),
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text('طلب #${o['id']}',
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold)),
+                child: Text(
+                  'طلب #${o['id']}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 4),
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: (o['statusColor'] as Color).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(o['status'],
-                    style: TextStyle(
-                        color: o['statusColor'] as Color,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold)),
+                child: Text(
+                  o['status'],
+                  style: TextStyle(
+                    color: o['statusColor'] as Color,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
           const Divider(color: Colors.white10, height: 20),
-          _routeRow(Icons.my_location, 'من', o['from'],
-              const Color(0xFF25D366)),
+          _routeRow(
+            Icons.my_location,
+            'من',
+            o['from'],
+            const Color(0xFF25D366),
+          ),
           const SizedBox(height: 6),
-          _routeRow(Icons.location_on, 'إلى', o['to'],
-              const Color(0xFFEF233C)),
+          _routeRow(Icons.location_on, 'إلى', o['to'], const Color(0xFFEF233C)),
           const SizedBox(height: 15),
           Row(
             children: [
@@ -374,7 +420,8 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
                     backgroundColor: const Color(0xFFEF233C),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   onPressed: () {
                     setState(() {
@@ -391,17 +438,24 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content: Text('🏁 تم إنهاء الرحلة'),
-                          backgroundColor: Color(0xFF25D366)),
+                        content: Text('🏁 تم إنهاء الرحلة'),
+                        backgroundColor: Color(0xFF25D366),
+                      ),
                     );
                   },
-                  icon: const Icon(Icons.check_circle,
-                      color: Colors.white, size: 18),
-                  label: const Text('إنهاء الرحلة',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold)),
+                  icon: const Icon(
+                    Icons.check_circle,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                  label: const Text(
+                    'إنهاء الرحلة',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -436,36 +490,47 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
               color: const Color(0xFF25D366).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.check_circle,
-                color: Color(0xFF25D366), size: 20),
+            child: const Icon(
+              Icons.check_circle,
+              color: Color(0xFF25D366),
+              size: 20,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('طلب #${o['id']}',
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold)),
+                Text(
+                  'طلب #${o['id']}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 3),
-                Text('${o['from']} → ${o['to']}',
-                    style: const TextStyle(
-                        color: Colors.white54, fontSize: 10),
-                    overflow: TextOverflow.ellipsis),
+                Text(
+                  '${o['from']} → ${o['to']}',
+                  style: const TextStyle(color: Colors.white54, fontSize: 10),
+                  overflow: TextOverflow.ellipsis,
+                ),
                 const SizedBox(height: 3),
-                Text(o['date'],
-                    style: const TextStyle(
-                        color: Colors.white38, fontSize: 10)),
+                Text(
+                  o['date'],
+                  style: const TextStyle(color: Colors.white38, fontSize: 10),
+                ),
               ],
             ),
           ),
-          Text('+${o['fee']}',
-              style: const TextStyle(
-                  color: Color(0xFF25D366),
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            '+${o['fee']}',
+            style: const TextStyle(
+              color: Color(0xFF25D366),
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
@@ -483,14 +548,16 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
           child: Icon(icon, color: color, size: 12),
         ),
         const SizedBox(width: 8),
-        Text('$label: ',
-            style: const TextStyle(
-                color: Colors.white38, fontSize: 11)),
+        Text(
+          '$label: ',
+          style: const TextStyle(color: Colors.white38, fontSize: 11),
+        ),
         Expanded(
-          child: Text(value,
-              style: const TextStyle(
-                  color: Colors.white70, fontSize: 12),
-              overflow: TextOverflow.ellipsis),
+          child: Text(
+            value,
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );

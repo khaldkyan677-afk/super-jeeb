@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:super_jeeb/widgets/password_field.dart';
 
 import '../../services/camera_service.dart';
 import 'driver_account.dart';
@@ -14,7 +13,8 @@ class DriverApp extends StatelessWidget {
     return MaterialApp(
       title: 'Super Jeeb Driver',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData( fontFamily: GoogleFonts.cairo().fontFamily, 
+      theme: ThemeData(
+        fontFamily: GoogleFonts.cairo().fontFamily,
         scaffoldBackgroundColor: const Color(0xFF1B1C2A),
         primaryColor: const Color(0xFF2B2D42),
         colorScheme: ColorScheme.fromSeed(
@@ -48,18 +48,21 @@ class _DriverSplashState extends State<DriverSplash>
     _c = AnimationController(vsync: this, duration: const Duration(seconds: 3));
     _moto = Tween<double>(begin: -150, end: 0).animate(
       CurvedAnimation(
-          parent: _c,
-          curve: const Interval(0, 0.6, curve: Curves.easeOut)),
+        parent: _c,
+        curve: const Interval(0, 0.6, curve: Curves.easeOut),
+      ),
     );
     _car = Tween<double>(begin: 400, end: 0).animate(
       CurvedAnimation(
-          parent: _c,
-          curve: const Interval(0, 0.6, curve: Curves.easeOut)),
+        parent: _c,
+        curve: const Interval(0, 0.6, curve: Curves.easeOut),
+      ),
     );
     _fade = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
-          parent: _c,
-          curve: const Interval(0.6, 1, curve: Curves.easeIn)),
+        parent: _c,
+        curve: const Interval(0.6, 1, curve: Curves.easeIn),
+      ),
     );
     _c.forward();
     _c.addListener(() {
@@ -67,8 +70,10 @@ class _DriverSplashState extends State<DriverSplash>
     });
     Future.delayed(const Duration(seconds: 4), () {
       if (mounted) {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (_) => const DriverLogin()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const DriverLogin()),
+        );
       }
     });
   }
@@ -91,14 +96,20 @@ class _DriverSplashState extends State<DriverSplash>
             Positioned(
               left: _moto.value == -150 ? -150 : (center + _moto.value),
               top: MediaQuery.of(context).size.height * 0.45,
-              child: const Icon(Icons.delivery_dining,
-                  color: Color(0xFFEF233C), size: 60),
+              child: const Icon(
+                Icons.delivery_dining,
+                color: Color(0xFFEF233C),
+                size: 60,
+              ),
             ),
             Positioned(
               left: _car.value,
               top: MediaQuery.of(context).size.height * 0.45,
-              child: const Icon(Icons.directions_car,
-                  color: Colors.white, size: 60),
+              child: const Icon(
+                Icons.directions_car,
+                color: Colors.white,
+                size: 60,
+              ),
             ),
           ],
           if (_merged)
@@ -110,17 +121,23 @@ class _DriverSplashState extends State<DriverSplash>
                   children: [
                     const SJLogo(size: 130),
                     const SizedBox(height: 25),
-                    const Text('سوبر جيب | رادار الكباتن',
-                        style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white)),
+                    const Text(
+                      'سوبر جيب | رادار الكباتن',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                     const SizedBox(height: 8),
-                    const Text('تحرّك.. الرزق يطلبك!',
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFFEF233C),
-                            fontWeight: FontWeight.w600)),
+                    const Text(
+                      'تحرّك.. الرزق يطلبك!',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFFEF233C),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -154,35 +171,46 @@ class _DriverLoginState extends State<DriverLogin> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20)),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
               child: const Center(
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Text('S',
-                        style: TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2B2D42))),
+                    Text(
+                      'S',
+                      style: TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2B2D42),
+                      ),
+                    ),
                     Positioned(
-                        right: 8,
-                        top: 8,
-                        child: Text('J',
-                            style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFEF233C)))),
+                      right: 8,
+                      top: 8,
+                      child: Text(
+                        'J',
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFEF233C),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 15),
-            const Text('Super Jeeb Driver',
-                style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white)),
+            const Text(
+              'Super Jeeb Driver',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
             const SizedBox(height: 25),
             Container(
               height: 110,
@@ -197,9 +225,10 @@ class _DriverLoginState extends State<DriverLogin> {
                 children: [
                   Icon(Icons.add_road, color: Color(0xFFEF233C), size: 36),
                   SizedBox(height: 8),
-                  Text('🚗 🛵 رادار الملاحة نشط',
-                      style: TextStyle(
-                          color: Colors.white70, fontSize: 12)),
+                  Text(
+                    '🚗 🛵 رادار الملاحة نشط',
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
                 ],
               ),
             ),
@@ -212,9 +241,11 @@ class _DriverLoginState extends State<DriverLogin> {
                 labelText: 'رقم الهاتف',
                 labelStyle: TextStyle(color: Colors.white70),
                 enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white30)),
+                  borderSide: BorderSide(color: Colors.white30),
+                ),
                 focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFEF233C))),
+                  borderSide: BorderSide(color: Color(0xFFEF233C)),
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -226,9 +257,11 @@ class _DriverLoginState extends State<DriverLogin> {
                 labelText: 'كلمة المرور',
                 labelStyle: TextStyle(color: Colors.white70),
                 enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white30)),
+                  borderSide: BorderSide(color: Colors.white30),
+                ),
                 focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFEF233C))),
+                  borderSide: BorderSide(color: Color(0xFFEF233C)),
+                ),
               ),
             ),
             const SizedBox(height: 40),
@@ -237,28 +270,32 @@ class _DriverLoginState extends State<DriverLogin> {
                 backgroundColor: const Color(0xFFEF233C),
                 minimumSize: const Size(double.infinity, 55),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
+                  borderRadius: BorderRadius.circular(15),
+                ),
               ),
               onPressed: () => Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                    builder: (_) => const DriverRadarDashboard()),
+                MaterialPageRoute(builder: (_) => const DriverRadarDashboard()),
               ),
-              child: const Text('تسجيل الدخول للرادار',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold)),
+              child: const Text(
+                'تسجيل الدخول للرادار',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             const SizedBox(height: 20),
             TextButton(
               onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => const DriverOnboarding())),
-              child: const Text('👋 انضم ككابتن جديد',
-                  style: TextStyle(
-                      color: Color(0xFFEF233C), fontSize: 14)),
+                context,
+                MaterialPageRoute(builder: (_) => const DriverOnboarding()),
+              ),
+              child: const Text(
+                '👋 انضم ككابتن جديد',
+                style: TextStyle(color: Color(0xFFEF233C), fontSize: 14),
+              ),
             ),
           ],
         ),
@@ -275,7 +312,7 @@ class DriverOnboarding extends StatefulWidget {
 
 class _DriverOnboardingState extends State<DriverOnboarding> {
   String _vehicle = 'دراجة نارية';
-  String? _d1, _d2, _d3, _d4;
+  String? _d1;
   final _vehicles = ['دراجة نارية', 'سيارة', 'باص فرزة', 'شاحنة صغيرة'];
 
   @override
@@ -284,11 +321,14 @@ class _DriverOnboardingState extends State<DriverOnboarding> {
       backgroundColor: const Color(0xFF1B1C2A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2D42),
-        title: const Text('طلب انضمام للكباتن',
-            style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16)),
+        title: const Text(
+          'طلب انضمام للكباتن',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
       ),
       body: SingleChildScrollView(
@@ -296,11 +336,14 @@ class _DriverOnboardingState extends State<DriverOnboarding> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('البيانات والوثائق',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white)),
+            const Text(
+              'البيانات والوثائق',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
             const SizedBox(height: 25),
             TextFormField(
               style: const TextStyle(color: Colors.white),
@@ -308,7 +351,8 @@ class _DriverOnboardingState extends State<DriverOnboarding> {
                 labelText: 'الاسم الرباعي الكامل',
                 labelStyle: TextStyle(color: Colors.white70),
                 enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white30)),
+                  borderSide: BorderSide(color: Colors.white30),
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -320,7 +364,8 @@ class _DriverOnboardingState extends State<DriverOnboarding> {
                 labelText: 'نوع المركبة',
                 labelStyle: TextStyle(color: Colors.white70),
                 enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white30)),
+                  borderSide: BorderSide(color: Colors.white30),
+                ),
               ),
               items: _vehicles
                   .map((v) => DropdownMenuItem(value: v, child: Text(v)))
@@ -328,11 +373,14 @@ class _DriverOnboardingState extends State<DriverOnboarding> {
               onChanged: (v) => setState(() => _vehicle = v!),
             ),
             const SizedBox(height: 30),
-            const Text('📸 الوثائق المطلوبة',
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white)),
+            const Text(
+              '📸 الوثائق المطلوبة',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
             const SizedBox(height: 15),
             GridView.count(
               crossAxisCount: 2,
@@ -372,15 +420,17 @@ class _DriverOnboardingState extends State<DriverOnboarding> {
               ),
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('✔️ جاري رفع وثائقك...')),
+                  const SnackBar(content: Text('✔️ جاري رفع وثائقك...')),
                 );
                 Navigator.pop(context);
               },
-              child: const Text('إرسال طلب الانضمام',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold)),
+              child: const Text(
+                'إرسال طلب الانضمام',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),
@@ -405,22 +455,26 @@ class _DriverRadarDashboardState extends State<DriverRadarDashboard> {
       backgroundColor: const Color(0xFF1B1C2A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2D42),
-        automaticallyImplyLeading: false,
-        title: const Text('رادار سوبر جيب',
-            style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16)),
+        automaticallyImplyLeading: true,
+        title: const Text(
+          'رادار سوبر جيب',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
         actions: [
           Row(
             children: [
-              Text(_online ? 'ONLINE' : 'OFFLINE',
-                  style: TextStyle(
-                      color: _online
-                          ? const Color(0xFF25D366)
-                          : Colors.grey,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 11)),
+              Text(
+                _online ? 'ONLINE' : 'OFFLINE',
+                style: TextStyle(
+                  color: _online ? const Color(0xFF25D366) : Colors.grey,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
+              ),
               Switch(
                 value: _online,
                 activeThumbColor: const Color(0xFF25D366),
@@ -428,9 +482,10 @@ class _DriverRadarDashboardState extends State<DriverRadarDashboard> {
                   setState(() => _online = v);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                        content: Text(v
-                            ? '🟩 تم تفعيل بث الـ GPS'
-                            : '🟥 تم إيقاف الاستقبال')),
+                      content: Text(
+                        v ? '🟩 تم تفعيل بث الـ GPS' : '🟥 تم إيقاف الاستقبال',
+                      ),
+                    ),
                   );
                 },
               ),
@@ -438,8 +493,10 @@ class _DriverRadarDashboardState extends State<DriverRadarDashboard> {
           ),
           IconButton(
             icon: const Icon(Icons.person, color: Colors.white),
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const DriverAccount())),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DriverAccount()),
+            ),
           ),
         ],
       ),
@@ -463,17 +520,18 @@ class _DriverRadarDashboardState extends State<DriverRadarDashboard> {
                               ? const Color(0xFFEF233C).withValues(alpha: 0.05)
                               : Colors.white.withValues(alpha: 0.02),
                           border: Border.all(
-                              color: _online
-                                  ? const Color(0xFFEF233C)
-                                  : Colors.white24,
-                              width: 2),
+                            color: _online
+                                ? const Color(0xFFEF233C)
+                                : Colors.white24,
+                            width: 2,
+                          ),
                         ),
                       ),
-                      Icon(Icons.radar,
-                          color: _online
-                              ? const Color(0xFFEF233C)
-                              : Colors.grey,
-                          size: 60),
+                      Icon(
+                        Icons.radar,
+                        color: _online ? const Color(0xFFEF233C) : Colors.grey,
+                        size: 60,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 25),
@@ -481,8 +539,7 @@ class _DriverRadarDashboardState extends State<DriverRadarDashboard> {
                     _online
                         ? '📡 جاري البحث عن طلبات...'
                         : '💤 فعّل المفتاح لبدء الاستقبال',
-                    style: const TextStyle(
-                        color: Colors.white70, fontSize: 13),
+                    style: const TextStyle(color: Colors.white70, fontSize: 13),
                   ),
                   const SizedBox(height: 30),
                   if (_online)
@@ -490,16 +547,22 @@ class _DriverRadarDashboardState extends State<DriverRadarDashboard> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFEF233C),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 30, vertical: 15),
+                          horizontal: 30,
+                          vertical: 15,
+                        ),
                       ),
                       onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => DriverActiveTrip(
-                                  serviceType: _service))),
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              DriverActiveTrip(serviceType: _service),
+                        ),
+                      ),
                       icon: const Icon(Icons.play_arrow, color: Colors.white),
-                      label: const Text('استلام طلب',
-                          style: TextStyle(color: Colors.white)),
+                      label: const Text(
+                        'استلام طلب',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                 ],
               ),
@@ -507,8 +570,7 @@ class _DriverRadarDashboardState extends State<DriverRadarDashboard> {
           ),
           if (_online)
             Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20, vertical: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               decoration: const BoxDecoration(
                 color: Color(0xFF2B2D42),
                 borderRadius: BorderRadius.only(
@@ -518,11 +580,14 @@ class _DriverRadarDashboardState extends State<DriverRadarDashboard> {
               ),
               child: Column(
                 children: [
-                  const Text('🎛️ اختر نوع الخدمة',
-                      style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold)),
+                  const Text(
+                    '🎛️ اختر نوع الخدمة',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -554,18 +619,21 @@ class _DriverRadarDashboardState extends State<DriverRadarDashboard> {
                 : Colors.white.withValues(alpha: 0.02),
             borderRadius: BorderRadius.circular(15),
             border: Border.all(
-                color: sel ? const Color(0xFFEF233C) : Colors.white12),
+              color: sel ? const Color(0xFFEF233C) : Colors.white12,
+            ),
           ),
           child: Column(
             children: [
-              Icon(icon,
-                  color: sel ? Colors.white : Colors.white70, size: 24),
+              Icon(icon, color: sel ? Colors.white : Colors.white70, size: 24),
               const SizedBox(height: 6),
-              Text(label,
-                  style: TextStyle(
-                      color: sel ? Colors.white : Colors.white70,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600)),
+              Text(
+                label,
+                style: TextStyle(
+                  color: sel ? Colors.white : Colors.white70,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
         ),
@@ -596,11 +664,18 @@ class _DriverActiveTripState extends State<DriverActiveTrip> {
       backgroundColor: const Color(0xFF1B1C2A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2D42),
-        title: Text(isCargo ? 'رحلة طرود' : isFrazah ? 'رحلة فرزة' : 'رحلة تاكسي',
-            style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14)),
+        title: Text(
+          isCargo
+              ? 'رحلة طرود'
+              : isFrazah
+              ? 'رحلة فرزة'
+              : 'رحلة تاكسي',
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
         leading: const BackButton(color: Colors.white),
         actions: [
           IconButton(
@@ -632,15 +707,19 @@ class _DriverActiveTripState extends State<DriverActiveTrip> {
                       children: [
                         Icon(Icons.map, color: Colors.white24, size: 80),
                         SizedBox(height: 10),
-                        Text('📍 خريطة الملاحة حية',
-                            style: TextStyle(
-                                color: Colors.white30, fontSize: 12)),
+                        Text(
+                          '📍 خريطة الملاحة حية',
+                          style: TextStyle(color: Colors.white30, fontSize: 12),
+                        ),
                         SizedBox(height: 5),
-                        Text('⬛⬛⬛⬛ الخط الملاحي نشط ⬛⬛⬛⬛',
-                            style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold)),
+                        Text(
+                          '⬛⬛⬛⬛ الخط الملاحي نشط ⬛⬛⬛⬛',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -665,23 +744,33 @@ class _DriverActiveTripState extends State<DriverActiveTrip> {
                   children: [
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2B2D42)),
+                        backgroundColor: const Color(0xFF2B2D42),
+                      ),
                       onPressed: () {},
-                      icon: const Icon(Icons.phone,
-                          color: Colors.white, size: 18),
-                      label: const Text('اتصال محمي',
-                          style: TextStyle(
-                              color: Colors.white, fontSize: 11)),
+                      icon: const Icon(
+                        Icons.phone,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                      label: const Text(
+                        'اتصال محمي',
+                        style: TextStyle(color: Colors.white, fontSize: 11),
+                      ),
                     ),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2B2D42)),
+                        backgroundColor: const Color(0xFF2B2D42),
+                      ),
                       onPressed: () {},
-                      icon: const Icon(Icons.chat,
-                          color: Colors.white, size: 18),
-                      label: const Text('دردشة',
-                          style: TextStyle(
-                              color: Colors.white, fontSize: 11)),
+                      icon: const Icon(
+                        Icons.chat,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                      label: const Text(
+                        'دردشة',
+                        style: TextStyle(color: Colors.white, fontSize: 11),
+                      ),
                     ),
                   ],
                 ),
@@ -694,8 +783,10 @@ class _DriverActiveTripState extends State<DriverActiveTrip> {
                     decoration: InputDecoration(
                       labelText: 'كود التحقق OTP',
                       suffixIcon: IconButton(
-                        icon: const Icon(Icons.qr_code_scanner,
-                            color: Color(0xFFEF233C)),
+                        icon: const Icon(
+                          Icons.qr_code_scanner,
+                          color: Color(0xFFEF233C),
+                        ),
                         onPressed: () {},
                       ),
                       border: const OutlineInputBorder(),
@@ -724,14 +815,20 @@ class _DriverActiveTripState extends State<DriverActiveTrip> {
                     ),
                     child: const Row(
                       children: [
-                        Icon(Icons.airport_shuttle,
-                            color: Colors.orange, size: 20),
+                        Icon(
+                          Icons.airport_shuttle,
+                          color: Colors.orange,
+                          size: 20,
+                        ),
                         SizedBox(width: 8),
-                        Text('رحلة بين المحافظات',
-                            style: TextStyle(
-                                color: Colors.orange,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)),
+                        Text(
+                          'رحلة بين المحافظات',
+                          style: TextStyle(
+                            color: Colors.orange,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -759,15 +856,19 @@ class _DriverActiveTripState extends State<DriverActiveTrip> {
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text('🏁 تم إنهاء الرحلة بنجاح'),
-                            backgroundColor: Color(0xFF25D366)),
+                          content: Text('🏁 تم إنهاء الرحلة بنجاح'),
+                          backgroundColor: Color(0xFF25D366),
+                        ),
                       );
                       Navigator.pop(context);
                     },
-                    child: const Text('🏁 إنهاء الرحلة',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      '🏁 إنهاء الرحلة',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],
