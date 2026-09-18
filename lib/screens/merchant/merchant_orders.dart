@@ -12,7 +12,7 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tab;
 
-  final _newOrders = [
+  final List<Map<String, dynamic>> _newOrders = [
     {
       'id': '5021',
       'customer': 'خالد أحمد',
@@ -35,7 +35,7 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
     },
   ];
 
-  final _preparingOrders = [
+  final List<Map<String, dynamic>> _preparingOrders = [
     {
       'id': '5018',
       'customer': 'أحمد علي',
@@ -48,7 +48,7 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
     },
   ];
 
-  final _doneOrders = [
+  final List<Map<String, dynamic>> _doneOrders = [
     {
       'id': '5015',
       'customer': 'فاطمة س.',
@@ -179,11 +179,11 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
           color: status == 'new'
-              ? Colors.orange.withOpacity(0.5)
+              ? Colors.orange.withValues(alpha: 0.5)
               : Colors.white10,
           width: status == 'new' ? 1.5 : 1,
         ),
@@ -196,7 +196,7 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(statusIcon, color: color, size: 20),
@@ -222,7 +222,7 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
                 padding: const EdgeInsets.symmetric(
                     horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(statusText,

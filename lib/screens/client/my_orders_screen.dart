@@ -162,7 +162,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.05), blurRadius: 8),
+                color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
           ],
         ),
         child: Column(
@@ -183,7 +183,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
                   padding: const EdgeInsets.symmetric(
                       horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
+                    color: color.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(

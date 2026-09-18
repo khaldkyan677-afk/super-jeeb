@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:super_jeeb/widgets/password_field.dart';
+
 import '../../services/camera_service.dart';
-import 'driver_orders.dart';
-import 'driver_earnings.dart';
 import 'driver_account.dart';
 import '../../widgets/sj_logo.dart';
 
@@ -13,7 +14,7 @@ class DriverApp extends StatelessWidget {
     return MaterialApp(
       title: 'Super Jeeb Driver',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
+      theme: ThemeData( fontFamily: GoogleFonts.cairo().fontFamily, 
         scaffoldBackgroundColor: const Color(0xFF1B1C2A),
         primaryColor: const Color(0xFF2B2D42),
         colorScheme: ColorScheme.fromSeed(
@@ -187,7 +188,7 @@ class _DriverLoginState extends State<DriverLogin> {
               height: 110,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.03),
+                color: Colors.white.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(color: Colors.white10),
               ),
@@ -312,7 +313,7 @@ class _DriverOnboardingState extends State<DriverOnboarding> {
             ),
             const SizedBox(height: 20),
             DropdownButtonFormField<String>(
-              value: _vehicle,
+              initialValue: _vehicle,
               dropdownColor: const Color(0xFF2B2D42),
               style: const TextStyle(color: Colors.white, fontSize: 13),
               decoration: const InputDecoration(
@@ -422,7 +423,7 @@ class _DriverRadarDashboardState extends State<DriverRadarDashboard> {
                       fontSize: 11)),
               Switch(
                 value: _online,
-                activeColor: const Color(0xFF25D366),
+                activeThumbColor: const Color(0xFF25D366),
                 onChanged: (v) {
                   setState(() => _online = v);
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -459,8 +460,8 @@ class _DriverRadarDashboardState extends State<DriverRadarDashboard> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: _online
-                              ? const Color(0xFFEF233C).withOpacity(0.05)
-                              : Colors.white.withOpacity(0.02),
+                              ? const Color(0xFFEF233C).withValues(alpha: 0.05)
+                              : Colors.white.withValues(alpha: 0.02),
                           border: Border.all(
                               color: _online
                                   ? const Color(0xFFEF233C)
@@ -550,7 +551,7 @@ class _DriverRadarDashboardState extends State<DriverRadarDashboard> {
           decoration: BoxDecoration(
             color: sel
                 ? const Color(0xFFEF233C)
-                : Colors.white.withOpacity(0.02),
+                : Colors.white.withValues(alpha: 0.02),
             borderRadius: BorderRadius.circular(15),
             border: Border.all(
                 color: sel ? const Color(0xFFEF233C) : Colors.white12),
@@ -622,7 +623,7 @@ class _DriverActiveTripState extends State<DriverActiveTrip> {
               child: Container(
                 width: double.infinity,
                 height: 300,
-                color: const Color(0xFF2B2D42).withOpacity(0.3),
+                color: const Color(0xFF2B2D42).withValues(alpha: 0.3),
                 child: const Stack(
                   alignment: Alignment.center,
                   children: [
@@ -717,7 +718,7 @@ class _DriverActiveTripState extends State<DriverActiveTrip> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
+                      color: Colors.orange.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: Colors.orange),
                     ),

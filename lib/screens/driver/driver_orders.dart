@@ -159,10 +159,10 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-            color: const Color(0xFF25D366).withOpacity(0.3),
+            color: const Color(0xFF25D366).withValues(alpha: 0.3),
             width: 1.5),
       ),
       child: Column(
@@ -173,7 +173,7 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF25D366).withOpacity(0.15),
+                  color: const Color(0xFF25D366).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.local_shipping,
@@ -316,10 +316,10 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-            color: const Color(0xFF25D366).withOpacity(0.5),
+            color: const Color(0xFF25D366).withValues(alpha: 0.5),
             width: 2),
       ),
       child: Column(
@@ -330,7 +330,7 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF25D366).withOpacity(0.15),
+                  color: const Color(0xFF25D366).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.local_shipping,
@@ -348,7 +348,7 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
                 padding: const EdgeInsets.symmetric(
                     horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: (o['statusColor'] as Color).withOpacity(0.15),
+                  color: (o['statusColor'] as Color).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(o['status'],
@@ -424,7 +424,7 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.white10),
       ),
@@ -433,7 +433,7 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFF25D366).withOpacity(0.1),
+              color: const Color(0xFF25D366).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(Icons.check_circle,
@@ -477,7 +477,7 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
         Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.15),
+            color: color.withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: color, size: 12),

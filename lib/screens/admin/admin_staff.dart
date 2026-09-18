@@ -113,7 +113,7 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.white10),
       ),
@@ -166,10 +166,10 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-            color: isActive ? Colors.white10 : Colors.orange.withOpacity(0.3)),
+            color: isActive ? Colors.white10 : Colors.orange.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -177,7 +177,7 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: roleColor.withOpacity(0.15),
+              color: roleColor.withValues(alpha: 0.15),
               shape: BoxShape.circle,
               border: Border.all(color: roleColor, width: 1.5),
             ),
@@ -208,7 +208,7 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.orange.withOpacity(0.15),
+                          color: Colors.orange.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Text('موقوف',
@@ -228,7 +228,7 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: roleColor.withOpacity(0.15),
+                    color: roleColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(s['role'],
@@ -305,9 +305,9 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,7 +317,7 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 22),
@@ -350,7 +350,7 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.1),
+                        color: color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(p,
@@ -415,7 +415,7 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
                 ),
                 const SizedBox(height: 15),
                 DropdownButtonFormField<String>(
-                  value: role,
+                  initialValue: role,
                   dropdownColor: const Color(0xFF2B0013),
                   style: const TextStyle(
                       color: Colors.white, fontSize: 12),
@@ -528,7 +528,7 @@ class _AdminStaffScreenState extends State<AdminStaffScreen> {
   Widget _permissionSwitch(String title, bool value) {
     return SwitchListTile(
       value: value,
-      activeColor: const Color(0xFF25D366),
+      activeThumbColor: const Color(0xFF25D366),
       onChanged: (_) {},
       title: Text(title,
           style: const TextStyle(color: Colors.white, fontSize: 13)),

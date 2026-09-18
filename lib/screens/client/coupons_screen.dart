@@ -76,7 +76,7 @@ class _CouponsScreenState extends State<CouponsScreen> {
                 borderRadius: BorderRadius.circular(15),
                 boxShadow: [
                   BoxShadow(
-                      color: Colors.black.withOpacity(0.05), blurRadius: 8),
+                      color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
                 ],
               ),
               child: Column(
@@ -158,7 +158,7 @@ class _CouponsScreenState extends State<CouponsScreen> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05), blurRadius: 8),
+              color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Row(
@@ -170,7 +170,7 @@ class _CouponsScreenState extends State<CouponsScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [color, color.withOpacity(0.7)],
+                colors: [color, color.withValues(alpha: 0.7)],
               ),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(15),
@@ -220,7 +220,7 @@ class _CouponsScreenState extends State<CouponsScreen> {
                             color: const Color(0xFFF8F9FA),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                                color: color.withOpacity(0.3)),
+                                color: color.withValues(alpha: 0.3)),
                           ),
                           child: Text(c['code'],
                               style: TextStyle(

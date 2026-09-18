@@ -29,12 +29,12 @@ class SJLogo extends StatelessWidget {
         boxShadow: withShadow
             ? [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: size * 0.15,
                   offset: Offset(0, size * 0.05),
                 ),
                 BoxShadow(
-                  color: const Color(0xFFEF233C).withOpacity(0.15),
+                  color: const Color(0xFFEF233C).withValues(alpha: 0.15),
                   blurRadius: size * 0.25,
                   spreadRadius: size * 0.02,
                 ),
@@ -107,13 +107,13 @@ class StoreAvatar extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            color.withOpacity(0.15),
-            color.withOpacity(0.05),
+            color.withValues(alpha: 0.15),
+            color.withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(size * 0.25),
         border: Border.all(
-          color: color.withOpacity(0.2),
+          color: color.withValues(alpha: 0.2),
           width: 1.5,
         ),
       ),

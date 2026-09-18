@@ -111,7 +111,7 @@ class SJCard extends StatelessWidget {
     final card = Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: color ?? Colors.white.withOpacity(0.02),
+        color: color ?? Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(radius ?? 15),
         border: Border.all(color: borderColor ?? Colors.white10),
       ),
@@ -177,15 +177,15 @@ class SJTextField extends StatelessWidget {
         labelText: label,
         hintText: hint,
         labelStyle: TextStyle(
-            color: textColor.withOpacity(0.5), fontSize: 13),
+            color: textColor.withValues(alpha: 0.5), fontSize: 13),
         hintStyle:
-            TextStyle(color: textColor.withOpacity(0.3), fontSize: 13),
+            TextStyle(color: textColor.withValues(alpha: 0.3), fontSize: 13),
         prefixIcon: icon != null
             ? Icon(icon, color: accent, size: 20)
             : null,
         filled: true,
         fillColor: darkMode
-            ? Colors.white.withOpacity(0.03)
+            ? Colors.white.withValues(alpha: 0.03)
             : Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
@@ -545,7 +545,7 @@ class SJStatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.white10),
       ),
@@ -557,7 +557,7 @@ class SJStatCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: color, size: 18),
@@ -571,7 +571,7 @@ class SJStatCard extends StatelessWidget {
                     color: (positive
                             ? const Color(0xFF25D366)
                             : const Color(0xFFEF233C))
-                        .withOpacity(0.15),
+                        .withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(change!,
@@ -672,9 +672,9 @@ class SJBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

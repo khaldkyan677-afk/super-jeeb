@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/settings_service.dart';
-import '../../widgets/sj_logo.dart';
+import 'package:super_jeeb/widgets/password_field.dart';
 import 'settings_screen.dart';
 import 'notifications_screen.dart';
 import 'favorites_screen.dart';
@@ -106,7 +105,7 @@ class AccountHubScreen extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text('حساب موثق',
                     style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                         fontSize: 12)),
               ],
             ),
@@ -158,10 +157,10 @@ class AccountHubScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05), blurRadius: 8),
+              color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Column(
@@ -169,7 +168,7 @@ class AccountHubScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 26),
@@ -196,7 +195,7 @@ class AccountHubScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05), blurRadius: 8),
+              color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Row(
@@ -255,7 +254,7 @@ class AccountHubScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.03), blurRadius: 5),
+              color: Colors.black.withValues(alpha: 0.03), blurRadius: 5),
         ],
       ),
       child: ListTile(
@@ -263,7 +262,7 @@ class AccountHubScreen extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: (color ?? const Color(0xFFEF233C)).withOpacity(0.1),
+            color: (color ?? const Color(0xFFEF233C)).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon,
@@ -548,7 +547,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFFEF233C).withOpacity(0.1),
+            color: const Color(0xFFEF233C).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: const Color(0xFFEF233C), size: 22),
@@ -563,7 +562,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: (statusColor ?? Colors.grey).withOpacity(0.15),
+                  color: (statusColor ?? Colors.grey).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(status,
@@ -590,7 +589,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFF25D366).withOpacity(0.1),
+            color: const Color(0xFF25D366).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: const Color(0xFF25D366), size: 22),
@@ -602,7 +601,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
             style: const TextStyle(fontSize: 11, color: Colors.grey)),
         trailing: Switch(
           value: value,
-          activeColor: const Color(0xFF25D366),
+          activeThumbColor: const Color(0xFF25D366),
           onChanged: onChanged,
         ),
       ),
@@ -643,25 +642,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
                   style: TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
-              TextField(
-                controller: oldPass,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'كلمة السر الحالية',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
+              PasswordField(controller: oldPass, labelText: 'كلمة المرور الحالية'),
               const SizedBox(height: 15),
-              TextField(
-                controller: newPass,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'كلمة السر الجديدة',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
+              PasswordField(controller: newPass, labelText: 'كلمة المرور الجديدة'),
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
@@ -754,7 +737,7 @@ class DevicesScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF2B2D42).withOpacity(0.1),
+              color: const Color(0xFF2B2D42).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -785,7 +768,7 @@ class DevicesScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF25D366).withOpacity(0.15),
+                          color: const Color(0xFF25D366).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Text('هذا الجهاز',

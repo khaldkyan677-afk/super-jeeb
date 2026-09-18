@@ -10,7 +10,7 @@ class OrderTrackingScreen extends StatefulWidget {
 }
 
 class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
-  int _currentStep = 2;
+  final int _currentStep = 2;
 
   final _steps = [
     {
@@ -59,7 +59,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             Container(
               height: 220,
               width: double.infinity,
-              color: const Color(0xFF2B2D42).withOpacity(0.05),
+              color: const Color(0xFF2B2D42).withValues(alpha: 0.05),
               child: const Stack(
                 alignment: Alignment.center,
                 children: [
@@ -92,7 +92,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 8),
                   ],
                 ),
@@ -164,7 +164,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 8),
                   ],
                 ),
@@ -196,10 +196,10 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF25D366).withOpacity(0.08),
+                  color: const Color(0xFF25D366).withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(15),
                   border: Border.all(
-                      color: const Color(0xFF25D366).withOpacity(0.3)),
+                      color: const Color(0xFF25D366).withValues(alpha: 0.3)),
                 ),
                 child: Column(
                   children: [
@@ -292,7 +292,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Colors.orange.withOpacity(0.15),
+                            color: Colors.orange.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Text('الآن',

@@ -146,7 +146,7 @@ class _UsersTabState extends State<_UsersTab> {
         Container(
           padding: const EdgeInsets.symmetric(
               horizontal: 15, vertical: 12),
-          color: Colors.white.withOpacity(0.02),
+          color: Colors.white.withValues(alpha: 0.02),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -162,7 +162,7 @@ class _UsersTabState extends State<_UsersTab> {
                       decoration: BoxDecoration(
                         color: sel
                             ? const Color(0xFFEF233C)
-                            : Colors.white.withOpacity(0.05),
+                            : Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(f,
@@ -197,11 +197,11 @@ class _UsersTabState extends State<_UsersTab> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
             color: isBanned
-                ? const Color(0xFFEF233C).withOpacity(0.5)
+                ? const Color(0xFFEF233C).withValues(alpha: 0.5)
                 : Colors.white10,
             width: isBanned ? 1.5 : 1),
       ),
@@ -211,7 +211,7 @@ class _UsersTabState extends State<_UsersTab> {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               shape: BoxShape.circle,
               border: Border.all(color: color, width: 1.5),
             ),
@@ -243,7 +243,7 @@ class _UsersTabState extends State<_UsersTab> {
                             horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: const Color(0xFFEF233C)
-                              .withOpacity(0.15),
+                              .withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Text('محظور',
@@ -265,7 +265,7 @@ class _UsersTabState extends State<_UsersTab> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.15),
+                        color: color.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(u['role'],
@@ -460,7 +460,7 @@ class _CategoriesTabState extends State<_CategoriesTab> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.white10),
       ),
@@ -469,7 +469,7 @@ class _CategoriesTabState extends State<_CategoriesTab> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFEF233C).withOpacity(0.15),
+              color: const Color(0xFFEF233C).withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(c['icon'] as IconData,
@@ -494,7 +494,7 @@ class _CategoriesTabState extends State<_CategoriesTab> {
           ),
           Switch(
             value: c['active'] as bool,
-            activeColor: const Color(0xFF25D366),
+            activeThumbColor: const Color(0xFF25D366),
             onChanged: (v) => setState(() => c['active'] = v),
           ),
           IconButton(
@@ -619,7 +619,7 @@ class _ZonesTabState extends State<_ZonesTab> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.white10),
       ),
@@ -631,7 +631,7 @@ class _ZonesTabState extends State<_ZonesTab> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF25D366).withOpacity(0.15),
+                  color: const Color(0xFF25D366).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(Icons.location_city,
@@ -656,7 +656,7 @@ class _ZonesTabState extends State<_ZonesTab> {
               ),
               Switch(
                 value: z['active'] as bool,
-                activeColor: const Color(0xFF25D366),
+                activeThumbColor: const Color(0xFF25D366),
                 onChanged: (v) => setState(() => z['active'] = v),
               ),
             ],
@@ -827,7 +827,7 @@ class _ComplaintsTabState extends State<_ComplaintsTab> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.white10),
       ),
@@ -839,7 +839,7 @@ class _ComplaintsTabState extends State<_ComplaintsTab> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.15),
+                  color: statusColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -871,7 +871,7 @@ class _ComplaintsTabState extends State<_ComplaintsTab> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: priorityColor.withOpacity(0.15),
+                  color: priorityColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(priorityText,
@@ -896,7 +896,7 @@ class _ComplaintsTabState extends State<_ComplaintsTab> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.15),
+                    color: statusColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Center(

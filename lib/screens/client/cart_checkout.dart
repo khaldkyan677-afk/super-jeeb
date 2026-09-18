@@ -200,7 +200,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05), blurRadius: 8),
+              color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Column(
@@ -222,7 +222,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEF233C).withOpacity(0.1),
+                  color: const Color(0xFFEF233C).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text('${items.length} منتج',
@@ -407,7 +407,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFEF233C).withOpacity(0.1),
+              color: const Color(0xFFEF233C).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(a['icon'] as IconData,
@@ -429,7 +429,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF25D366).withOpacity(0.15),
+                          color: const Color(0xFF25D366).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Text('افتراضي',
@@ -548,7 +548,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(m['icon'] as IconData, color: color, size: 24),
@@ -655,7 +655,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -711,7 +711,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
             Container(
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
-                color: const Color(0xFF25D366).withOpacity(0.15),
+                color: const Color(0xFF25D366).withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.check,

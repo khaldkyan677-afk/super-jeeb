@@ -1,19 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import '../../services/camera_service.dart';
 import '../../widgets/sj_logo.dart';
 import '../../services/settings_service.dart';
-import 'notifications_screen.dart';
-import 'my_orders_screen.dart';
-import 'favorites_screen.dart';
-import 'coupons_screen.dart';
-import 'settings_screen.dart';
-import 'help_screen.dart';
-import 'about_screen.dart';
 import 'account_hub.dart';
 import 'cart_checkout.dart';
-import 'wallet_loyalty.dart';
-import 'search_discovery.dart';
 
 class ClientApp extends StatelessWidget {
   const ClientApp({super.key});
@@ -130,7 +122,7 @@ class _ClientMainNavState extends State<ClientMainNav> {
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
         selectedItemColor: const Color(0xFFEF233C),
-        unselectedItemColor: const Color(0xFF2B2D42).withOpacity(0.6),
+        unselectedItemColor: const Color(0xFF2B2D42).withValues(alpha: 0.6),
         items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.home_filled), label: 'الرئيسية'),
@@ -224,7 +216,7 @@ class _ClientHomeState extends State<ClientHome> {
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(
                               color: const Color(0xFF2B2D42)
-                                  .withOpacity(0.2)),
+                                  .withValues(alpha: 0.2)),
                         ),
                         child: Text(f,
                             style: TextStyle(
@@ -279,7 +271,7 @@ class _ClientHomeState extends State<ClientHome> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10),
         ],
       ),
       child: Column(
@@ -322,7 +314,7 @@ class _SIcon extends StatelessWidget {
               color: Colors.white,
               shape: BoxShape.circle,
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5),
+                BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 5),
               ],
             ),
             child: Icon(icon, color: const Color(0xFF2B2D42), size: 24),
@@ -364,7 +356,7 @@ class _ClientPrescriptionScreenState extends State<ClientPrescriptionScreen> {
             Container(
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
-                color: const Color(0xFF25D366).withOpacity(0.1),
+                color: const Color(0xFF25D366).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: const Row(
@@ -549,7 +541,7 @@ class _MerchantApplicationState extends State<MerchantApplication> {
             ),
             const SizedBox(height: 15),
             DropdownButtonFormField<String>(
-              value: _type,
+              initialValue: _type,
               decoration: InputDecoration(
                 labelText: 'تصنيف المتجر',
                 border: OutlineInputBorder(
@@ -667,7 +659,7 @@ class _CourierApplicationState extends State<CourierApplication> {
             Container(
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
+                color: Colors.orange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: const Row(
@@ -697,7 +689,7 @@ class _CourierApplicationState extends State<CourierApplication> {
             ),
             const SizedBox(height: 15),
             DropdownButtonFormField<String>(
-              value: _vehicle,
+              initialValue: _vehicle,
               decoration: InputDecoration(
                 labelText: 'نوع المركبة',
                 border: OutlineInputBorder(
@@ -888,7 +880,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF25D366).withOpacity(0.15),
+                          color: const Color(0xFF25D366).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Text('متوفر',
@@ -1025,7 +1017,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),
@@ -1128,7 +1120,7 @@ class _MerchantDetailsScreenState extends State<MerchantDetailsScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       body: NestedScrollView(
-        headerSliverBuilder: (_, __) => [
+        headerSliverBuilder: (_, _) => [
           SliverAppBar(
             expandedHeight: 200,
             pinned: true,
@@ -1199,7 +1191,7 @@ class _MerchantDetailsScreenState extends State<MerchantDetailsScreen>
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF25D366).withOpacity(0.15),
+                          color: const Color(0xFF25D366).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Text('مفتوح الآن',
@@ -1274,7 +1266,7 @@ class _MerchantDetailsScreenState extends State<MerchantDetailsScreen>
               borderRadius: BorderRadius.circular(15),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 8),
               ],
             ),
@@ -1570,7 +1562,7 @@ class _CategoryShopsScreenState extends State<CategoryShopsScreen> {
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.05), blurRadius: 8),
+                color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
           ],
         ),
         child: Row(
@@ -1607,7 +1599,7 @@ class _CategoryShopsScreenState extends State<CategoryShopsScreen> {
                               horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
                             color:
-                                const Color(0xFFEF233C).withOpacity(0.15),
+                                const Color(0xFFEF233C).withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Text('مغلق',
@@ -1824,7 +1816,7 @@ class FeaturedShopsList extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
                 boxShadow: [
                   BoxShadow(
-                      color: Colors.black.withOpacity(0.05), blurRadius: 8),
+                      color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
                 ],
               ),
               child: Column(
@@ -1833,7 +1825,7 @@ class FeaturedShopsList extends StatelessWidget {
                   Container(
                     height: 100,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2B2D42).withOpacity(0.1),
+                      color: const Color(0xFF2B2D42).withValues(alpha: 0.1),
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(15),
                         topRight: Radius.circular(15),

@@ -142,7 +142,7 @@ class _CategoriesTab extends StatelessWidget {
               borderRadius: BorderRadius.circular(15),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withOpacity(0.05), blurRadius: 8),
+                    color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
               ],
             ),
             child: TextField(
@@ -193,7 +193,7 @@ class _CategoriesTab extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05), blurRadius: 8),
+              color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Column(
@@ -202,7 +202,7 @@ class _CategoriesTab extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
             child: Icon(cat['icon'] as IconData, color: color, size: 28),
@@ -279,7 +279,7 @@ class _OffersTab extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05), blurRadius: 8),
+              color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Column(
@@ -288,7 +288,7 @@ class _OffersTab extends StatelessWidget {
             height: 120,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [color, color.withOpacity(0.7)],
+                colors: [color, color.withValues(alpha: 0.7)],
               ),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(15),
@@ -301,7 +301,7 @@ class _OffersTab extends StatelessWidget {
                   right: 20,
                   top: 20,
                   child: Icon(o['image'] as IconData,
-                      color: Colors.white.withOpacity(0.3), size: 100),
+                      color: Colors.white.withValues(alpha: 0.3), size: 100),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(20),
@@ -313,7 +313,7 @@ class _OffersTab extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text('⏱️ ${o['expires']}',
@@ -443,7 +443,7 @@ class _TopRatedTab extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05), blurRadius: 8),
+              color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Row(
@@ -471,7 +471,7 @@ class _TopRatedTab extends StatelessWidget {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(15),
             ),
             child: Icon(m['icon'] as IconData, color: color, size: 30),
@@ -573,7 +573,7 @@ class _BrandsTab extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05), blurRadius: 8),
+              color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Column(
@@ -779,7 +779,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.05), blurRadius: 8),
+                color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
           ],
         ),
         child: Column(

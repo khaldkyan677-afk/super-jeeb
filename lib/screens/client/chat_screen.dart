@@ -90,7 +90,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundColor: widget.color.withOpacity(0.2),
+              backgroundColor: widget.color.withValues(alpha: 0.2),
               child: Icon(widget.icon, color: widget.color, size: 20),
             ),
             const SizedBox(width: 10),
@@ -210,7 +210,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.05), blurRadius: 5),
+                color: Colors.black.withValues(alpha: 0.05), blurRadius: 5),
           ],
         ),
         child: Column(

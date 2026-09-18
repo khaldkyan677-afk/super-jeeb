@@ -122,19 +122,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: read ? Colors.white : const Color(0xFFEF233C).withOpacity(0.05),
+          color: read ? Colors.white : const Color(0xFFEF233C).withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
               color: read
                   ? Colors.grey.shade200
-                  : const Color(0xFFEF233C).withOpacity(0.3)),
+                  : const Color(0xFFEF233C).withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: (n['color'] as Color).withOpacity(0.15),
+                color: (n['color'] as Color).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(n['icon'] as IconData,

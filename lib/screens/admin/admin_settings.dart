@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'screen_simulator.dart';
 
 class AdminSettingsScreen extends StatefulWidget {
   const AdminSettingsScreen({super.key});
@@ -29,6 +30,13 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => ScreenSimulator()));
+        },
+        child: const Icon(Icons.phonelink_setup),
+        tooltip: 'محاكي الشاشات',
+      ),
       backgroundColor: const Color(0xFF2B0013),
       appBar: AppBar(
         backgroundColor: const Color(0xFF660F24),
@@ -175,28 +183,44 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
                 'العربية / English',
                 Icons.language,
                 Colors.cyan,
-                () {},
+                () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('سيتم تفعيل ميزة اللغة قريباً')),
+            );
+          },
               ),
               _actionTile(
                 'العملات',
                 'ريال قديم، جديد، سعودي، دولار',
                 Icons.attach_money,
                 const Color(0xFFD4AF37),
-                () {},
+                () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('سيتم تفعيل ميزة العملات قريباً')),
+            );
+          },
               ),
               _actionTile(
                 'أسعار الصرف',
                 'تحديث الأسعار حسب المحافظة',
                 Icons.currency_exchange,
                 Colors.amber,
-                () {},
+                () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('سيتم تفعيل ميزة أسعار الصرف قريباً')),
+            );
+          },
               ),
               _actionTile(
                 'المحافظات والمدن',
                 'إدارة مواقع التوصيل',
                 Icons.location_city,
                 Colors.blue,
-                () {},
+                () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('سيتم تفعيل ميزة المحافظات قريباً')),
+            );
+          },
               ),
             ]),
             const SizedBox(height: 20),
@@ -261,7 +285,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.white10),
       ),
@@ -281,7 +305,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text('${value.toStringAsFixed(0)}%',
@@ -317,7 +341,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.white10),
       ),
@@ -325,7 +349,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.15),
+            color: color.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: color, size: 20),
@@ -340,7 +364,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
                 color: Colors.white54, fontSize: 10)),
         trailing: Switch(
           value: value,
-          activeColor: color,
+          activeThumbColor: color,
           onChanged: onChanged,
         ),
       ),
@@ -357,7 +381,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.white10),
       ),
@@ -366,7 +390,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.15),
+            color: color.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: color, size: 20),

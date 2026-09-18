@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:super_jeeb/widgets/password_field.dart';
+
 import '../../services/camera_service.dart';
-import 'merchant_analytics.dart';
-import 'merchant_orders.dart';
 import 'merchant_products.dart';
 import 'merchant_account.dart';
 import '../../widgets/sj_logo.dart';
@@ -14,7 +15,7 @@ class MerchantApp extends StatelessWidget {
     return MaterialApp(
       title: 'Super Jeeb Merchant',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
+      theme: ThemeData( fontFamily: GoogleFonts.cairo().fontFamily, 
         scaffoldBackgroundColor: const Color(0xFF1B1C2A),
         primaryColor: const Color(0xFF2B2D42),
         colorScheme: ColorScheme.fromSeed(
@@ -317,7 +318,7 @@ class _MerchantRegisterState extends State<MerchantRegister> {
             ),
             const SizedBox(height: 20),
             DropdownButtonFormField<String>(
-              value: _type,
+              initialValue: _type,
               dropdownColor: const Color(0xFF2B2D42),
               style: const TextStyle(color: Colors.white, fontSize: 13),
               decoration: const InputDecoration(
@@ -402,7 +403,7 @@ class _MerchantDashboardState extends State<MerchantDashboard>
     with SingleTickerProviderStateMixin {
   late AnimationController _spin;
   bool _open = false;
-  int _active = 3;
+  final int _active = 3;
 
   @override
   void initState() {
@@ -443,7 +444,7 @@ class _MerchantDashboardState extends State<MerchantDashboard>
                       fontWeight: FontWeight.bold)),
               Switch(
                 value: _open,
-                activeColor: const Color(0xFF25D366),
+                activeThumbColor: const Color(0xFF25D366),
                 onChanged: (v) {
                   setState(() => _open = v);
                   if (v) {
@@ -466,7 +467,7 @@ class _MerchantDashboardState extends State<MerchantDashboard>
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.02),
+                color: Colors.white.withValues(alpha: 0.02),
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(color: Colors.white10),
               ),
@@ -620,7 +621,7 @@ class MerchantWorkflow extends StatefulWidget {
 
 class _MerchantWorkflowState extends State<MerchantWorkflow> {
   int _step = 1;
-  bool _paid = true;
+  final bool _paid = true;
   bool _available = true;
 
   @override
@@ -677,8 +678,8 @@ class _MerchantWorkflowState extends State<MerchantWorkflow> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: _paid
-                          ? const Color(0xFF25D366).withOpacity(0.08)
-                          : const Color(0xFFEF233C).withOpacity(0.08),
+                          ? const Color(0xFF25D366).withValues(alpha: 0.08)
+                          : const Color(0xFFEF233C).withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                           color: _paid
@@ -738,7 +739,7 @@ class _MerchantWorkflowState extends State<MerchantWorkflow> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.01),
+                color: Colors.white.withValues(alpha: 0.01),
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(color: Colors.white10),
               ),
@@ -748,7 +749,7 @@ class _MerchantWorkflowState extends State<MerchantWorkflow> {
                     width: 60,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: Colors.white.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(Icons.checkroom,
@@ -772,7 +773,7 @@ class _MerchantWorkflowState extends State<MerchantWorkflow> {
                   ),
                   Switch(
                     value: _available,
-                    activeColor: const Color(0xFF25D366),
+                    activeThumbColor: const Color(0xFF25D366),
                     onChanged: (v) => setState(() => _available = v),
                   ),
                 ],
@@ -864,214 +865,6 @@ class MerchantProducts extends StatelessWidget {
   }
 }
 
-class _MerchantProductsState extends State<MerchantProducts> {
-  final List<Map<String, dynamic>> _products = [
-    {'name': 'قميص رجالي', 'price': 8000, 'stock': 50, 'available': true},
-    {'name': 'بنطلون جينز', 'price': 12000, 'stock': 30, 'available': true},
-    {'name': 'حزام جلد', 'price': 3500, 'stock': 5, 'available': false},
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1B1C2A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2B2D42),
-        title: const Text('مستودع المنتجات',
-            style: TextStyle(color: Colors.white, fontSize: 14)),
-        leading: const BackButton(color: Colors.white),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_circle,
-                color: Color(0xFF25D366), size: 28),
-            onPressed: () => _showAddDialog(context),
-          ),
-        ],
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(15),
-        itemCount: _products.length,
-        itemBuilder: (context, i) => _productCard(_products[i], i),
-      ),
-    );
-  }
-
-  Widget _productCard(Map<String, dynamic> p, int i) {
-    final low = (p['stock'] as int) < 10;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(Icons.checkroom,
-                color: Colors.white60, size: 30),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(p['name'],
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold)),
-                const SizedBox(height: 3),
-                Text('${p['price']} YER',
-                    style: const TextStyle(
-                        color: Colors.white70, fontSize: 11)),
-                const SizedBox(height: 3),
-                Row(
-                  children: [
-                    Icon(Icons.inventory_2,
-                        color: low
-                            ? const Color(0xFFEF233C)
-                            : Colors.white38,
-                        size: 12),
-                    const SizedBox(width: 4),
-                    Text('${p['stock']} قطعة',
-                        style: TextStyle(
-                            color: low
-                                ? const Color(0xFFEF233C)
-                                : Colors.white38,
-                            fontSize: 10)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Switch(
-            value: p['available'],
-            activeColor: const Color(0xFF25D366),
-            onChanged: (v) => setState(() => p['available'] = v),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAddDialog(BuildContext context) {
-    String? _image;
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: const Color(0xFF2B2D42),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
-        ),
-      ),
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setS) => Padding(
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 50,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.white24,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const Text('إضافة منتج جديد',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold)),
-                const SizedBox(height: 20),
-                SizedBox(
-                  height: 160,
-                  child: ImageUploadBox(
-                    label: 'صورة المنتج (بدون خلفية)',
-                    icon: Icons.checkroom,
-                    activeColor: const Color(0xFF25D366),
-                    onUploaded: (url) {
-                      setS(() => _image = url);
-                      BackgroundRemover.showRemoveDialog(
-                        ctx,
-                        url!,
-                        (newUrl) => _image = newUrl,
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 15),
-                TextField(
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'اسم المنتج',
-                    labelStyle: const TextStyle(color: Colors.white60),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide:
-                            const BorderSide(color: Colors.white24)),
-                  ),
-                ),
-                const SizedBox(height: 15),
-                TextField(
-                  style: const TextStyle(color: Colors.white),
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'السعر',
-                    labelStyle: const TextStyle(color: Colors.white60),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide:
-                            const BorderSide(color: Colors.white24)),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF25D366),
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('✔️ تم إضافة المنتج'),
-                            backgroundColor: Color(0xFF25D366)),
-                      );
-                    },
-                    child: const Text('حفظ المنتج',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class MerchantAds extends StatefulWidget {
   const MerchantAds({super.key});
@@ -1112,7 +905,7 @@ class _MerchantAdsState extends State<MerchantAds> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFFEF233C).withOpacity(0.2),
+                    const Color(0xFFEF233C).withValues(alpha: 0.2),
                     const Color(0xFF2B2D42),
                   ],
                 ),
@@ -1158,12 +951,12 @@ class _MerchantAdsState extends State<MerchantAds> {
                     fontSize: 14)),
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
-              value: _position,
+              initialValue: _position,
               dropdownColor: const Color(0xFF2B2D42),
               style: const TextStyle(color: Colors.white, fontSize: 13),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.02),
+                fillColor: Colors.white.withValues(alpha: 0.02),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Colors.white24)),
@@ -1196,7 +989,7 @@ class _MerchantAdsState extends State<MerchantAds> {
                       decoration: BoxDecoration(
                         color: sel
                             ? const Color(0xFFEF233C)
-                            : Colors.white.withOpacity(0.02),
+                            : Colors.white.withValues(alpha: 0.02),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                             color: sel
@@ -1330,9 +1123,9 @@ class MerchantSubscriptions extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.4), width: 2),
+        border: Border.all(color: color.withValues(alpha: 0.4), width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1344,7 +1137,7 @@ class MerchantSubscriptions extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(p['name'],

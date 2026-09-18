@@ -80,7 +80,7 @@ class _OverviewTab extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 horizontal: 15, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.02),
+              color: Colors.white.withValues(alpha: 0.02),
               borderRadius: BorderRadius.circular(15),
               border: Border.all(color: Colors.white10),
             ),
@@ -174,7 +174,7 @@ class _OverviewTab extends StatelessWidget {
             height: 200,
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.02),
+              color: Colors.white.withValues(alpha: 0.02),
               borderRadius: BorderRadius.circular(15),
               border: Border.all(color: Colors.white10),
             ),
@@ -214,7 +214,7 @@ class _OverviewTab extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.white10),
       ),
@@ -226,7 +226,7 @@ class _OverviewTab extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: color, size: 18),
@@ -237,7 +237,7 @@ class _OverviewTab extends StatelessWidget {
                     horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: (positive ? const Color(0xFF25D366) : const Color(0xFFEF233C))
-                      .withOpacity(0.15),
+                      .withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(change,
@@ -364,8 +364,8 @@ class _ProductsTab extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: Colors.white)),
           const SizedBox(height: 15),
-          _stagnantProduct('حزام جلد', 5, 'منذ 30 يوم'),
-          _stagnantProduct('ربطة عنق', 100, 'منذ 45 يوم'),
+          _stagnantProduct(context, 'حزام جلد', 5, 'منذ 30 يوم'),
+          _stagnantProduct(context, 'ربطة عنق', 100, 'منذ 45 يوم'),
         ],
       ),
     );
@@ -388,7 +388,7 @@ class _ProductsTab extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white10),
       ),
@@ -398,7 +398,7 @@ class _ProductsTab extends StatelessWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: rankColor.withOpacity(0.15),
+              color: rankColor.withValues(alpha: 0.15),
               shape: BoxShape.circle,
               border: Border.all(color: rankColor, width: 1.5),
             ),
@@ -437,15 +437,15 @@ class _ProductsTab extends StatelessWidget {
     );
   }
 
-  Widget _stagnantProduct(String name, int stock, String lastSold) {
+  Widget _stagnantProduct(BuildContext context, String name, int stock, String lastSold) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFEF233C).withOpacity(0.05),
+        color: const Color(0xFFEF233C).withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-            color: const Color(0xFFEF233C).withOpacity(0.3)),
+            color: const Color(0xFFEF233C).withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -539,7 +539,7 @@ class _InvoicesTab extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.02),
+              color: Colors.white.withValues(alpha: 0.02),
               borderRadius: BorderRadius.circular(15),
               border: Border.all(color: Colors.white10),
             ),
@@ -614,7 +614,7 @@ class _InvoicesTab extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.white10),
       ),
@@ -623,7 +623,7 @@ class _InvoicesTab extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 22),
@@ -646,7 +646,7 @@ class _InvoicesTab extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.15),
+                        color: color.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(label,

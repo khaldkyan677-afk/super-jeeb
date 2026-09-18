@@ -74,7 +74,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
   Widget _filterBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-      color: const Color(0xFF2B2D42).withOpacity(0.5),
+      color: const Color(0xFF2B2D42).withValues(alpha: 0.5),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -90,7 +90,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
                   decoration: BoxDecoration(
                     color: sel
                         ? const Color(0xFFEF233C)
-                        : Colors.white.withOpacity(0.05),
+                        : Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(f,
@@ -114,7 +114,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     final out = _products.where((p) => p['status'] == 'out').length;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-      color: Colors.white.withOpacity(0.02),
+      color: Colors.white.withValues(alpha: 0.02),
       child: Row(
         children: [
           _statItem(Icons.inventory, '$total', 'إجمالي',
@@ -179,7 +179,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.white10),
       ),
@@ -189,7 +189,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
             width: 70,
             height: 70,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(p['icon'] as IconData,
@@ -242,7 +242,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.15),
+                  color: statusColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(statusText,
@@ -464,7 +464,7 @@ class _ProductEditorScreenState extends State<ProductEditorScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.03),
+                color: Colors.white.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.white24),
               ),
@@ -491,7 +491,7 @@ class _ProductEditorScreenState extends State<ProductEditorScreen> {
                   ),
                   Switch(
                     value: _available,
-                    activeColor: const Color(0xFF25D366),
+                    activeThumbColor: const Color(0xFF25D366),
                     onChanged: (v) => setState(() => _available = v),
                   ),
                 ],
@@ -552,7 +552,7 @@ class _ProductEditorScreenState extends State<ProductEditorScreen> {
         prefixIcon:
             Icon(icon, color: const Color(0xFFEF233C), size: 20),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.03),
+        fillColor: Colors.white.withValues(alpha: 0.03),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.white24),

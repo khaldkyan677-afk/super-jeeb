@@ -119,9 +119,9 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
@@ -171,8 +171,8 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
       child: Container(
         decoration: BoxDecoration(
           color: isDone
-              ? widget.activeColor.withOpacity(0.1)
-              : Colors.white.withOpacity(0.02),
+              ? widget.activeColor.withValues(alpha: 0.1)
+              : Colors.white.withValues(alpha: 0.02),
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
             color: isDone ? widget.activeColor : Colors.white24,
