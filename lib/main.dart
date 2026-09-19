@@ -357,39 +357,46 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _verifyOtp() async {
-    final code = _otpController.text.trim();
-    if (code.length < 6) {
-      setState(() => _error = 'الكود يجب أن يكون 6 أرقام');
-      return;
-    }
-    if (_verificationId == null) {
-      setState(() => _error = 'لم يتم إرسال الكود بعد');
-      return;
-    }
-    setState(() {
-      _isLoading = true;
-      _error = '';
-    });
-    try {
-      final credential = fb_auth.PhoneAuthProvider.credential(
-        verificationId: _verificationId!,
-        smsCode: code,
-      );
-      await fb_auth.FirebaseAuth.instance.signInWithCredential(credential);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تم التحقق بنجاح!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+      final code = _otpController.text.trim();
+      if (code.length < 6) {
+        setState(() => _error = 'الرجاء إدخال رمز التحقق المكون من 6 أرقام');
+        return;
       }
-    } catch (e) {
-      setState(() => _error = 'كود غير صحيح');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (_verificationId == null) {
+        setState(() => _error = 'حدث خطأ، الرجاء المحاولة مرة أخرى');
+        return;
+      }
+      setState(() {
+        _isLoading = true;
+        _error = '';
+      });
+      try {
+        final credential = fb_auth.PhoneAuthProvider.credential(
+          verificationId: _verificationId!,
+          smsCode: code,
+        );
+        await fb_auth.FirebaseAuth.instance.signInWithCredential(credential);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم تسجيل الدخول بنجاح'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          // ═══════════════════════════════════════════════
+          // 🔥 التوجيه للواجهة المناسبة
+          // ═══════════════════════════════════════════════
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const ClientApp()),
+          );
+        }
+      } catch (e) {
+        setState(() => _error = 'رمز التحقق غير صحيح');
+      } finally {
+        if (mounted) setState(() => _isLoading = false);
+      }
     }
-  }
 
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
