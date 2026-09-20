@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'screens/client/taxi_screen.dart';
-
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 
 import 'dart:async';

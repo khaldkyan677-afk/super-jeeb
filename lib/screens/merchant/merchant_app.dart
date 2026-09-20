@@ -325,6 +325,9 @@ class MerchantRegister extends StatefulWidget {
 class _MerchantRegisterState extends State<MerchantRegister> {
   String _type = 'مطاعم والكافيهات';
   String? _d1;
+  String? _d2;
+  String? _d3;
+  String? _d4;
 
   final _cats = [
     'مطاعم والكافيهات',

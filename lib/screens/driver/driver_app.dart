@@ -313,6 +313,9 @@ class DriverOnboarding extends StatefulWidget {
 class _DriverOnboardingState extends State<DriverOnboarding> {
   String _vehicle = 'دراجة نارية';
   String? _d1;
+  String? _d2;
+  String? _d3;
+  String? _d4;
   final _vehicles = ['دراجة نارية', 'سيارة', 'باص فرزة', 'شاحنة صغيرة'];
 
   @override

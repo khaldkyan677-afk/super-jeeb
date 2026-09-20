@@ -7,7 +7,7 @@ import '../../widgets/sj_logo.dart';
 import '../../services/settings_service.dart';
 import 'account_hub.dart';
 import 'cart_checkout.dart';
-import 'taxi_screen.dart';
+import 'transport_screen.dart';
 import 'services_screen.dart';
 
 class ClientApp extends StatelessWidget {
@@ -308,7 +308,7 @@ class _SIcon extends StatelessWidget {
     if (label == 'تاكسي') {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const TaxiScreen()),
+        MaterialPageRoute(builder: (_) => const TransportScreen()),
       );
       return;
     }
