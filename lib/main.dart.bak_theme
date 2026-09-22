@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'widgets/custom_keypad.dart';
 import 'theme/app_theme.dart';
 import 'screens/client/taxi_screen.dart';
 
@@ -93,7 +92,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(auth.error ?? 'فشل تسجيل الدخول'),
-            backgroundColor: AppTheme.red,
+            backgroundColor: const Color(0xFFFFF233),
           ),
         );
       }
@@ -102,7 +101,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('خطأ: \$e'),
-            backgroundColor: AppTheme.red,
+            backgroundColor: const Color(0xFFFFF233),
           ),
         );
       }
@@ -126,7 +125,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.dark,
+      backgroundColor: const Color(0xFF1B1C2A),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -155,7 +154,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   'يجبها لحد عندك',
                   style: TextStyle(
                     fontSize: 16,
-                    color: AppTheme.red,
+                    color: Color(0xFFFFF233),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -172,7 +171,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   icon: Icons.g_mobiledata,
                   label: 'المتابعة بحساب Google',
                   color: Colors.white,
-                  textColor: AppTheme.dark,
+                  textColor: const Color(0xFF2B2D42),
                   onTap: () => _loginWithGoogle(context),
                 ),
                 const SizedBox(height: 15),
@@ -182,7 +181,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   context,
                   icon: Icons.phone_iphone,
                   label: 'المتابعة برقم الهاتف',
-                  color: AppTheme.red,
+                  color: const Color(0xFFFFF233),
                   textColor: Colors.white,
                   onTap: () => _login(context, 'phone'),
                 ),
@@ -266,12 +265,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _phoneController = TextEditingController();
-  final _phoneFocus = FocusNode(canRequestFocus: false);
   final _otpController = TextEditingController();
-  final _otpFocus = FocusNode(canRequestFocus: false);
-  bool _showKeypad = false;
-  bool _allowSystemKeyboard = false;
-  bool _isPhoneField = true;
   bool _otpSent = false;
   bool _isLoading = false;
   String _error = '';
@@ -280,19 +274,9 @@ class _LoginScreenState extends State<LoginScreen> {
   int _secondsLeft = 0;
 
   @override
-  void initState() {
-    super.initState();
-    // إظهار Keypad تلقائياً عند فتح شاشة الهاتف
-    _showKeypad = true;
-    _isPhoneField = true;
-  }
-
-  @override
   void dispose() {
     _timer?.cancel();
     _phoneController.dispose();
-    _phoneFocus.dispose();
-    _otpFocus.dispose();
     _otpController.dispose();
     super.dispose();
   }
@@ -310,14 +294,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _sendOtp({bool isResend = false}) async {
-    final phoneInput = _phoneController.text.trim();
-    // إذا كان يحتوي حروفاً (مثل كلمة سر الأدمن) → اتركه
-    // إذا كان أرقاماً فقط → أضف +967
-    final phone = phoneInput.contains(RegExp(r'[A-Za-z]'))
-        ? phoneInput
-        : (phoneInput.startsWith('+') || phoneInput.startsWith('0')
-            ? phoneInput
-            : '+967$phoneInput');
+    final phone = _phoneController.text.trim();
     if (phone == 'KHALED#SJ#ADMIN') {
       Navigator.pushReplacement(
         context,
@@ -415,7 +392,7 @@ class _LoginScreenState extends State<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('سيتم تفعيل $feature قريباً'),
-        backgroundColor: AppTheme.red,
+        backgroundColor: const Color(0xFFFFF233),
       ),
     );
   }
@@ -424,8 +401,8 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     if (widget.method == 'main') {
       return Scaffold(
-        backgroundColor: AppTheme.dark,
-      body: SafeArea(
+        backgroundColor: const Color(0xFF1B1C2A),
+        body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(25),
             child: Column(
@@ -434,7 +411,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: const BoxDecoration(
-                    color: AppTheme.red,
+                    color: Color(0xFFFFF233),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.apps, color: Colors.black, size: 60),
@@ -488,7 +465,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.red,
+                    backgroundColor: const Color(0xFFFFF233),
                     minimumSize: const Size(double.infinity, 60),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -552,41 +529,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     return Scaffold(
-      bottomNavigationBar: _showKeypad ? CustomNumberPad(
-        onNumberPressed: (n) {
-          setState(() {
-            if (_isPhoneField) {
-              if (n.length > 1) {
-                final cleaned = n.replaceAll(RegExp(r'[^0-9+]'), '');
-                _phoneController.text = cleaned.length > 12 ? cleaned.substring(0, 12) : cleaned;
-              } else if (_phoneController.text.length < 12) {
-                _phoneController.text += n;
-              }
-            } else {
-              final cleaned = n.replaceAll(RegExp(r'[^0-9]'), '');
-              if (cleaned.length > 1) {
-                _otpController.text = cleaned.length > 6 ? cleaned.substring(0, 6) : cleaned;
-              } else if (_otpController.text.length < 6) {
-                _otpController.text += n;
-              }
-            }
-          });
-        },
-        onBackspace: () {
-          setState(() {
-            if (_isPhoneField) {
-              if (_phoneController.text.isNotEmpty) {
-                _phoneController.text = _phoneController.text.substring(0, _phoneController.text.length - 1);
-              }
-            } else {
-              if (_otpController.text.isNotEmpty) {
-                _otpController.text = _otpController.text.substring(0, _otpController.text.length - 1);
-              }
-            }
-          });
-        },
-      ) : null,
-      backgroundColor: AppTheme.dark,
+      backgroundColor: const Color(0xFF1B1C2A),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -604,12 +547,12 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppTheme.red.withValues(alpha: 0.15),
+                  color: const Color(0xFFFFF233).withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.phone_iphone,
-                  color: AppTheme.red,
+                  color: Color(0xFFFFF233),
                   size: 60,
                 ),
               ),
@@ -631,46 +574,14 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 40),
               TextField(
                 controller: _phoneController,
-              focusNode: _phoneFocus,
-              readOnly: !_allowSystemKeyboard,
-              showCursor: true,
-              onTap: () => setState(() {
-                _isPhoneField = true;
-                _allowSystemKeyboard = false;
-                _showKeypad = true;
-              }),
                 keyboardType: TextInputType.phone,
                 enabled: !_otpSent,
                 style: const TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
-                  hintText: '7XX XXX XXX',
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.keyboard, color: AppTheme.red, size: 20),
-                  onPressed: () {
-                    setState(() {
-                      _allowSystemKeyboard = true;
-                      _showKeypad = false;
-                    });
-                    _phoneFocus.canRequestFocus = true;
-                    _phoneFocus.requestFocus();
-                  },
-                  tooltip: 'كيبورد النظام',
-                ),
+                  hintText: '+967 7XX XXX XXX',
                   hintStyle: GoogleFonts.cairo(color: Colors.white38),
-                  prefixIcon: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.phone, color: AppTheme.red, size: 22),
-                      const SizedBox(width: 8),
-                      Text('+967', style: TextStyle(color: AppTheme.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                      const SizedBox(width: 8),
-                      Container(width: 1, height: 20, color: Colors.grey.shade300),
-                    ],
-                  ),
-                ),
+                  prefixIcon: const Icon(Icons.phone, color: Color(0xFFFFF233)),
                   filled: true,
                   fillColor: Colors.white.withValues(alpha: 0.05),
                   enabledBorder: OutlineInputBorder(
@@ -679,7 +590,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: const BorderSide(color: AppTheme.red),
+                    borderSide: const BorderSide(color: Color(0xFFFFF233)),
                   ),
                 ),
               ),
@@ -687,13 +598,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
                 TextField(
                   controller: _otpController,
-              focusNode: _otpFocus,
-              readOnly: true,
-              showCursor: true,
-              onTap: () => setState(() { _isPhoneField = false; _showKeypad = true; }),
                   keyboardType: TextInputType.number,
                   maxLength: 6,
-                  style: TextStyle(color: AppTheme.dark, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 8),
+                  style: const TextStyle(color: Colors.white),
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
                     hintText: '------',
@@ -708,7 +615,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(color: AppTheme.red),
+                      borderSide: const BorderSide(color: Color(0xFFFFF233)),
                     ),
                   ),
                 ),
@@ -732,7 +639,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ? null
                       : (_otpSent ? _verifyOtp : _sendOtp),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.red,
+                    backgroundColor: const Color(0xFFFFF233),
                     minimumSize: const Size(double.infinity, 55),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -767,14 +674,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             const Icon(
                               Icons.refresh,
-                              color: AppTheme.red,
+                              color: Color(0xFFFFF233),
                               size: 18,
                             ),
                             const SizedBox(width: 6),
                             Text(
                               'لم أتلقى الكود؟ إعادة الإرسال',
                               style: GoogleFonts.cairo(
-                                color: AppTheme.red,
+                                color: const Color(0xFFFFF233),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -861,12 +768,12 @@ class _AdminGateScreenState extends State<AdminGateScreen> {
                 width: 90,
                 height: 90,
                 decoration: BoxDecoration(
-                  color: AppTheme.red.withValues(alpha: 0.15),
+                  color: const Color(0xFFEF233C).withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.shield,
-                  color: AppTheme.red,
+                  color: Color(0xFFEF233C),
                   size: 50,
                 ),
               ),
@@ -906,7 +813,7 @@ class _AdminGateScreenState extends State<AdminGateScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: const BorderSide(color: AppTheme.red),
+                    borderSide: const BorderSide(color: Color(0xFFEF233C)),
                   ),
                 ),
               ),
@@ -919,12 +826,12 @@ class _AdminGateScreenState extends State<AdminGateScreen> {
                   onPressed: () => _openForgotPassword(context),
                   icon: const Icon(
                     Icons.lock_reset,
-                    color: AppTheme.green,
+                    color: Color(0xFF25D366),
                     size: 16,
                   ),
                   label: const Text(
                     'نسيت كلمة السر؟',
-                    style: TextStyle(color: AppTheme.green, fontSize: 12),
+                    style: TextStyle(color: Color(0xFF25D366), fontSize: 12),
                   ),
                 ),
               ),
@@ -934,7 +841,7 @@ class _AdminGateScreenState extends State<AdminGateScreen> {
                   child: Text(
                     _error,
                     style: const TextStyle(
-                      color: AppTheme.red,
+                      color: Color(0xFFEF233C),
                       fontSize: 13,
                     ),
                   ),
@@ -944,7 +851,7 @@ class _AdminGateScreenState extends State<AdminGateScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.red,
+                    backgroundColor: const Color(0xFFEF233C),
                     minimumSize: const Size(0, 55),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -982,7 +889,7 @@ class _AdminGateScreenState extends State<AdminGateScreen> {
                   children: [
                     const Icon(
                       Icons.info_outline,
-                      color: AppTheme.green,
+                      color: Color(0xFF25D366),
                       size: 18,
                     ),
                     const SizedBox(width: 10),
@@ -1001,7 +908,7 @@ class _AdminGateScreenState extends State<AdminGateScreen> {
                           Text(
                             'khaldkyan677@gmail.com',
                             style: TextStyle(
-                              color: AppTheme.green,
+                              color: Color(0xFF25D366),
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
                             ),
@@ -1064,7 +971,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('📧 تم إرسال كود الاستعادة إلى البريد الاحتياطي'),
-          backgroundColor: AppTheme.green,
+          backgroundColor: Color(0xFF25D366),
         ),
       );
     }
@@ -1090,7 +997,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('✅ تم التحقق'),
-            backgroundColor: AppTheme.green,
+            backgroundColor: Color(0xFF25D366),
           ),
         );
         Navigator.pop(context);
@@ -1121,7 +1028,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('🔑 دخول رئيسي مقبول'),
-          backgroundColor: AppTheme.green,
+          backgroundColor: Color(0xFF25D366),
         ),
       );
       Navigator.pop(context);
@@ -1169,12 +1076,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           width: 90,
           height: 90,
           decoration: BoxDecoration(
-            color: AppTheme.green.withValues(alpha: 0.15),
+            color: const Color(0xFF25D366).withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
           child: const Icon(
             Icons.lock_reset,
-            color: AppTheme.green,
+            color: Color(0xFF25D366),
             size: 50,
           ),
         ),
@@ -1199,7 +1106,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           icon: Icons.email_outlined,
           title: 'كود عبر البريد الاحتياطي',
           subtitle: 'khaldkyan677@gmail.com',
-          color: AppTheme.green,
+          color: const Color(0xFF25D366),
           onTap: _requestEmailCode,
         ),
         const SizedBox(height: 15),
@@ -1209,7 +1116,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           icon: Icons.vpn_key,
           title: 'المفتاح الرئيسي (Master Key)',
           subtitle: 'SJ-MASTER-XXXX-XXXX',
-          color: AppTheme.red,
+          color: const Color(0xFFEF233C),
           onTap: () => setState(() => _step = 2),
         ),
       ],
@@ -1285,14 +1192,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           width: 90,
           height: 90,
           decoration: BoxDecoration(
-            color: AppTheme.green.withValues(alpha: 0.15),
+            color: const Color(0xFF25D366).withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
           child: Icon(
             _step == 1 ? Icons.email_outlined : Icons.vpn_key,
             color: _step == 1
-                ? AppTheme.green
-                : AppTheme.red,
+                ? const Color(0xFF25D366)
+                : const Color(0xFFEF233C),
             size: 50,
           ),
         ),
@@ -1329,8 +1236,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide(
                 color: _step == 1
-                    ? AppTheme.green
-                    : AppTheme.red,
+                    ? const Color(0xFF25D366)
+                    : const Color(0xFFEF233C),
               ),
             ),
           ),
@@ -1340,7 +1247,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             padding: const EdgeInsets.only(top: 15),
             child: Text(
               _error,
-              style: const TextStyle(color: AppTheme.red, fontSize: 13),
+              style: const TextStyle(color: Color(0xFFEF233C), fontSize: 13),
             ),
           ),
         const SizedBox(height: 30),
@@ -1349,8 +1256,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: _step == 1
-                  ? AppTheme.green
-                  : AppTheme.red,
+                  ? const Color(0xFF25D366)
+                  : const Color(0xFFEF233C),
               minimumSize: const Size(0, 55),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
