@@ -43,6 +43,15 @@ class AppTheme {
   // ═══ ThemeData الموحد ═══
   static ThemeData get theme => ThemeData(
         useMaterial3: true,
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+            TargetPlatform.iOS: FadeUpwardsPageTransitionsBuilder(),
+            TargetPlatform.linux: FadeUpwardsPageTransitionsBuilder(),
+            TargetPlatform.macOS: FadeUpwardsPageTransitionsBuilder(),
+            TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
+          },
+        ),
         scaffoldBackgroundColor: lightGray,
         primaryColor: red,
         colorScheme: ColorScheme.fromSeed(

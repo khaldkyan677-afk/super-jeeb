@@ -31,8 +31,35 @@
 
   <title>super_jeeb</title>
   <link rel="manifest" href="manifest.json">
+<style>
+      html, body {
+        background-color: #0D0D12;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+      }
+      #loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #0D0D12;
+      }
+      #loading .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #EF233C;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
 </head>
-<body>
+<body style="background-color: #0D0D12; margin: 0;">
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/sj_logo.dart';
 import 'widgets/custom_keypad.dart';
 import 'theme/app_theme.dart';
 import 'screens/client/taxi_screen.dart';
@@ -18,7 +19,6 @@ import 'package:super_jeeb/widgets/password_field.dart';
 
 import 'screens/client/client_app.dart';
 import 'screens/admin/admin_app.dart';
-import 'widgets/animated_logo.dart';
 import 'services/security_service.dart';
 import 'services/auth_service.dart';
 
@@ -136,9 +136,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               children: [
                 GestureDetector(
                   onTap: () => _openAdmin(context),
-                  child: const AnimatedSJLogo(
+                  child: const SJLogo(
                     size: 160,
-                    onAnimationComplete: null,
                   ),
                 ),
                 const SizedBox(height: 25),

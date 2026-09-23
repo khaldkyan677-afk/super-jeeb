@@ -73,6 +73,234 @@ class _ClientMainNavState extends State<ClientMainNav> {
   }
 }
 
+class ClientHome extends StatefulWidget {
+  const ClientHome({super.key});
+  @override
+  State<ClientHome> createState() => _ClientHomeState();
+}
+
+class _ClientHomeState extends State<ClientHome> {
+  String _filter = 'القريب';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF2B2D42),
+        title: const Text('Super Jeeb',
+            style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.medical_services_outlined,
+                color: Color(0xFF25D366), size: 26),
+            onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const ClientPrescriptionScreen())),
+          ),
+          IconButton(
+            icon: const Icon(Icons.location_on,
+                color: Color(0xFFEF233C), size: 28),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const BannerCarousel(),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                    child: _fCard(Icons.local_shipping, 'Super Express',
+                        'شحن آمن', const Color(0xFFEF233C))),
+                const SizedBox(width: 15),
+                Expanded(
+                    child: _fCard(Icons.edit_note, 'اشترِ لي',
+                        'المندوب يشتري', const Color(0xFF2B2D42))),
+              ],
+            ),
+            const SizedBox(height: 25),
+            const Text('الخدمات',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2B2D42))),
+            const SizedBox(height: 15),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: ['القريب', 'الأعلى تقييماً', 'مفتوح الآن']
+                    .map((f) {
+                  final sel = _filter == f;
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: InkWell(
+                      onTap: () => setState(() => _filter = f),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: sel
+                              ? const Color(0xFFEF233C)
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                              color: const Color(0xFF2B2D42)
+                                  .withValues(alpha: 0.2)),
+                        ),
+                        child: Text(f,
+                            style: TextStyle(
+                                color: sel
+                                    ? Colors.white
+                                    : const Color(0xFF2B2D42),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12)),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 20),
+            GridView.count(
+              crossAxisCount: 4,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 15,
+              crossAxisSpacing: 15,
+              children: [
+                _SIcon(icon: Icons.restaurant, label: 'مطاعم'),
+                _SIcon(icon: Icons.shopping_cart, label: 'سوبرماركت'),
+                _SIcon(icon: Icons.local_pharmacy, label: 'صيدلية'),
+                _SIcon(icon: Icons.bakery_dining, label: 'بقالة'),
+                _SIcon(icon: Icons.storefront, label: 'متاجر'),
+                InkWell(
+              onTap: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const TaxiScreen())),
+              child: _SIcon(icon: Icons.directions_car, label: 'تاكسي'),
+            ),
+                _SIcon(icon: Icons.airport_shuttle, label: 'فرزة'),
+                _SIcon(icon: Icons.local_shipping, label: 'طرود'),
+              ],
+            ),
+            const SizedBox(height: 25),
+            const Text('متاجر مميزة قريبة منك',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2B2D42))),
+            const SizedBox(height: 15),
+            const FeaturedShopsList(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _fCard(IconData i, String t, String s, Color c) {
+    return Container(
+      height: 130,
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(i, color: c, size: 35),
+          const SizedBox(height: 10),
+          Text(t,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: 14)),
+          Text(s,
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 10)),
+        ],
+      ),
+    );
+  }
+}
+
+class _SIcon extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _SIcon({required this.icon, required this.label});
+
+  void _navigate(BuildContext context) {
+    // 🚕 تاكسي → شاشة المواصلات
+    if (label == 'تاكسي') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const TaxiScreen()),
+      );
+      return;
+    }
+    // 🆘 فزعة / فرزة → شاشة الخدمات (فزعة)
+    if (label == 'فزعة' || label == 'فرزة') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const ServicesScreen(serviceType: 'fazaa'),
+        ),
+      );
+      return;
+    }
+    // 📦 طرود → شاشة الخدمات (طرود)
+    if (label == 'طرود') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const ServicesScreen(serviceType: 'parcel'),
+        ),
+      );
+      return;
+    }
+    // 🏪 باقي الأقسام → شاشة المتاجر المُصفَّاة
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CategoryShopsScreen(category: label),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => _navigate(context),
+      borderRadius: BorderRadius.circular(50),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 5),
+              ],
+            ),
+            child: Icon(icon, color: const Color(0xFF2B2D42), size: 24),
+          ),
+          const SizedBox(height: 5),
+          Text(label,
+              style: const TextStyle(fontSize: 10),
+              overflow: TextOverflow.ellipsis),
+        ],
+      ),
+    );
+  }
+}
+
 class ClientPrescriptionScreen extends StatefulWidget {
   const ClientPrescriptionScreen({super.key});
   @override
