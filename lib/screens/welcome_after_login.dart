@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'client/home_screen.dart';
+import 'client/client_app.dart';
 
 class WelcomeAfterLogin extends StatefulWidget {
   const WelcomeAfterLogin({super.key});
@@ -76,7 +76,7 @@ class _WelcomeAfterLoginState extends State<WelcomeAfterLogin> with TickerProvid
     Timer(const Duration(milliseconds: 8300), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => ClientHomeScreen()),
+          MaterialPageRoute(builder: (_) => ClientMainNav()),
         );
       }
     });

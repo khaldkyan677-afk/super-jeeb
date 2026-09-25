@@ -1,3 +1,6 @@
+import 'general/search_screen.dart';
+import 'general/cart_screen.dart';
+import 'general/account_screen.dart';
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'taxi_screen.dart';
