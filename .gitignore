@@ -42,3 +42,6 @@ build/
 
 # Logs
 *.log
+lib/firebase_options.dart
+server/node_modules/
+server/.env
