@@ -1,0 +1,5 @@
+const Trip = require('../models/Trip');
+exports.requestTrip = async (req, res) => { try { const { from, to, fare } = req.body; const trip = await Trip.create({ customerId: req.user._id, from, to, fare, status: 'requested' }); res.status(201).json(trip); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.getMyTrips = async (req, res) => { try { const trips = await Trip.find({ customerId: req.user._id }).sort({ createdAt: -1 }); res.json(trips); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.acceptTrip = async (req, res) => { try { const trip = await Trip.findByIdAndUpdate(req.params.id, { driverId: req.user._id, status: 'accepted' }, { new: true }); res.json(trip); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.verifyPin = async (req, res) => { try { const { pin } = req.body; const trip = await Trip.findById(req.params.id); if (trip.pin === pin) { trip.status = 'ongoing'; await trip.save(); res.json({ success: true, trip }); } else { res.status(400).json({ success: false, message: 'Invalid PIN' }); } } catch (e) { res.status(500).json({ message: e.message }); } };
