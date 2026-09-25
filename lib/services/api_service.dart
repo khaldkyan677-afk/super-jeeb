@@ -8,7 +8,7 @@ class ApiService {
   static final ApiService instance = ApiService._();
 
   static const String baseUrl =
-      'https://5000-cs-9c3821e8-581e-43e4-85a2-54d427329293.cs-europe-west1-iuzs.cloudshell.dev';
+      'https://5000-cs-3051c663-cf57-42cb-974c-f26f566307a6.cs-europe-west1-onse.cloudshell.dev';
 
   static String? _authToken;
   static String? _deviceId;

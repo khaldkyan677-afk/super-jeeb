@@ -14,7 +14,6 @@ class DriverApp extends StatelessWidget {
       title: 'Super Jeeb Driver',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: GoogleFonts.cairo().fontFamily,
         scaffoldBackgroundColor: const Color(0xFF1B1C2A),
         primaryColor: const Color(0xFF2B2D42),
         colorScheme: ColorScheme.fromSeed(

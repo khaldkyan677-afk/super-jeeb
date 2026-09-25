@@ -24,7 +24,6 @@ class AdminApp extends StatelessWidget {
       title: 'Super Jeeb Admin',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: GoogleFonts.cairo().fontFamily,
         scaffoldBackgroundColor: const Color(0xFF2B0013),
         primaryColor: const Color(0xFF660F24),
         useMaterial3: true,

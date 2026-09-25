@@ -15,7 +15,6 @@ class MerchantApp extends StatelessWidget {
       title: 'Super Jeeb Merchant',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: GoogleFonts.cairo().fontFamily,
         scaffoldBackgroundColor: const Color(0xFF1B1C2A),
         primaryColor: const Color(0xFF2B2D42),
         colorScheme: ColorScheme.fromSeed(
@@ -291,7 +290,6 @@ class _MerchantLoginState extends State<MerchantLogin> {
                 size: 30,
               ),
               label: const Text(
-                'الدخول بـ Google',
                 style: TextStyle(color: Colors.white),
               ),
             ),

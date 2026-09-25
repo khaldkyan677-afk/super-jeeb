@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'widgets/sj_logo.dart';
-import 'widgets/store_logo_animated.dart';
 import 'widgets/custom_keypad.dart';
 import 'theme/app_theme.dart';
 import 'screens/client/taxi_screen.dart';
@@ -19,7 +18,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:super_jeeb/widgets/password_field.dart';
 
 import 'screens/client/client_app.dart';
-import 'screens/welcome_after_login.dart';
 import 'screens/admin/admin_app.dart';
 import 'services/security_service.dart';
 import 'services/auth_service.dart';
@@ -89,7 +87,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       if (success) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const WelcomeAfterLogin()),
+          MaterialPageRoute(builder: (_) => const ClientApp()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -138,7 +136,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               children: [
                 GestureDetector(
                   onTap: () => _openAdmin(context),
-                  child: const StoreLogoAnimated(
+                  child: const SJLogo(
                     size: 160,
                   ),
                 ),
@@ -167,17 +165,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
                 const SizedBox(height: 25),
 
-                // زر Phone
-                _buildSocialButton(
-                  context,
-                  icon: Icons.phone_iphone,
-                  label: 'المتابعة برقم الهاتف',
-                  color: AppTheme.red,
-                  textColor: Colors.white,
-                  onTap: () => _login(context, 'phone'),
-                ),
-                const SizedBox(height: 15),
-
                 // زر Google
                 _buildSocialButton(
                   context,
@@ -186,6 +173,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   color: Colors.white,
                   textColor: AppTheme.dark,
                   onTap: () => _loginWithGoogle(context),
+                ),
+                const SizedBox(height: 15),
+
+                // زر Phone
+                _buildSocialButton(
+                  context,
+                  icon: Icons.phone_iphone,
+                  label: 'المتابعة برقم الهاتف',
+                  color: AppTheme.red,
+                  textColor: Colors.white,
+                  onTap: () => _login(context, 'phone'),
                 ),
                 const SizedBox(height: 15),
 
@@ -402,7 +400,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // ═══════════════════════════════════════════════
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const WelcomeAfterLogin()),
+            MaterialPageRoute(builder: (_) => const ClientApp()),
           );
         }
       } catch (e) {

@@ -55,7 +55,7 @@ class _ClientSplashState extends State<ClientSplash>
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (_) => const ClientMainNav()));
+            MaterialPageRoute(builder: (_) => const WelcomeAfterLogin()));
       }
     });
   }
@@ -100,13 +100,13 @@ class _ClientSplashState extends State<ClientSplash>
   }
 }
 
-class ClientMainNav extends StatefulWidget {
-  const ClientMainNav({super.key});
+class WelcomeAfterLogin extends StatefulWidget {
+  const WelcomeAfterLogin({super.key});
   @override
-  State<ClientMainNav> createState() => _ClientMainNavState();
+  State<WelcomeAfterLogin> createState() => _WelcomeAfterLoginState();
 }
 
-class _ClientMainNavState extends State<ClientMainNav> {
+class _WelcomeAfterLoginState extends State<WelcomeAfterLogin> {
   int _index = 0;
   final _pages = const [
     ClientHome(),

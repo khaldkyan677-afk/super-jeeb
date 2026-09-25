@@ -1,3 +1,7 @@
+import 'supermarket/grocery_screen.dart';
+import 'supermarket/stores_screen.dart';
+import 'supermarket/restaurants_screen.dart';
+import 'supermarket/supermarket_screen.dart';
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/store_logo_animated.dart';
@@ -312,13 +316,17 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const TaxiScreen()));
         break;
       case 'سوبرماركت':
-      case 'صيدلية':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const SupermarketScreen()));
+        break;
       case 'مطاعم':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const RestaurantsScreen()));
+        break;
       case 'متاجر':
-      case 'طرود':
-      case 'فرزة':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const StoresScreen()));
+        break;
       case 'بقاة':
-        _showComingSoon(name);
+      case 'بقالة':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const GroceryScreen()));
         break;
       default:
         _showComingSoon(name);
