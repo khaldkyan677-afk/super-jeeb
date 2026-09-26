@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'widgets/search_bar.dart';
 import 'widgets/category_chips.dart';
 import 'widgets/store_card.dart';
+import 'store_detail_screen.dart';
 import 'services/supermarket_service.dart';
 
 class GroceryScreen extends StatefulWidget {
@@ -19,7 +20,7 @@ class _GroceryScreenState extends State<GroceryScreen> {
   List<Map<String, dynamic>> _all = [];
   bool _loading = true;
   final Set<String> _favorites = {};
-  final List<String> _cats = ['الكل', 'قريب منك'];
+  final List<String> _cats = ['الكل', 'قريب منك', 'بقالات الحارة', 'خضار وفواكه', 'مخبز', 'دجاج ولحوم'];
 
   @override
   void initState() { super.initState(); _load(); }
@@ -40,7 +41,7 @@ class _GroceryScreenState extends State<GroceryScreen> {
     var list = _all;
     if (_sel > 1) {
       final cat = _cats[_sel];
-      list = list.where((s) => (s['category'] ?? '') == cat).toList();
+      list = list.where((s) => (s['subCategory'] ?? '') == cat).toList();
     }
     if (_query.isNotEmpty) {
       list = list.where((s) => (s['name'] ?? '').toString().contains(_query)).toList();
@@ -74,7 +75,7 @@ class _GroceryScreenState extends State<GroceryScreen> {
                     isOpen: s['isActive'] ?? true, deliveryFee: (s['deliveryFee'] ?? 0).toDouble(), minimumOrder: (s['minimumOrder'] ?? 0).toDouble(),
                     location: (s['location'] is Map) ? (s['location']['address'] ?? '') : '',
                     rating: (s['rating'] ?? 5).toDouble(),
-                    isFavorite: _favorites.contains(s['_id']), onFavorite: () => _toggleFavorite(s['_id']), onTap: () {}, onReport: () => showReportSheet(context, s['_id'] ?? '', s['name'] ?? ''), onRate: () => showRatingSheet(context, s['_id'] ?? '', s['name'] ?? '', () {})); })),
+                    isFavorite: _favorites.contains(s['_id']), onFavorite: () => _toggleFavorite(s['_id']), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => StoreDetailScreen(store: s))), onReport: () => showReportSheet(context, s['_id'] ?? '', s['name'] ?? ''), onRate: () => showRatingSheet(context, s['_id'] ?? '', s['name'] ?? '', () {})); })),
       ]));
   }
 }

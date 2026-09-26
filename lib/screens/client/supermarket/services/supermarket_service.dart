@@ -15,6 +15,18 @@ class SupermarketService {
     return [];
   }
 
+  Future<List<Map<String, dynamic>>> getProductsByStore(String storeId) async {
+    try {
+      final uri = Uri.base.resolve('/api/products/store/$storeId');
+      final r = await http.get(uri);
+      if (r.statusCode == 200) {
+        final d = jsonDecode(r.body) as List;
+        return d.cast<Map<String, dynamic>>();
+      }
+    } catch (_) {}
+    return [];
+  }
+
   Future<bool> toggleFavorite(String storeId) async {
     try {
       final uri = Uri.base.resolve('/api/favorites/$storeId');
