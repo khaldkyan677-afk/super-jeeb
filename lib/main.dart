@@ -10,6 +10,8 @@ import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'dart:async';
 
 import 'screens/email_auth_screen.dart';
+import 'screens/dev_selector_screen.dart';
+import 'screens/dev_selector_screen.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 
@@ -829,7 +831,7 @@ class _AdminGateScreenState extends State<AdminGateScreen> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const AdminApp()),
+          MaterialPageRoute(builder: (_) => const DevSelectorScreen()),
         );
       }
     } else {

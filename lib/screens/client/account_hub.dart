@@ -6,6 +6,11 @@ import 'notifications_screen.dart';
 import 'favorites_screen.dart';
 import 'help_screen.dart';
 import 'general/become_merchant_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../merchant/merchant_app.dart';
+import '../driver/driver_app.dart';
+
 import 'general/become_driver_screen.dart';
 import 'about_screen.dart';
 import 'my_orders_screen.dart';
@@ -24,6 +29,48 @@ class AccountHubScreen extends StatelessWidget {
             _header(),
             const SizedBox(height: 20),
             _upgradeSection(context),
+        Builder(builder: (ctx) {
+          try {
+            if (FirebaseAuth.instance.currentUser?.email == 'khaled20010405@gmail.com') {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('لوحة المطوّر', style: GoogleFonts.cairo(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => Navigator.push(ctx, MaterialPageRoute(builder: (_) => const MerchantApp())),
+                            child: Container(
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(color: const Color(0xFF25D366).withOpacity(0.15), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFF25D366).withOpacity(0.5))),
+                              child: Row(children: [const Icon(Icons.storefront, color: Color(0xFF25D366), size: 22), const SizedBox(width: 8), Expanded(child: Text('دخول كتاجر', style: GoogleFonts.cairo(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)))]),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => Navigator.push(ctx, MaterialPageRoute(builder: (_) => const DriverApp())),
+                            child: Container(
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(color: const Color(0xFFF0C107).withOpacity(0.15), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFFF0C107).withOpacity(0.5))),
+                              child: Row(children: [const Icon(Icons.delivery_dining, color: Color(0xFFF0C107), size: 22), const SizedBox(width: 8), Expanded(child: Text('دخول كمندوب', style: GoogleFonts.cairo(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)))]),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }
+          } catch (_) {}
+          return const SizedBox.shrink();
+        }),
             const SizedBox(height: 20),
             _quickStats(),
             const SizedBox(height: 20),

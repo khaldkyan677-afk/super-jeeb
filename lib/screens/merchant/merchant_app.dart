@@ -289,7 +289,7 @@ class _MerchantLoginState extends State<MerchantLogin> {
                 color: Colors.white,
                 size: 30,
               ),
-              label: const Text(
+              label: const Text("متجر",
                 style: TextStyle(color: Colors.white),
               ),
             ),

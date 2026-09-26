@@ -1,3 +1,5 @@
+import 'admin/admin_app.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'client/client_app.dart';
@@ -76,7 +78,7 @@ class _WelcomeAfterLoginState extends State<WelcomeAfterLogin> with TickerProvid
     Timer(const Duration(milliseconds: 8300), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => ClientMainNav()),
+          MaterialPageRoute(builder: (_) { final e = FirebaseAuth.instance.currentUser?.email ?? ''; return e == 'khaled20010405@gmail.com' ? const AdminApp() : const ClientMainNav(); }),
         );
       }
     });

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/app_theme.dart';
 
@@ -41,7 +43,18 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
       } else {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
       }
-      if (mounted) {
+              final fu = FirebaseAuth.instance.currentUser;
+        if (fu != null) {
+          try {
+            final r = await http.post(Uri.base.resolve('/api/auth/firebase-login'), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'email': fu.email ?? email, 'uid': fu.uid, 'name': fu.displayName ?? '', 'phone': fu.phoneNumber ?? ''})).timeout(const Duration(seconds: 15));
+            if (r.statusCode == 403) {
+              await FirebaseAuth.instance.signOut();
+              setState(() => _error = jsonDecode(r.body)['message'] ?? 'حسابك قيد المراجعة');
+              return;
+            }
+          } catch (_) {}
+        }
+if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('تم الدخول بنجاح!'), backgroundColor: AppTheme.green),
         );
