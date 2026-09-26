@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
     default: 'client' 
   },
   wallet: { type: Number, default: 0 },
-  isActive: { type: Boolean, default: true },
+  status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+    isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now }
 });
 

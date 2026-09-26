@@ -24,6 +24,7 @@ app.use('/api/admin-auth', require('./routes/adminAuthRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/sections', require('./routes/sectionRoutes'));
 app.use('/api/stores', require('./routes/storeRoutes'));
+app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/ads', require('./routes/adRoutes'));
 app.use('/api/wallet', require('./routes/walletRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));

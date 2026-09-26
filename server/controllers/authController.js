@@ -37,12 +37,54 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'بيانات الدخول غير صحيحة' });
 
+    if (user.role !== 'admin' && user.status !== 'approved') {
+      const msg = user.status === 'rejected'
+        ? 'تم رفض حسابك. تواصل مع الدعم'
+        : 'حسابك قيد المراجعة. سيتم إشعارك عند الموافقة';
+      return res.status(403).json({ message: msg, status: user.status });
+    }
+
     res.json({
       _id: user._id, name: user.name, email: user.email, phone: user.phone,
       role: user.role, token: generateToken(user._id)
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+
+exports.firebaseLogin = async (req, res) => {
+  try {
+    const { email, uid, name, phone } = req.body;
+    if (!email) return res.status(400).json({ message: 'البريد مطلوب' });
+
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await User.create({
+        name: name || email.split('@')[0],
+        email,
+        phone: phone || uid || email,
+        password: uid || 'firebase_' + Date.now(),
+        role: 'client',
+        status: 'pending',
+      });
+    }
+
+    if (user.role !== 'admin' && user.status !== 'approved') {
+      const msg = user.status === 'rejected'
+        ? 'تم رفض حسابك. تواصل مع الدعم'
+        : 'حسابك قيد المراجعة. سيتم إشعارك عند الموافقة';
+      return res.status(403).json({ message: msg, status: user.status });
+    }
+
+    res.json({
+      id: user._id, name: user.name, email: user.email, phone: user.phone,
+      role: user.role, status: user.status,
+      token: generateToken(user._id),
+    });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
   }
 };
 
