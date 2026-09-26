@@ -2,6 +2,8 @@ import 'supermarket/grocery_screen.dart';
 import 'supermarket/stores_screen.dart';
 import 'supermarket/restaurants_screen.dart';
 import 'supermarket/supermarket_screen.dart';
+import 'supermarket/pharmacy_screen.dart';
+import 'general/request_form_screen.dart';
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/store_logo_animated.dart';
@@ -220,15 +222,15 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
 
   Widget _buildQuickActions() {
     return Row(children: [
-      Expanded(child: _quickCard(Icons.local_shipping, 'Super Express', 'شحن آمن')),
+      Expanded(child: _quickCard(Icons.local_shipping, 'Super Express', 'شحن آمن', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RequestFormScreen(serviceType: 'Super Express', icon: Icons.local_shipping))))),
       const SizedBox(width: 12),
-      Expanded(child: _quickCard(Icons.edit_note, 'اشترِ لي', 'المندوب يشتري')),
+      Expanded(child: _quickCard(Icons.edit_note, 'اشترِ لي', 'المندوب يشتري', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RequestFormScreen(serviceType: 'اشتري لي', icon: Icons.shopping_bag))))),
     ]);
   }
 
-  Widget _quickCard(IconData icon, String title, String subtitle) {
+  Widget _quickCard(IconData icon, String title, String subtitle, {VoidCallback? onTap}) {
     return InkWell(
-      onTap: () => _showComingSoon(title),
+      onTap: onTap ?? () => _showComingSoon(title),
       borderRadius: BorderRadius.circular(16),
       child: Container(
       padding: const EdgeInsets.all(16),
@@ -313,7 +315,16 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
 
     switch (name) {
       case 'تاكسي':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const TaxiScreen()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const RequestFormScreen(serviceType: 'تاكسي', icon: Icons.local_taxi)));
+        break;
+      case 'طرود':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const RequestFormScreen(serviceType: 'طرود', icon: Icons.local_shipping)));
+        break;
+      case 'فرزة':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const RequestFormScreen(serviceType: 'فرزة', icon: Icons.airport_shuttle)));
+        break;
+      case 'اشتري لي':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const RequestFormScreen(serviceType: 'اشتري لي', icon: Icons.shopping_bag)));
         break;
       case 'سوبرماركت':
         Navigator.push(context, MaterialPageRoute(builder: (_) => const SupermarketScreen()));
@@ -327,6 +338,9 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       case 'بقاة':
       case 'بقالة':
         Navigator.push(context, MaterialPageRoute(builder: (_) => const GroceryScreen()));
+        break;
+      case 'صيدلية':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const PharmacyScreen()));
         break;
       default:
         _showComingSoon(name);

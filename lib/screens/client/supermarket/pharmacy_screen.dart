@@ -8,19 +8,19 @@ import 'widgets/store_card.dart';
 import 'store_detail_screen.dart';
 import 'services/supermarket_service.dart';
 
-class StoresScreen extends StatefulWidget {
-  const StoresScreen({super.key});
+class PharmacyScreen extends StatefulWidget {
+  const PharmacyScreen({super.key});
   @override
-  State<StoresScreen> createState() => _StoresScreenState();
+  State<PharmacyScreen> createState() => _PharmacyScreenState();
 }
 
-class _StoresScreenState extends State<StoresScreen> {
+class _PharmacyScreenState extends State<PharmacyScreen> {
   int _sel = 0;
   String _query = '';
   List<Map<String, dynamic>> _all = [];
   bool _loading = true;
   final Set<String> _favorites = {};
-  final List<String> _cats = ['الكل', 'قريب منك', 'مواد غذائية', 'تجميل وعطور', 'ملابس', 'أدوات منزلية', 'مفروشات', 'إلكترونيات', 'مواد بناء', 'أحذية', 'مكتبات وقرطاسية', 'نظارات وساعات', 'صحة ولياقة', 'مستلزمات حيوانات', 'اتصالات'];
+  final List<String> _cats = ["الكل", "قريب منك", "صيدلية", "مستلزمات طبية"];
 
   @override
   void initState() { super.initState(); _load(); }
@@ -33,7 +33,7 @@ class _StoresScreenState extends State<StoresScreen> {
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final s = await SupermarketService().getStoresByCategory('متاجر');
+    final s = await SupermarketService().getStoresByCategory('صيدلية');
     if (mounted) setState(() { _all = s; _loading = false; });
   }
 
@@ -56,11 +56,11 @@ class _StoresScreenState extends State<StoresScreen> {
       appBar: AppBar(backgroundColor: const Color(0xFF0D0D12), elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context)),
-        title: Text('متاجر', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.w600)),
+        title: Text('صيدلية', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.w600)),
         centerTitle: true),
       body: Column(children: [
         Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: SmSearchBar(hint: 'ابحث عن متجر...', onChanged: (v) => setState(() => _query = v))),
+          child: SmSearchBar(hint: 'ابحث عن صيدلية...', onChanged: (v) => setState(() => _query = v))),
         Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: CategoryChips(categories: _cats, selectedIndex: _sel,
             onSelected: (i) => setState(() => _sel = i))),
