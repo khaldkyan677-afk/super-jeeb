@@ -48,9 +48,9 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: const Color(0xFF0D0D12),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2B2D42),
+        backgroundColor: const Color(0xFFFFFFFF),
         title: Text(
           _step == 0
               ? 'سلاتي'
@@ -140,7 +140,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
                   style: TextStyle(
                     fontSize: 11,
                     color: (done || active)
-                        ? const Color(0xFF2B2D42)
+                        ? const Color(0xFFFFFFFF)
                         : Colors.grey,
                     fontWeight: (done || active)
                         ? FontWeight.bold
@@ -206,7 +206,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
+          BoxShadow(color: Colors.white.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Column(
@@ -222,7 +222,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF2B2D42),
+                    color: Color(0xFFFFFFFF),
                   ),
                 ),
               ),
@@ -282,12 +282,12 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
             width: 55,
             height: 55,
             decoration: BoxDecoration(
-              color: const Color(0xFFF8F9FA),
+              color: const Color(0xFF0D0D12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               item['icon'] as IconData,
-              color: const Color(0xFF2B2D42),
+              color: const Color(0xFFFFFFFF),
               size: 28,
             ),
           ),
@@ -316,7 +316,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
           ),
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFF8F9FA),
+              color: const Color(0xFF0D0D12),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -391,7 +391,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF2B2D42),
+            color: Color(0xFFFFFFFF),
           ),
         ),
         const SizedBox(height: 15),
@@ -535,7 +535,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
         'title': 'بطاقة بنكية',
         'subtitle': 'Visa / Mastercard',
         'icon': Icons.credit_card,
-        'color': const Color(0xFF2B2D42),
+        'color': const Color(0xFFFFFFFF),
       },
     ];
 
@@ -547,7 +547,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF2B2D42),
+            color: Color(0xFFFFFFFF),
           ),
         ),
         const SizedBox(height: 15),
@@ -579,7 +579,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF8F9FA),
+                          color: const Color(0xFF0D0D12),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
@@ -735,7 +735,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),

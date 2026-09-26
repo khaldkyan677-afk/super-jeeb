@@ -198,31 +198,56 @@ class ClientSearch extends StatefulWidget {
 }
 
 class _ClientSearchState extends State<ClientSearch> {
+  final _controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: TextField(
-          decoration: InputDecoration(
-            hintText: 'ابحث...',
-            hintStyle: const TextStyle(fontSize: 14),
-            prefixIcon:
-                const Icon(Icons.search, color: Color(0xFFEF233C)),
-            filled: true,
-            fillColor: const Color(0xFFF8F9FA),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: BorderSide.none,
+      backgroundColor: const Color(0xFF0D0D12),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1B26),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFEF233C).withOpacity(0.3), width: 1.5),
+                ),
+                child: TextField(
+                  controller: _controller,
+                  textAlign: TextAlign.right,
+                  style: GoogleFonts.cairo(color: Colors.white, fontSize: 15),
+                  decoration: InputDecoration(
+                    hintText: 'ابحث عن متجر أو منتج...',
+                    hintStyle: GoogleFonts.cairo(color: Colors.grey, fontSize: 14),
+                    prefixIcon: const Icon(Icons.search, color: Color(0xFFEF233C)),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+              ),
             ),
-          ),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: const BoxDecoration(color: Color(0xFF1A1B26), shape: BoxShape.circle),
+                      child: const Icon(Icons.search, color: Color(0xFFEF233C), size: 48),
+                    ),
+                    const SizedBox(height: 20),
+                    Text('ابحث عن متجر أو منتج', style: GoogleFonts.cairo(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 8),
+                    Text('اكتب اسم المتجر أو التصنيف', style: GoogleFonts.cairo(color: Colors.grey, fontSize: 13)),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
-      ),
-      body: const Center(
-        child: Text('بحث المنتجات والمتاجر',
-            style: TextStyle(fontSize: 16)),
       ),
     );
   }

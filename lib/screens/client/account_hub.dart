@@ -5,6 +5,8 @@ import 'settings_screen.dart';
 import 'notifications_screen.dart';
 import 'favorites_screen.dart';
 import 'help_screen.dart';
+import 'general/become_merchant_screen.dart';
+import 'general/become_driver_screen.dart';
 import 'about_screen.dart';
 import 'my_orders_screen.dart';
 import 'coupons_screen.dart';
@@ -15,7 +17,7 @@ class AccountHubScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: const Color(0xFF0D0D12),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -111,7 +113,7 @@ class AccountHubScreen extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFF2B2D42), Color(0xFF1B1C2A)],
+          colors: [Color(0xFFFFFFFF), Color(0xFF1B1C2A)],
         ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(40),
@@ -125,7 +127,7 @@ class AccountHubScreen extends StatelessWidget {
             const CircleAvatar(
               radius: 50,
               backgroundColor: Colors.white,
-              child: Icon(Icons.person, size: 55, color: Color(0xFF2B2D42)),
+              child: Icon(Icons.person, size: 55, color: Color(0xFFFFFFFF)),
             ),
             const SizedBox(height: 12),
             const Text(
@@ -174,6 +176,7 @@ class AccountHubScreen extends StatelessWidget {
               title: 'قدّم كتاجر',
               subtitle: 'افتح متجرك',
               color: const Color(0xFF25D366),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BecomeMerchantScreen())),
             ),
           ),
           const SizedBox(width: 12),
@@ -184,6 +187,7 @@ class AccountHubScreen extends StatelessWidget {
               title: 'قدّم كمندوب',
               subtitle: 'انضم ككابتن',
               color: Colors.orange,
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BecomeDriverScreen())),
             ),
           ),
         ],
@@ -197,15 +201,18 @@ class AccountHubScreen extends StatelessWidget {
     required String title,
     required String subtitle,
     required Color color,
+    VoidCallback? onTap,
   }) {
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
+          BoxShadow(color: Colors.white.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Column(
@@ -224,7 +231,7 @@ class AccountHubScreen extends StatelessWidget {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2B2D42),
+              color: Color(0xFFFFFFFF),
             ),
           ),
           Text(
@@ -232,6 +239,7 @@ class AccountHubScreen extends StatelessWidget {
             style: const TextStyle(fontSize: 10, color: Colors.grey),
           ),
         ],
+      ),
       ),
     );
   }
@@ -244,7 +252,7 @@ class AccountHubScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
+          BoxShadow(color: Colors.white.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Row(
@@ -311,7 +319,7 @@ class AccountHubScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 5),
+          BoxShadow(color: Colors.white.withValues(alpha: 0.03), blurRadius: 5),
         ],
       ),
       child: ListTile(
@@ -329,7 +337,7 @@ class AccountHubScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: color ?? const Color(0xFF2B2D42),
+            color: color ?? const Color(0xFFFFFFFF),
           ),
         ),
         trailing: Icon(
@@ -449,9 +457,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: const Color(0xFF0D0D12),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2B2D42),
+        backgroundColor: const Color(0xFFFFFFFF),
         title: const Text(
           'تعديل الملف الشخصي',
           style: TextStyle(color: Colors.white, fontSize: 15),
@@ -467,7 +475,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               children: [
                 const CircleAvatar(
                   radius: 60,
-                  backgroundColor: Color(0xFF2B2D42),
+                  backgroundColor: Color(0xFFFFFFFF),
                   child: Icon(Icons.person, size: 65, color: Colors.white),
                 ),
                 CircleAvatar(
@@ -565,9 +573,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: const Color(0xFF0D0D12),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2B2D42),
+        backgroundColor: const Color(0xFFFFFFFF),
         title: const Text(
           'الأمان',
           style: TextStyle(color: Colors.white, fontSize: 15),
@@ -816,9 +824,9 @@ class DevicesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: const Color(0xFF0D0D12),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2B2D42),
+        backgroundColor: const Color(0xFFFFFFFF),
         title: const Text(
           'الأجهزة المتصلة',
           style: TextStyle(color: Colors.white, fontSize: 15),
@@ -850,7 +858,7 @@ class DevicesScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF2B2D42).withValues(alpha: 0.1),
+              color: const Color(0xFFFFFFFF).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -859,7 +867,7 @@ class DevicesScreen extends StatelessWidget {
                   : d['type'] == 'iOS'
                   ? Icons.phone_iphone
                   : Icons.computer,
-              color: const Color(0xFF2B2D42),
+              color: const Color(0xFFFFFFFF),
               size: 24,
             ),
           ),
