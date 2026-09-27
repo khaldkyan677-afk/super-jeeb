@@ -1,447 +1,373 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'merchant_theme.dart';
+import '../../services/api_service.dart';
 
 class MerchantOrdersScreen extends StatefulWidget {
   const MerchantOrdersScreen({super.key});
-
   @override
   State<MerchantOrdersScreen> createState() => _MerchantOrdersScreenState();
 }
 
 class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tab;
-
-  final List<Map<String, dynamic>> _newOrders = [
-    {
-      'id': '5021',
-      'customer': 'خالد أحمد',
-      'phone': '777000001',
-      'address': 'صنعاء - شارع حدة',
-      'total': 20000,
-      'items': 2,
-      'status': 'new',
-      'time': 'منذ 5 دقائق',
-    },
-    {
-      'id': '5022',
-      'customer': 'سارة محمد',
-      'phone': '777000002',
-      'address': 'صنعاء - شارع تعز',
-      'total': 8500,
-      'items': 1,
-      'status': 'new',
-      'time': 'منذ 12 دقيقة',
-    },
-  ];
-
-  final List<Map<String, dynamic>> _preparingOrders = [
-    {
-      'id': '5018',
-      'customer': 'أحمد علي',
-      'phone': '777000003',
-      'address': 'صنعاء - شارع الزبيري',
-      'total': 35000,
-      'items': 3,
-      'status': 'preparing',
-      'time': 'منذ 20 دقيقة',
-    },
-  ];
-
-  final List<Map<String, dynamic>> _doneOrders = [
-    {
-      'id': '5015',
-      'customer': 'فاطمة س.',
-      'phone': '777000004',
-      'address': 'صنعاء - شارع بغداد',
-      'total': 12000,
-      'items': 1,
-      'status': 'done',
-      'time': 'اليوم - 10:30 ص',
-    },
-    {
-      'id': '5014',
-      'customer': 'محمد ح.',
-      'phone': '777000005',
-      'address': 'صنعاء - شارع الستين',
-      'total': 45000,
-      'items': 4,
-      'status': 'done',
-      'time': 'اليوم - 09:15 ص',
-    },
-  ];
+  late TabController _tabs;
+  final _statuses = ['جديدة', 'قيد المراجعة', 'قيد التجهيز', 'جاهزة للمندوب', 'مع المندوب', 'مكتملة', 'ملغاة'];
+  List<_Order> _orders = [];
+  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 4, vsync: this);
+    _tabs = TabController(length: _statuses.length, vsync: this);
+    _loadOrders();
   }
 
   @override
-  void dispose() {
-    _tab.dispose();
-    super.dispose();
+  void dispose() { _tabs.dispose(); super.dispose(); }
+
+  Future<void> _loadOrders() async {
+    setState(() => _loading = true);
+    final data = await ApiService.getMerchantOrders();
+    final statusMap = {
+      'pending': 'جديدة',
+      'accepted': 'قيد المراجعة',
+      'preparing': 'قيد التجهيز',
+      'ready': 'جاهزة للمندوب',
+      'on_the_way': 'مع المندوب',
+      'delivered': 'مكتملة',
+      'cancelled': 'ملغاة',
+    };
+    final list = data.map((raw) {
+      final o = raw as Map<String, dynamic>;
+      final client = o['clientId'] as Map<String, dynamic>?;
+      final driver = o['driverId'] as Map<String, dynamic>?;
+      final items = (o['items'] as List<dynamic>?) ?? [];
+      final oid = (o['_id'] ?? '').toString();
+      return _Order(
+        id: oid,
+        shortId: '#${oid.length >= 6 ? oid.substring(0, 6) : oid}',
+        customer: client?['name'] ?? 'عميل',
+        phone: client?['phone'] ?? '—',
+        itemsCount: '${items.length} منتجات',
+        total: '${o['total'] ?? 0}',
+        statusLabel: statusMap[o['status']] ?? 'جديدة',
+        rawStatus: o['status'] ?? 'pending',
+        payment: 'نقداً',
+        address: o['address'] ?? 'صنعاء',
+        driver: driver?['name'] ?? 'لا يوجد',
+        notes: o['notes'] ?? '',
+      );
+    }).toList();
+
+    if (!mounted) return;
+    setState(() { _orders = list; _loading = false; });
   }
+
+  List<_Order> _filter(String s) => _orders.where((o) => o.statusLabel == s).toList();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1B1C2A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2B2D42),
-        title: const Text(
-          'إدارة الطلبات',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: const BackButton(color: Colors.white),
-        bottom: TabBar(
-          controller: _tab,
-          indicatorColor: const Color(0xFFEF233C),
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white60,
-          labelStyle: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-          ),
-          tabs: [
-            Tab(text: 'جديدة (${_newOrders.length})'),
-            Tab(text: 'تحضير (${_preparingOrders.length})'),
-            Tab(text: 'مكتملة (${_doneOrders.length})'),
-            const Tab(text: 'الكل'),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tab,
-        children: [
-          _buildList(_newOrders, 'new'),
-          _buildList(_preparingOrders, 'preparing'),
-          _buildList(_doneOrders, 'done'),
-          _buildList([
-            ..._newOrders,
-            ..._preparingOrders,
-            ..._doneOrders,
-          ], 'all'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildList(List<Map<String, dynamic>> orders, String filter) {
-    if (orders.isEmpty) {
-      return const Center(
+      backgroundColor: MJ.bg,
+      body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.receipt_long_outlined, size: 80, color: Colors.white24),
-            SizedBox(height: 15),
-            Text(
-              'لا توجد طلبات',
-              style: TextStyle(color: Colors.white54, fontSize: 14),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: Row(
+                children: [
+                  Text('الطلبات', style: MJ.h1),
+                  const Spacer(),
+                  InkWell(
+                    onTap: _loadOrders,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(color: MJ.softPink, borderRadius: BorderRadius.circular(12)),
+                      child: Row(
+                        children: [
+                          Icon(Icons.refresh_rounded, color: MJ.primary, size: 16),
+                          const SizedBox(width: 4),
+                          Text('تحديث', style: GoogleFonts.cairo(color: MJ.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              height: 40,
+              child: TabBar(
+                controller: _tabs,
+                isScrollable: true,
+                labelColor: Colors.white,
+                unselectedLabelColor: MJ.textMuted,
+                labelStyle: GoogleFonts.cairo(fontSize: 12, fontWeight: FontWeight.w700),
+                unselectedLabelStyle: GoogleFonts.cairo(fontSize: 12),
+                indicator: BoxDecoration(color: MJ.primary, borderRadius: BorderRadius.circular(12)),
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                tabs: _statuses.map((s) => Tab(
+                  child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: Text(s)),
+                )).toList(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator(color: MJ.primary))
+                  : RefreshIndicator(
+                      color: MJ.primary,
+                      onRefresh: _loadOrders,
+                      child: TabBarView(
+                        controller: _tabs,
+                        children: _statuses.map((s) {
+                          final list = _filter(s);
+                          if (list.isEmpty) return _emptyState();
+                          return ListView.separated(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                            itemCount: list.length,
+                            separatorBuilder: (_, i) => const SizedBox(height: 10),
+                            itemBuilder: (_, i) => _orderCard(list[i]),
+                          );
+                        }).toList(),
+                      ),
+                    ),
             ),
           ],
         ),
-      );
-    }
-    return ListView.builder(
-      padding: const EdgeInsets.all(15),
-      itemCount: orders.length,
-      itemBuilder: (context, i) => _orderCard(orders[i]),
+      ),
     );
   }
 
-  Widget _orderCard(Map<String, dynamic> o) {
-    final status = o['status'] as String;
-    Color color;
-    String statusText;
-    IconData statusIcon;
+  Widget _emptyState() => Center(
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.inbox_rounded, color: MJ.textMuted, size: 64),
+        const SizedBox(height: 12),
+        Text('لا توجد طلبات في هذه الحالة', style: MJ.muted),
+      ],
+    ),
+  );
 
-    switch (status) {
-      case 'new':
-        color = Colors.orange;
-        statusText = 'جديد';
-        statusIcon = Icons.notifications_active;
-        break;
-      case 'preparing':
-        color = const Color(0xFFEF233C);
-        statusText = 'قيد التحضير';
-        statusIcon = Icons.restaurant;
-        break;
-      case 'done':
-        color = const Color(0xFF25D366);
-        statusText = 'مكتمل';
-        statusIcon = Icons.check_circle;
-        break;
-      default:
-        color = Colors.grey;
-        statusText = 'غير معروف';
-        statusIcon = Icons.help;
-    }
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.02),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: status == 'new'
-              ? Colors.orange.withValues(alpha: 0.5)
-              : Colors.white10,
-          width: status == 'new' ? 1.5 : 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(statusIcon, color: color, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'طلب #${o['id']}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      o['time'],
-                      style: const TextStyle(
-                        color: Colors.white38,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  statusText,
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const Divider(color: Colors.white10, height: 20),
-          _row(Icons.person, 'العميل', o['customer']),
-          const SizedBox(height: 6),
-          _row(Icons.phone, 'الهاتف', o['phone']),
-          const SizedBox(height: 6),
-          _row(Icons.location_on, 'العنوان', o['address']),
-          const SizedBox(height: 6),
-          _row(
-            Icons.shopping_bag,
-            'المنتجات',
-            '${o['items']} منتج - ${o['total']} YER',
-          ),
-          if (status == 'new') ...[
-            const SizedBox(height: 15),
+  Widget _orderCard(_Order o) {
+    final stColor = _statusColor(o.rawStatus);
+    return GestureDetector(
+      onTap: () => _openDetails(o),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(color: MJ.card, borderRadius: BorderRadius.circular(18), boxShadow: MJ.shadowSoft),
+        child: Column(
+          children: [
             Row(
               children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF25D366),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        o['status'] = 'preparing';
-                        _newOrders.remove(o);
-                        _preparingOrders.add(o);
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('✅ تم قبول الطلب'),
-                          backgroundColor: Color(0xFF25D366),
-                        ),
-                      );
-                    },
-                    icon: const Icon(
-                      Icons.check,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                    label: const Text(
-                      'قبول',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+                Text(o.shortId, style: GoogleFonts.cairo(fontWeight: FontWeight.w800, fontSize: 14)),
                 const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(color: stColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
+                  child: Text(o.statusLabel, style: GoogleFonts.cairo(color: stColor, fontSize: 10, fontWeight: FontWeight.w700)),
+                ),
+                const Spacer(),
+                Text('${o.total} ري', style: MJ.price),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Container(
+                  width: 40, height: 40,
+                  decoration: BoxDecoration(color: MJ.softPink, borderRadius: BorderRadius.circular(12)),
+                  child: Icon(Icons.person_rounded, color: MJ.primary),
+                ),
+                const SizedBox(width: 10),
                 Expanded(
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFFEF233C)),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    onPressed: () => _showRejectDialog(o),
-                    icon: const Icon(
-                      Icons.close,
-                      color: Color(0xFFEF233C),
-                      size: 16,
-                    ),
-                    label: const Text(
-                      'رفض',
-                      style: TextStyle(
-                        color: Color(0xFFEF233C),
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(o.customer, style: MJ.body.copyWith(fontWeight: FontWeight.w700, fontSize: 12)),
+                      Text('${o.itemsCount} • ${o.payment}', style: MJ.tiny),
+                    ],
                   ),
                 ),
+                Icon(Icons.chevron_left_rounded, color: MJ.textMuted),
               ],
             ),
           ],
-          if (status == 'preparing') ...[
-            const SizedBox(height: 15),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFEF233C),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () {
-                  setState(() {
-                    o['status'] = 'done';
-                    _preparingOrders.remove(o);
-                    _doneOrders.add(o);
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('🏁 تم تسليم الطلب للمندوب'),
-                      backgroundColor: Color(0xFF25D366),
-                    ),
-                  );
-                },
-                icon: const Icon(
-                  Icons.local_shipping,
-                  color: Colors.white,
-                  size: 16,
-                ),
-                label: const Text(
-                  'تسليم للمندوب',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ],
+        ),
       ),
     );
   }
 
-  Widget _row(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.white38, size: 14),
-        const SizedBox(width: 6),
-        Text(
-          '$label: ',
-          style: const TextStyle(color: Colors.white38, fontSize: 11),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(color: Colors.white70, fontSize: 11),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
+  Color _statusColor(String s) {
+    switch (s) {
+      case 'pending': return MJ.danger;
+      case 'accepted': return MJ.warning;
+      case 'preparing': return MJ.warning;
+      case 'ready': return MJ.success;
+      case 'on_the_way': return MJ.primary;
+      case 'delivered': return MJ.success;
+      case 'cancelled': return MJ.textMuted;
+      default: return MJ.textMuted;
+    }
   }
 
-  void _showRejectDialog(Map<String, dynamic> o) {
-    showDialog(
+  void _openDetails(_Order o) {
+    showModalBottomSheet(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF2B2D42),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'سبب الرفض',
-          style: TextStyle(color: Colors.white, fontSize: 15),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _orderDetailsSheet(o),
+    );
+  }
+
+  Widget _orderDetailsSheet(_Order o) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      maxChildSize: 0.95,
+      minChildSize: 0.5,
+      builder: (_, scroll) => Container(
+        decoration: const BoxDecoration(color: MJ.bg, borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+        child: ListView(
+          controller: scroll,
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
           children: [
-            _reason(context, o, 'نفذت الكمية'),
-            _reason(context, o, 'الفرع مغلق'),
-            _reason(context, o, 'لا يمكن التوصيل للمنطقة'),
+            Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: MJ.border, borderRadius: BorderRadius.circular(4)))),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Text('تفاصيل الطلب ${o.shortId}', style: MJ.h2),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(color: _statusColor(o.rawStatus).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
+                  child: Text(o.statusLabel, style: GoogleFonts.cairo(color: _statusColor(o.rawStatus), fontSize: 11, fontWeight: FontWeight.w700)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            _infoSection('بيانات العميل', [
+              _infoRow(Icons.person_rounded, 'الاسم', o.customer),
+              _infoRow(Icons.phone_rounded, 'الجوال', o.phone),
+            ]),
+            const SizedBox(height: 14),
+            _infoSection('المنتجات', [
+              _infoRow(Icons.shopping_bag_rounded, 'العناصر', o.itemsCount),
+              _infoRow(Icons.payments_rounded, 'الإجمالي', '${o.total} ري'),
+              _infoRow(Icons.credit_card_rounded, 'الدفع', o.payment),
+            ]),
+            const SizedBox(height: 14),
+            _infoSection('التوصيل', [
+              _infoRow(Icons.location_on_rounded, 'العنوان', o.address),
+              _infoRow(Icons.delivery_dining_rounded, 'المندوب', o.driver),
+            ]),
+            if (o.notes.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              _infoSection('ملاحظات', [_infoRow(Icons.notes_rounded, 'ملاحظة', o.notes)]),
+            ],
+            const SizedBox(height: 20),
+            Text('الإجراءات', style: MJ.h3),
+            const SizedBox(height: 10),
+            _actionButtons(o),
           ],
         ),
       ),
     );
   }
 
-  Widget _reason(BuildContext context, Map<String, dynamic> o, String reason) {
-    return ListTile(
-      title: Text(
-        reason,
-        style: const TextStyle(color: Colors.white, fontSize: 13),
-      ),
-      trailing: const Icon(
-        Icons.arrow_forward_ios,
-        color: Colors.white30,
-        size: 14,
-      ),
-      onTap: () {
-        setState(() => _newOrders.remove(o));
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('❌ تم رفض الطلب: $reason'),
-            backgroundColor: const Color(0xFFEF233C),
-          ),
-        );
-      },
+  Widget _infoSection(String title, List<Widget> rows) => Container(
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(color: MJ.card, borderRadius: BorderRadius.circular(16), boxShadow: MJ.shadowSoft),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: MJ.h3.copyWith(fontSize: 13)),
+        const SizedBox(height: 10),
+        ...rows,
+      ],
+    ),
+  );
+
+  Widget _infoRow(IconData ic, String label, String value) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 5),
+    child: Row(
+      children: [
+        Icon(ic, color: MJ.primary, size: 18),
+        const SizedBox(width: 10),
+        Text('$label:', style: MJ.muted),
+        const SizedBox(width: 6),
+        Expanded(child: Text(value, style: MJ.body.copyWith(fontWeight: FontWeight.w700, fontSize: 12))),
+      ],
+    ),
+  );
+
+  Widget _actionButtons(_Order o) {
+    final buttons = <Widget>[];
+    if (o.rawStatus == 'pending') {
+      buttons.add(_btn('قبول الطلب', MJ.success, Icons.check_rounded, 'accepted', o));
+      buttons.add(_btn('رفض الطلب', MJ.danger, Icons.close_rounded, 'cancelled', o));
+    } else if (o.rawStatus == 'accepted') {
+      buttons.add(_btn('بدء التجهيز', MJ.warning, Icons.play_arrow_rounded, 'preparing', o));
+    } else if (o.rawStatus == 'preparing') {
+      buttons.add(_btn('الطلب جاهز', MJ.success, Icons.done_all_rounded, 'ready', o));
+    } else if (o.rawStatus == 'ready') {
+      buttons.add(_btn('إلغاء الطلب', MJ.danger, Icons.cancel_rounded, 'cancelled', o));
+    }
+    return Column(
+      children: buttons.map((b) => Padding(padding: const EdgeInsets.only(bottom: 10), child: b)).toList(),
     );
   }
+
+  Widget _btn(String label, Color color, IconData ic, String newStatus, _Order o) {
+    return SizedBox(
+      width: double.infinity,
+      height: 48,
+      child: ElevatedButton.icon(
+        onPressed: () async {
+          Navigator.pop(context);
+          final res = await ApiService.updateOrderStatus(orderId: o.id, status: newStatus);
+          if (!mounted) return;
+          if (res.containsKey('error')) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('فشل: ${res['error']}', style: GoogleFonts.cairo()), backgroundColor: MJ.danger),
+            );
+            return;
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('تم: $label', style: GoogleFonts.cairo()), backgroundColor: color),
+          );
+          _loadOrders();
+        },
+        icon: Icon(ic, color: Colors.white, size: 20),
+        label: Text(label, style: GoogleFonts.cairo(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          elevation: 0,
+        ),
+      ),
+    );
+  }
+}
+
+class _Order {
+  final String id, shortId, customer, phone, itemsCount, total, statusLabel, rawStatus, payment, address, driver, notes;
+  _Order({
+    required this.id,
+    required this.shortId,
+    required this.customer,
+    required this.phone,
+    required this.itemsCount,
+    required this.total,
+    required this.statusLabel,
+    required this.rawStatus,
+    required this.payment,
+    required this.address,
+    required this.driver,
+    required this.notes,
+  });
 }

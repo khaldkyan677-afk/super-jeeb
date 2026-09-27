@@ -1,609 +1,94 @@
 import 'package:flutter/material.dart';
-
-import '../../services/camera_service.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'merchant_theme.dart';
 
 class MerchantProductsScreen extends StatefulWidget {
   const MerchantProductsScreen({super.key});
-
   @override
   State<MerchantProductsScreen> createState() => _MerchantProductsScreenState();
 }
 
 class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
-  String _filter = 'الكل';
-  final _filters = ['الكل', 'نشط', 'موقوف', 'نفذ'];
+  final _cats = ['الكل', 'فواكه', 'خضروات', 'عروض'];
+  int _catIdx = 0;
 
-  final List<Map<String, dynamic>> _products = [
-    {
-      'name': 'قميص رجالي',
-      'price': 8000,
-      'stock': 50,
-      'status': 'active',
-      'icon': Icons.checkroom,
-    },
-    {
-      'name': 'بنطلون جينز',
-      'price': 12000,
-      'stock': 30,
-      'status': 'active',
-      'icon': Icons.checkroom,
-    },
-    {
-      'name': 'حزام جلد',
-      'price': 3500,
-      'stock': 5,
-      'status': 'active',
-      'icon': Icons.checkroom,
-    },
-    {
-      'name': 'جاكيت شتوي',
-      'price': 25000,
-      'stock': 0,
-      'status': 'out',
-      'icon': Icons.checkroom,
-    },
-    {
-      'name': 'ربطة عنق',
-      'price': 2000,
-      'stock': 100,
-      'status': 'inactive',
-      'icon': Icons.checkroom,
-    },
+  final _products = [
+    _P('طماطم طازجة', '1,200', '1,500', 24, 'خضروات', true),
+    _P('موز', '900', '0', 15, 'فواكه', true),
+    _P('تفاح أحمر', '1,500', '1,800', 0, 'فواكه', false),
+    _P('خيار', '800', '0', 40, 'خضروات', true),
+    _P('برتقال', '1,100', '1,400', 8, 'فواكه', true),
+    _P('جزر', '700', '0', 3, 'خضروات', true),
   ];
 
-  List<Map<String, dynamic>> get _filtered {
-    if (_filter == 'الكل') return _products;
-    if (_filter == 'نشط') {
-      return _products.where((p) => p['status'] == 'active').toList();
-    }
-    if (_filter == 'موقوف') {
-      return _products.where((p) => p['status'] == 'inactive').toList();
-    }
-    return _products.where((p) => p['status'] == 'out').toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1B1C2A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2B2D42),
-        title: const Text(
-          'إدارة المنتجات',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: const BackButton(color: Colors.white),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.add_circle,
-              color: Color(0xFF25D366),
-              size: 28,
-            ),
-            onPressed: () => _openEditor(context, null),
-          ),
-        ],
+      backgroundColor: MJ.bg,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _openEditor(null),
+        backgroundColor: MJ.primary,
+        icon: const Icon(Icons.add_rounded, color: Colors.white),
+        label: Text('إضافة منتج', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.w800)),
       ),
-      body: Column(
-        children: [
-          _filterBar(),
-          _statsBar(),
-          Expanded(
-            child: _filtered.isEmpty
-                ? _emptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.all(15),
-                    itemCount: _filtered.length,
-                    itemBuilder: (context, i) => _productCard(_filtered[i]),
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _filterBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-      color: const Color(0xFF2B2D42).withValues(alpha: 0.5),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: _filters.map((f) {
-            final sel = _filter == f;
-            return Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: InkWell(
-                onTap: () => setState(() => _filter = f),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: sel
-                        ? const Color(0xFFEF233C)
-                        : Colors.white.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    f,
-                    style: TextStyle(
-                      color: sel ? Colors.white : Colors.white60,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
-  Widget _statsBar() {
-    final total = _products.length;
-    final active = _products.where((p) => p['status'] == 'active').length;
-    final out = _products.where((p) => p['status'] == 'out').length;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-      color: Colors.white.withValues(alpha: 0.02),
-      child: Row(
-        children: [
-          _statItem(
-            Icons.inventory,
-            '$total',
-            'إجمالي',
-            const Color(0xFFEF233C),
-          ),
-          const SizedBox(width: 15),
-          _statItem(
-            Icons.check_circle,
-            '$active',
-            'نشط',
-            const Color(0xFF25D366),
-          ),
-          const SizedBox(width: 15),
-          _statItem(Icons.warning, '$out', 'نفذ', Colors.orange),
-        ],
-      ),
-    );
-  }
-
-  Widget _statItem(IconData icon, String value, String label, Color color) {
-    return Row(
-      children: [
-        Icon(icon, color: color, size: 16),
-        const SizedBox(width: 4),
-        Text(
-          '$value $label',
-          style: TextStyle(
-            color: color,
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _emptyState() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.inventory_2_outlined, size: 80, color: Colors.white24),
-          SizedBox(height: 15),
-          Text(
-            'لا توجد منتجات',
-            style: TextStyle(color: Colors.white54, fontSize: 14),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _productCard(Map<String, dynamic> p) {
-    final stock = p['stock'] as int;
-    final status = p['status'] as String;
-    final lowStock = stock < 10 && stock > 0;
-    final isOut = stock == 0;
-
-    Color statusColor;
-    String statusText;
-    if (status == 'inactive') {
-      statusColor = Colors.grey;
-      statusText = 'موقوف';
-    } else if (isOut) {
-      statusColor = const Color(0xFFEF233C);
-      statusText = 'نفذ';
-    } else {
-      statusColor = const Color(0xFF25D366);
-      statusText = 'نشط';
-    }
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.02),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(p['icon'] as IconData, color: Colors.white60, size: 32),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  p['name'],
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${p['price']} YER',
-                  style: const TextStyle(
-                    color: Color(0xFFEF233C),
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.inventory_2,
-                      color: lowStock
-                          ? Colors.orange
-                          : isOut
-                          ? const Color(0xFFEF233C)
-                          : Colors.white38,
-                      size: 12,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '$stock قطعة',
-                      style: TextStyle(
-                        color: lowStock
-                            ? Colors.orange
-                            : isOut
-                            ? const Color(0xFFEF233C)
-                            : Colors.white38,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  statusText,
-                  style: TextStyle(
-                    color: statusColor,
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 6),
-              PopupMenuButton<String>(
-                icon: const Icon(
-                  Icons.more_vert,
-                  color: Colors.white54,
-                  size: 20,
-                ),
-                color: const Color(0xFF2B2D42),
-                onSelected: (v) {
-                  if (v == 'edit') {
-                    _openEditor(context, p);
-                  } else if (v == 'delete') {
-                    _confirmDelete(p);
-                  } else if (v == 'toggle') {
-                    setState(() {
-                      p['status'] = status == 'active' ? 'inactive' : 'active';
-                    });
-                  }
-                },
-                itemBuilder: (_) => [
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Row(
-                      children: [
-                        Icon(Icons.edit, color: Colors.white, size: 18),
-                        SizedBox(width: 8),
-                        Text('تعديل', style: TextStyle(color: Colors.white)),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'toggle',
-                    child: Row(
-                      children: [
-                        Icon(Icons.toggle_on, color: Colors.white, size: 18),
-                        SizedBox(width: 8),
-                        Text(
-                          'تفعيل/إيقاف',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete, color: Color(0xFFEF233C), size: 18),
-                        SizedBox(width: 8),
-                        Text('حذف', style: TextStyle(color: Color(0xFFEF233C))),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _openEditor(BuildContext context, Map<String, dynamic>? product) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => ProductEditorScreen(product: product)),
-    );
-  }
-
-  void _confirmDelete(Map<String, dynamic> p) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF2B2D42),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'حذف المنتج',
-          style: TextStyle(color: Colors.white, fontSize: 15),
-        ),
-        content: Text(
-          'هل تريد حذف "${p['name']}"؟',
-          style: const TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء', style: TextStyle(color: Colors.white60)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEF233C),
-            ),
-            onPressed: () {
-              setState(() => _products.remove(p));
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('🗑️ تم حذف المنتج'),
-                  backgroundColor: Color(0xFFEF233C),
-                ),
-              );
-            },
-            child: const Text('حذف', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class ProductEditorScreen extends StatefulWidget {
-  final Map<String, dynamic>? product;
-  const ProductEditorScreen({super.key, this.product});
-
-  @override
-  State<ProductEditorScreen> createState() => _ProductEditorScreenState();
-}
-
-class _ProductEditorScreenState extends State<ProductEditorScreen> {
-  late TextEditingController _nameCtrl;
-  late TextEditingController _priceCtrl;
-  late TextEditingController _stockCtrl;
-  String? _image;
-  bool _available = true;
-
-  @override
-  void initState() {
-    super.initState();
-    final p = widget.product;
-    _nameCtrl = TextEditingController(text: p?['name'] ?? '');
-    _priceCtrl = TextEditingController(text: p?['price']?.toString() ?? '');
-    _stockCtrl = TextEditingController(text: p?['stock']?.toString() ?? '');
-    _image = p?['image'];
-  }
-
-  @override
-  void dispose() {
-    _nameCtrl.dispose();
-    _priceCtrl.dispose();
-    _stockCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isEdit = widget.product != null;
-    return Scaffold(
-      backgroundColor: const Color(0xFF1B1C2A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2B2D42),
-        title: Text(
-          isEdit ? 'تعديل منتج' : 'منتج جديد',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: const BackButton(color: Colors.white),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(15),
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'صورة المنتج (بدون خلفية)',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 180,
-              child: ImageUploadBox(
-                label: _image == null ? 'اضغط لإضافة صورة' : 'تم رفع الصورة',
-                icon: Icons.add_photo_alternate,
-                activeColor: const Color(0xFF25D366),
-                onUploaded: (url) {
-                  setState(() => _image = url);
-                  if (url != null) {
-                    BackgroundRemover.showRemoveDialog(
-                      context,
-                      url,
-                      (newUrl) => setState(() => _image = newUrl),
-                    );
-                  }
-                },
-              ),
-            ),
-            const SizedBox(height: 20),
-            _field(_nameCtrl, 'اسم المنتج', Icons.title),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _field(
-                    _priceCtrl,
-                    'السعر',
-                    Icons.attach_money,
-                    keyboard: TextInputType.number,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _field(
-                    _stockCtrl,
-                    'المخزون',
-                    Icons.inventory_2,
-                    keyboard: TextInputType.number,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 15),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.03),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white24),
-              ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Row(
                 children: [
-                  Icon(
-                    _available ? Icons.check_circle : Icons.cancel,
-                    color: _available
-                        ? const Color(0xFF25D366)
-                        : const Color(0xFFEF233C),
-                    size: 22,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      _available ? 'المنتج متاح' : 'المنتج غير متاح',
-                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                  Text('المنتجات', style: MJ.h1),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(color: MJ.softPink, borderRadius: BorderRadius.circular(12)),
+                    child: Row(
+                      children: [
+                        Icon(Icons.search_rounded, color: MJ.primary, size: 16),
+                        const SizedBox(width: 4),
+                        Text('بحث', style: GoogleFonts.cairo(color: MJ.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+                      ],
                     ),
-                  ),
-                  Switch(
-                    value: _available,
-                    activeThumbColor: const Color(0xFF25D366),
-                    onChanged: (v) => setState(() => _available = v),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 30),
             SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF25D366),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-                onPressed: () {
-                  if (_nameCtrl.text.isEmpty || _priceCtrl.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('⚠️ املأ الحقول'),
-                        backgroundColor: Color(0xFFEF233C),
+              height: 38,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: _cats.length,
+                itemBuilder: (_, i) {
+                  final sel = _catIdx == i;
+                  return GestureDetector(
+                    onTap: () => setState(() => _catIdx = i),
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: sel ? MJ.primary : MJ.card,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: MJ.shadowSoft,
                       ),
-                    );
-                    return;
-                  }
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        isEdit ? '✅ تم حفظ التعديلات' : '✅ تم إضافة المنتج',
-                      ),
-                      backgroundColor: const Color(0xFF25D366),
+                      child: Text(_cats[i], style: GoogleFonts.cairo(
+                        color: sel ? Colors.white : MJ.text,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      )),
                     ),
                   );
                 },
-                icon: const Icon(Icons.save, color: Colors.white),
-                label: Text(
-                  isEdit ? 'حفظ التعديلات' : 'إضافة المنتج',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: ListView.separated(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 90),
+                itemCount: _products.length,
+                separatorBuilder: (_, i) => const SizedBox(height: 10),
+                itemBuilder: (_, i) => _productCard(_products[i]),
               ),
             ),
           ],
@@ -612,31 +97,282 @@ class _ProductEditorScreenState extends State<ProductEditorScreen> {
     );
   }
 
-  Widget _field(
-    TextEditingController c,
-    String label,
-    IconData icon, {
-    TextInputType? keyboard,
-  }) {
-    return TextField(
-      controller: c,
-      keyboardType: keyboard,
-      style: const TextStyle(color: Colors.white, fontSize: 13),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.white54, fontSize: 12),
-        prefixIcon: Icon(icon, color: const Color(0xFFEF233C), size: 20),
-        filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.03),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.white24),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFEF233C)),
+  Widget _productCard(_P p) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: MJ.card, borderRadius: BorderRadius.circular(18), boxShadow: MJ.shadowSoft),
+      child: Row(
+        children: [
+          Container(
+            width: 70, height: 70,
+            decoration: BoxDecoration(color: MJ.softPink, borderRadius: BorderRadius.circular(14)),
+            child: Icon(Icons.eco_rounded, color: MJ.primary, size: 36),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: Text(p.name, style: MJ.body.copyWith(fontWeight: FontWeight.w800, fontSize: 13))),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: p.available ? MJ.success.withValues(alpha: 0.15) : MJ.danger.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(p.available ? 'متوفر' : 'نفذ',
+                        style: GoogleFonts.cairo(color: p.available ? MJ.success : MJ.danger, fontSize: 10, fontWeight: FontWeight.w700)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(p.cat, style: MJ.tiny),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text('${p.price} ري', style: MJ.price),
+                    if (p.oldPrice != '0') ...[
+                      const SizedBox(width: 8),
+                      Text('${p.oldPrice} ري', style: GoogleFonts.cairo(fontSize: 11, color: MJ.textMuted, decoration: TextDecoration.lineThrough)),
+                    ],
+                    const Spacer(),
+                    Icon(Icons.inventory_2_rounded, color: MJ.textMuted, size: 14),
+                    const SizedBox(width: 3),
+                    Text('${p.stock}', style: MJ.tiny),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert_rounded, color: MJ.textMuted),
+            onSelected: (v) {
+              if (v == 'edit') _openEditor(p);
+              if (v == 'delete') _confirmDelete(p);
+            },
+            itemBuilder: (_) => [
+              _menuItem('edit', Icons.edit_rounded, 'تعديل'),
+              _menuItem('hide', Icons.visibility_off_rounded, 'إخفاء'),
+              _menuItem('price', Icons.attach_money_rounded, 'تغيير السعر'),
+              _menuItem('stock', Icons.inventory_rounded, 'إدارة المخزون'),
+              _menuItem('delete', Icons.delete_rounded, 'حذف'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  PopupMenuItem<String> _menuItem(String v, IconData ic, String label) {
+    return PopupMenuItem(
+      value: v,
+      child: Row(
+        children: [
+          Icon(ic, color: MJ.primary, size: 18),
+          const SizedBox(width: 10),
+          Text(label, style: GoogleFonts.cairo(fontSize: 13)),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDelete(_P p) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: MJ.card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('حذف المنتج', style: MJ.h3),
+        content: Text('هل تريد حذف "${p.name}"؟', style: MJ.body),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('إلغاء', style: GoogleFonts.cairo(color: MJ.textMuted))),
+          TextButton(onPressed: () { Navigator.pop(context); }, child: Text('حذف', style: GoogleFonts.cairo(color: MJ.danger, fontWeight: FontWeight.w800))),
+        ],
+      ),
+    );
+  }
+
+  void _openEditor(_P? p) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _ProductEditor(product: p),
+    );
+  }
+}
+
+class _ProductEditor extends StatefulWidget {
+  final _P? product;
+  const _ProductEditor({this.product});
+  @override
+  State<_ProductEditor> createState() => _ProductEditorState();
+}
+
+class _ProductEditorState extends State<_ProductEditor> {
+  late TextEditingController _name, _desc, _price, _oldPrice, _stock;
+  String _cat = 'فواكه';
+  bool _available = true;
+
+  @override
+  void initState() {
+    super.initState();
+    final p = widget.product;
+    _name = TextEditingController(text: p?.name ?? '');
+    _desc = TextEditingController();
+    _price = TextEditingController(text: p?.price ?? '');
+    _oldPrice = TextEditingController(text: p?.oldPrice == '0' ? '' : p?.oldPrice ?? '');
+    _stock = TextEditingController(text: p?.stock.toString() ?? '');
+    _cat = p?.cat ?? 'فواكه';
+    _available = p?.available ?? true;
+  }
+
+  @override
+  void dispose() {
+    _name.dispose(); _desc.dispose(); _price.dispose(); _oldPrice.dispose(); _stock.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isNew = widget.product == null;
+    return DraggableScrollableSheet(
+      initialChildSize: 0.9,
+      maxChildSize: 0.95,
+      minChildSize: 0.6,
+      builder: (_, scroll) => Container(
+        decoration: const BoxDecoration(color: MJ.bg, borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+        child: ListView(
+          controller: scroll,
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+          children: [
+            Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: MJ.border, borderRadius: BorderRadius.circular(4)))),
+            const SizedBox(height: 16),
+            Text(isNew ? 'إضافة منتج جديد' : 'تعديل المنتج', style: MJ.h2),
+            const SizedBox(height: 18),
+
+            _imagePicker(),
+            const SizedBox(height: 16),
+
+            _field('اسم المنتج', _name, Icons.label_rounded),
+            const SizedBox(height: 10),
+            _field('الوصف', _desc, Icons.description_rounded, maxLines: 3),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(child: _field('السعر', _price, Icons.attach_money_rounded)),
+                const SizedBox(width: 10),
+                Expanded(child: _field('السعر بعد الخصم', _oldPrice, Icons.local_offer_rounded)),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(child: _field('المخزون', _stock, Icons.inventory_2_rounded)),
+                const SizedBox(width: 10),
+                Expanded(child: _dropdown()),
+              ],
+            ),
+            const SizedBox(height: 14),
+            _switchAvail(),
+            const SizedBox(height: 20),
+
+            SizedBox(
+              height: 52,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(isNew ? 'تم نشر المنتج' : 'تم حفظ التعديلات', style: GoogleFonts.cairo()), backgroundColor: MJ.success),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: MJ.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 0,
+                ),
+                child: Text(isNew ? 'نشر المنتج' : 'حفظ التعديلات', style: GoogleFonts.cairo(fontSize: 15, fontWeight: FontWeight.w800)),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+
+  Widget _imagePicker() {
+    return GestureDetector(
+      onTap: () {},
+      child: Container(
+        height: 140,
+        decoration: BoxDecoration(color: MJ.softPink, borderRadius: BorderRadius.circular(18), border: Border.all(color: MJ.primary.withValues(alpha: 0.2))),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add_photo_alternate_rounded, color: MJ.primary, size: 40),
+            const SizedBox(height: 8),
+            Text('إضافة صورة المنتج', style: GoogleFonts.cairo(color: MJ.primary, fontSize: 13, fontWeight: FontWeight.w700)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _field(String hint, TextEditingController c, IconData ic, {int maxLines = 1}) {
+    return Container(
+      decoration: BoxDecoration(color: MJ.card, borderRadius: BorderRadius.circular(14), boxShadow: MJ.shadowSoft),
+      child: TextField(
+        controller: c,
+        maxLines: maxLines,
+        style: GoogleFonts.cairo(),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: GoogleFonts.cairo(color: MJ.textMuted),
+          prefixIcon: Icon(ic, color: MJ.primary),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _dropdown() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(color: MJ.card, borderRadius: BorderRadius.circular(14), boxShadow: MJ.shadowSoft),
+      child: DropdownButton<String>(
+        value: _cat,
+        isExpanded: true,
+        underline: const SizedBox.shrink(),
+        style: GoogleFonts.cairo(color: MJ.text),
+        items: ['فواكه', 'خضروات', 'عروض'].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+        onChanged: (v) => setState(() => _cat = v!),
+      ),
+    );
+  }
+
+  Widget _switchAvail() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(color: MJ.card, borderRadius: BorderRadius.circular(14), boxShadow: MJ.shadowSoft),
+      child: Row(
+        children: [
+          Icon(_available ? Icons.check_circle_rounded : Icons.cancel_rounded, color: _available ? MJ.success : MJ.danger),
+          const SizedBox(width: 10),
+          Expanded(child: Text('متوفر للبيع', style: MJ.body.copyWith(fontWeight: FontWeight.w700))),
+          Switch(value: _available, activeThumbColor: MJ.primary, onChanged: (v) => setState(() => _available = v)),
+        ],
+      ),
+    );
+  }
+}
+
+class _P {
+  final String name, price, oldPrice, cat;
+  final int stock;
+  final bool available;
+  _P(this.name, this.price, this.oldPrice, this.stock, this.cat, this.available);
 }

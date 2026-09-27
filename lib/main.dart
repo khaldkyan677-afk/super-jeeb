@@ -22,6 +22,7 @@ import 'package:super_jeeb/widgets/password_field.dart';
 
 import 'screens/client/client_app.dart';
 import 'screens/welcome_after_login.dart';
+import 'screens/role_router.dart';
 import 'screens/admin/admin_app.dart';
 import 'services/security_service.dart';
 import 'services/auth_service.dart';
@@ -91,7 +92,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       if (success) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const WelcomeAfterLogin()),
+          MaterialPageRoute(builder: (_) => const RoleRouterScreen()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -404,7 +405,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // ═══════════════════════════════════════════════
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const WelcomeAfterLogin()),
+            MaterialPageRoute(builder: (_) => const RoleRouterScreen()),
           );
         }
       } catch (e) {

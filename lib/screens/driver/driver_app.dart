@@ -6,7 +6,8 @@ import 'driver_account.dart';
 import '../../widgets/sj_logo.dart';
 
 class DriverApp extends StatelessWidget {
-  const DriverApp({super.key});
+  final bool skipLogin;
+  const DriverApp({super.key, this.skipLogin = false});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class DriverApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const DriverSplash(),
+      home: skipLogin ? const DriverRadarDashboard() : const DriverSplash(),
     );
   }
 }

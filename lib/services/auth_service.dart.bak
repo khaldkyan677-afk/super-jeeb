@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'api_service.dart';
 
 /// خدمة المصادقة — Firebase Auth
 class AuthService extends ChangeNotifier {
@@ -12,14 +10,6 @@ class AuthService extends ChangeNotifier {
 
   // ---------- الحالة ----------
   User? _firebaseUser;
-
-  String? _role;
-  String? _status;
-  String? get role => _role;
-  String? get status => _status;
-  static const _kRole = 'sj_role';
-  static const _kStatus = 'sj_status';
-  static const _kToken = 'sj_token';
   String? _verificationId;
   int? _resendToken;
   bool _loading = false;
@@ -143,38 +133,6 @@ class AuthService extends ChangeNotifier {
   // ============================================================
   // 4) تسجيل خروج
   // ============================================================
-  Future<Map<String, dynamic>?> _syncWithServer() async {
-    final user = _firebaseUser;
-    if (user == null || user.email == null) return null;
-    final res = await ApiService.firebaseLogin(
-      email: user.email!,
-      uid: user.uid,
-      name: user.displayName,
-      phone: user.phoneNumber,
-    );
-    if (res['token'] == null) return res;
-    _role = res['role'] as String?;
-    _status = res['status'] as String?;
-    ApiService.setToken(res['token'] as String);
-    final p = await SharedPreferences.getInstance();
-    await p.setString(_kRole, _role ?? 'client');
-    await p.setString(_kStatus, _status ?? 'pending');
-    await p.setString(_kToken, res['token'] as String);
-    notifyListeners();
-    return res;
-  }
-
-  Future<void> loadCachedRole() async {
-    final p = await SharedPreferences.getInstance();
-    _role = p.getString(_kRole);
-    _status = p.getString(_kStatus);
-    final t = p.getString(_kToken);
-    if (t != null) ApiService.setToken(t);
-    notifyListeners();
-  }
-
-  Future<Map<String, dynamic>?> syncAfterLogin() => _syncWithServer();
-
   Future<void> signOut() async {
     await _auth.signOut();
     _firebaseUser = null;
@@ -182,13 +140,6 @@ class AuthService extends ChangeNotifier {
     _resendToken = null;
     _pendingPhone = null;
     _error = null;
-    _role = null;
-    _status = null;
-    final p = await SharedPreferences.getInstance();
-    await p.remove(_kRole);
-    await p.remove(_kStatus);
-    await p.remove(_kToken);
-    ApiService.setToken('');
     notifyListeners();
   }
 

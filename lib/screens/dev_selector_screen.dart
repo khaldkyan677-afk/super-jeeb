@@ -37,11 +37,11 @@ class DevSelectorScreen extends StatelessWidget {
               Row(children: [
                 Expanded(child: _card(context, 'العميل', Icons.phone_android, _kRed, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ClientApp())))),
                 const SizedBox(width: 12),
-                Expanded(child: _card(context, 'التاجر', Icons.storefront, _kGreen, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MerchantApp())))),
+                Expanded(child: _card(context, 'التاجر', Icons.storefront, _kGreen, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MerchantApp(skipLogin: true))))),
               ]),
               const SizedBox(height: 12),
               Row(children: [
-                Expanded(child: _card(context, 'المندوب', Icons.delivery_dining, _kGold, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverApp())))),
+                Expanded(child: _card(context, 'المندوب', Icons.delivery_dining, _kGold, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverApp(skipLogin: true))))),
                 const SizedBox(width: 12),
                 Expanded(child: _card(context, 'الأدمن', Icons.admin_panel_settings, _kRed, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminApp())))),
               ]),

@@ -7,7 +7,8 @@ class ApiService {
   ApiService._();
   static final ApiService instance = ApiService._();
 
-  static const String baseUrl = 'https://8080-cs-3051c663-cf57-42cb-974c-f26f566307a6.cs-europe-west1-onse.cloudshell.dev';
+  static const String baseUrl =
+      'https://5000-cs-3051c663-cf57-42cb-974c-f26f566307a6.cs-europe-west1-onse.cloudshell.dev';
 
   static String? _authToken;
   static String? _deviceId;
@@ -154,110 +155,6 @@ class ApiService {
           .timeout(const Duration(seconds: 15));
       debugPrint('📤 VerifyOTP: ${r.body}');
       return jsonDecode(r.body);
-    } catch (e) {
-      return {'error': e.toString()};
-    }
-  }
-
-  // ═══════════════ MERCHANT ═══════════════
-
-  // طلبات المتجر
-  static Future<List<dynamic>> getMerchantOrders() async {
-    try {
-      final r = await http
-          .get(Uri.parse('$baseUrl/api/orders/merchant'), headers: _headers)
-          .timeout(const Duration(seconds: 15));
-      if (r.statusCode == 200) {
-        return jsonDecode(r.body) as List<dynamic>;
-      }
-      return [];
-    } catch (e) {
-      debugPrint('❌ getMerchantOrders: $e');
-      return [];
-    }
-  }
-
-  // تحديث حالة طلب
-  static Future<Map<String, dynamic>> updateOrderStatus({
-    required String orderId,
-    required String status,
-  }) async {
-    try {
-      final r = await http
-          .patch(
-            Uri.parse('$baseUrl/api/orders/$orderId/status'),
-            headers: _headers,
-            body: jsonEncode({'status': status}),
-          )
-          .timeout(const Duration(seconds: 15));
-      return jsonDecode(r.body);
-    } catch (e) {
-      return {'error': e.toString()};
-    }
-  }
-
-  // تعيين مندوب
-  static Future<Map<String, dynamic>> assignDriver({
-    required String orderId,
-    required String driverId,
-  }) async {
-    try {
-      final r = await http
-          .patch(
-            Uri.parse('$baseUrl/api/orders/$orderId/assign-driver'),
-            headers: _headers,
-            body: jsonEncode({'driverId': driverId}),
-          )
-          .timeout(const Duration(seconds: 15));
-      return jsonDecode(r.body);
-    } catch (e) {
-      return {'error': e.toString()};
-    }
-  }
-
-  // منتجات المتجر
-  static Future<List<dynamic>> getMerchantProducts(String storeId) async {
-    try {
-      final r = await http
-          .get(Uri.parse('$baseUrl/api/products/store/$storeId'), headers: _headers)
-          .timeout(const Duration(seconds: 15));
-      if (r.statusCode == 200) {
-        return jsonDecode(r.body) as List<dynamic>;
-      }
-      return [];
-    } catch (e) {
-      debugPrint('❌ getMerchantProducts: $e');
-      return [];
-    }
-  }
-
-
-  // ═══════════════ FIREBASE LOGIN ═══════════════
-
-  static Future<Map<String, dynamic>> firebaseLogin({
-    required String email,
-    required String uid,
-    String? name,
-    String? phone,
-  }) async {
-    try {
-      final r = await http
-          .post(
-            Uri.parse('$baseUrl/api/auth/firebase-login'),
-            headers: _headers,
-            body: jsonEncode({
-              'email': email,
-              'uid': uid,
-              'name': ?name,
-              'phone': ?phone,
-            }),
-          )
-          .timeout(const Duration(seconds: 15));
-      final data = jsonDecode(r.body);
-      if (r.statusCode == 200 && data['token'] != null) {
-        _authToken = data['token'];
-      }
-      return data;
     } catch (e) {
       return {'error': e.toString()};
     }
