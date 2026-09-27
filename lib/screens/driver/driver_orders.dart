@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'driver_theme.dart';
+import '../../services/api_service.dart';
 
 class DriverOrdersScreen extends StatefulWidget {
   const DriverOrdersScreen({super.key});
@@ -11,21 +12,77 @@ class DriverOrdersScreen extends StatefulWidget {
 class _DriverOrdersScreenState extends State<DriverOrdersScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabs;
+  List<dynamic> _liveOrders = [];
+  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
     _tabs = TabController(length: 2, vsync: this);
+    _loadOrders();
   }
+
+  Future<void> _loadOrders() async {
+    setState(() => _loading = true);
+    final data = await ApiService.getAvailableOrders();
+    if (!mounted) return;
+    setState(() {
+      _liveOrders = data;
+      _loading = false;
+    });
+  }
+
+  Future<void> _acceptOrder(String orderId) async {
+    final res = await ApiService.acceptOrder(orderId);
+    if (!mounted) return;
+    if (res.containsKey('error')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('فشل: ${res['error']}'), backgroundColor: DJ.danger),
+      );
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('✓ تم قبول الطلب'), backgroundColor: DJ.success),
+    );
+    _loadOrders();
+  }
+
+  Future<void> _rejectOrder(String orderId) async {
+    final res = await ApiService.rejectOrder(orderId);
+    if (!mounted) return;
+    if (res.containsKey('error')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('فشل: ${res['error']}'), backgroundColor: DJ.danger),
+      );
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('✗ تم رفض الطلب'), backgroundColor: DJ.danger),
+    );
+    _loadOrders();
+  }
+
 
   @override
   void dispose() { _tabs.dispose(); super.dispose(); }
 
-  final _delivery = [
-    _O('#5489', 'مطعم الأصالة', 'حي المنصورة', 'حي الروضة', '4,500', '2.3 كم', '15 د'),
-    _O('#5490', 'متجر موبايلات', 'شارع تعز', 'حي الشماسي', '3,200', '3.1 كم', '20 د'),
-    _O('#5491', 'صيدلية الحياة', 'حي الروضة', 'حي المظفر', '2,800', '1.8 كم', '10 د'),
-  ];
+  List<_O> get _delivery => _liveOrders.map((raw) {
+    final o = raw as Map<String, dynamic>;
+    final merchant = o['merchantId'] as Map<String, dynamic>?;
+    final items = (o['items'] as List<dynamic>?) ?? [];
+    final oid = (o['_id'] ?? '').toString();
+    return _O(
+      '#${oid.length >= 6 ? oid.substring(0, 6) : oid}',
+      merchant?['name'] ?? 'متجر',
+      merchant?['address'] ?? 'صنعاء',
+      o['address'] ?? 'عنوان العميل',
+      '${o['total'] ?? 0}',
+      '— كم',
+      '— د',
+      orderId: oid,
+      itemCount: items.length,
+    );
+  }).toList();
 
   final _services = [
     _O('#S120', 'نقل أغراض', 'حي القاهرة', 'حي السنينة', '5,000', '4.2 كم', '25 د'),
@@ -96,6 +153,9 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
   }
 
   Widget _list(List<_O> list) {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator(color: DJ.primary));
+    }
     if (list.isEmpty) {
       return Center(
         child: Column(
@@ -152,7 +212,7 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () => _rejectOrder(o.orderId),
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: DJ.border),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -165,7 +225,7 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
               Expanded(
                 flex: 2,
                 child: ElevatedButton(
-                  onPressed: () => _showActions(o),
+                  onPressed: () => _acceptOrder(o.orderId),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: DJ.primary,
                     foregroundColor: Colors.white,
@@ -195,59 +255,13 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
     );
   }
 
-  void _showActions(_O o) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: DJ.card,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: DJ.border, borderRadius: BorderRadius.circular(4))),
-            const SizedBox(height: 20),
-            Text('مراحل الرحلة', style: DJ.h3),
-            const SizedBox(height: 16),
-            ..._stages.map((s) => _stageItem(s)),
-          ],
-        ),
-      ),
-    );
-  }
 
-  final _stages = [
-    ('توجه إلى المتجر', Icons.directions_bike_rounded),
-    ('وصلت إلى المتجر', Icons.store_rounded),
-    ('استلمت الطلب', Icons.inventory_2_rounded),
-    ('في الطريق', Icons.local_shipping_rounded),
-    ('وصلت للعميل', Icons.pin_drop_rounded),
-    ('تم التسليم', Icons.check_circle_rounded),
-  ];
 
-  Widget _stageItem((String, IconData) s) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          Container(
-            width: 40, height: 40,
-            decoration: BoxDecoration(color: DJ.softRed, borderRadius: BorderRadius.circular(12)),
-            child: Icon(s.$2, color: DJ.primary, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(child: Text(s.$1, style: DJ.body.copyWith(fontWeight: FontWeight.w700, fontSize: 13))),
-          Icon(Icons.chevron_left_rounded, color: DJ.textMuted),
-        ],
-      ),
-    );
-  }
 }
 
 class _O {
   final String id, from, fromAddr, to, price, distance, duration;
-  _O(this.id, this.from, this.fromAddr, this.to, this.price, this.distance, this.duration);
+  final String orderId;
+  final int itemCount;
+  _O(this.id, this.from, this.fromAddr, this.to, this.price, this.distance, this.duration, {this.orderId = '', this.itemCount = 0});
 }

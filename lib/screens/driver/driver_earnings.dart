@@ -26,6 +26,16 @@ class _DriverEarningsScreenState extends State<DriverEarningsScreen> {
     ('#5487', 'توصيل طلب', 'أمس 16:20', '+2,800', true),
   ];
 
+
+  void _requestWithdraw() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('سيتم إرسال طلب السحب للإدارة'),
+        backgroundColor: DJ.success,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final d = _data[_tabs[_tab]]!;
@@ -45,9 +55,9 @@ class _DriverEarningsScreenState extends State<DriverEarningsScreen> {
               const SizedBox(height: 14),
               Row(
                 children: [
-                  _miniCard('أرباح التوصيل', d[3] + ' ري', Icons.delivery_dining_rounded),
+                  _miniCard('أرباح التوصيل', '\${d[3]} ري', Icons.delivery_dining_rounded),
                   const SizedBox(width: 10),
-                  _miniCard('أرباح الخدمات', d[4] + ' ري', Icons.handyman_rounded),
+                  _miniCard('أرباح الخدمات', '\${d[4]} ري', Icons.handyman_rounded),
                 ],
               ),
               const SizedBox(height: 20),
@@ -64,7 +74,7 @@ class _DriverEarningsScreenState extends State<DriverEarningsScreen> {
               SizedBox(
                 height: 52,
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => _requestWithdraw(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: DJ.primary,
                     foregroundColor: Colors.white,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'driver_theme.dart';
+import '../../services/auth_service.dart';
 
 class DriverAccountScreen extends StatelessWidget {
   const DriverAccountScreen({super.key});
@@ -142,7 +143,14 @@ class DriverAccountScreen extends StatelessWidget {
               content: Text('هل تريد الخروج من التطبيق؟', style: DJ.body),
               actions: [
                 TextButton(onPressed: () => Navigator.pop(context), child: Text('إلغاء', style: GoogleFonts.cairo(color: DJ.textMuted))),
-                TextButton(onPressed: () => Navigator.pop(context), child: Text('خروج', style: GoogleFonts.cairo(color: DJ.danger, fontWeight: FontWeight.w800))),
+                TextButton(
+                  onPressed: () async {
+                    await AuthService.instance.signOut();
+                    if (!context.mounted) return;
+                    Navigator.of(context).popUntil((r) => r.isFirst);
+                  },
+                  child: Text('خروج', style: GoogleFonts.cairo(color: DJ.danger, fontWeight: FontWeight.w800)),
+                ),
               ],
             ),
           );

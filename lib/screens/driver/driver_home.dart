@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'driver_theme.dart';
+import 'driver_map.dart';
+import '../../services/api_service.dart';
 
 class DriverHomeScreen extends StatefulWidget {
   const DriverHomeScreen({super.key});
@@ -11,6 +13,41 @@ class DriverHomeScreen extends StatefulWidget {
 class _DriverHomeScreenState extends State<DriverHomeScreen> {
   bool _availableDelivery = true;
   bool _availableServices = false;
+
+
+  Future<void> _updateStage(String stage, String label) async {
+    // TODO: نستخدم الطلب الحالي
+    final res = await ApiService.updateTripStage(orderId: 'CURRENT', stage: stage);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(res.containsKey('error') ? 'خطأ: ${res['error']}' : '✓ $label'),
+        backgroundColor: res.containsKey('error') ? DJ.danger : DJ.success,
+      ),
+    );
+  }
+
+
+  Future<void> _acceptFromList() async {
+    final list = await ApiService.getAvailableOrders();
+    if (!mounted) return;
+    if (list.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('لا توجد طلبات متاحة'), backgroundColor: DJ.warning),
+      );
+      return;
+    }
+    final first = list.first as Map<String, dynamic>;
+    final oid = first['_id'].toString();
+    final res = await ApiService.acceptOrder(oid);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(res.containsKey('error') ? 'فشل: ${res['error']}' : '✓ تم قبول الطلب'),
+        backgroundColor: res.containsKey('error') ? DJ.danger : DJ.success,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +252,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
             children: [
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverMapScreen())),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: DJ.primary,
                     foregroundColor: Colors.white,
@@ -252,19 +289,25 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       children: [
         for (int i = 0; i < steps.length; i++) ...[
           Expanded(
-            child: Column(
-              children: [
-                Container(
-                  width: 22, height: 22,
-                  decoration: BoxDecoration(
-                    color: i <= 1 ? DJ.primary : DJ.border,
-                    shape: BoxShape.circle,
+            child: GestureDetector(
+              onTap: () {
+                final stages = ['accepted', 'on_the_way', 'delivered'];
+                _updateStage(stages[i], steps[i]);
+              },
+              child: Column(
+                children: [
+                  Container(
+                    width: 22, height: 22,
+                    decoration: BoxDecoration(
+                      color: i <= 1 ? DJ.primary : DJ.border,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(i == 0 ? Icons.check_rounded : (i == 1 ? Icons.local_shipping_rounded : Icons.done_all_rounded), color: Colors.white, size: 12),
                   ),
-                  child: Icon(i == 0 ? Icons.check_rounded : (i == 1 ? Icons.local_shipping_rounded : Icons.done_all_rounded), color: Colors.white, size: 12),
-                ),
-                const SizedBox(height: 4),
-                Text(steps[i], style: DJ.tiny.copyWith(color: i <= 1 ? DJ.primary : DJ.textMuted)),
-              ],
+                  const SizedBox(height: 4),
+                  Text(steps[i], style: DJ.tiny.copyWith(color: i <= 1 ? DJ.primary : DJ.textMuted)),
+                ],
+              ),
             ),
           ),
           if (i < steps.length - 1)
@@ -328,7 +371,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                 ),
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () => _acceptFromList(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: DJ.primary,
                   foregroundColor: Colors.white,

@@ -262,4 +262,211 @@ class ApiService {
       return {'error': e.toString()};
     }
   }
+
+  // ═══════════════ DRIVER ═══════════════
+
+  static Future<List<dynamic>> getDriverOrders() async {
+    try {
+      final r = await http
+          .get(Uri.parse('$baseUrl/api/orders/driver'), headers: _headers)
+          .timeout(const Duration(seconds: 15));
+      if (r.statusCode == 200) {
+        return jsonDecode(r.body) as List<dynamic>;
+      }
+      return [];
+    } catch (e) {
+      debugPrint('❌ getDriverOrders: $e');
+      return [];
+    }
+  }
+
+  static Future<List<dynamic>> getAvailableOrders() async {
+    try {
+      final r = await http
+          .get(Uri.parse('$baseUrl/api/orders/recent'), headers: _headers)
+          .timeout(const Duration(seconds: 15));
+      if (r.statusCode == 200) {
+        return jsonDecode(r.body) as List<dynamic>;
+      }
+      return [];
+    } catch (e) {
+      debugPrint('❌ getAvailableOrders: $e');
+      return [];
+    }
+  }
+
+  static Future<Map<String, dynamic>> acceptOrder(String orderId) async {
+    try {
+      final r = await http
+          .patch(
+            Uri.parse('$baseUrl/api/orders/$orderId/accept'),
+            headers: _headers,
+          )
+          .timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) {
+      return {'error': e.toString()};
+    }
+  }
+
+  static Future<Map<String, dynamic>> rejectOrder(String orderId) async {
+    try {
+      final r = await http
+          .patch(Uri.parse('$baseUrl/api/orders/$orderId/reject'), headers: _headers)
+          .timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) {
+      return {'error': e.toString()};
+    }
+  }
+
+  static Future<Map<String, dynamic>> updateTripStage({
+    required String orderId,
+    required String stage,
+  }) async {
+    try {
+      final r = await http
+          .patch(
+            Uri.parse('$baseUrl/api/orders/$orderId/stage'),
+            headers: _headers,
+            body: jsonEncode({'stage': stage}),
+          )
+          .timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) {
+      return {'error': e.toString()};
+    }
+  }
+
+  // ═══════════════ ORDERS — EXTRA ═══════════════
+
+  static Future<Map<String, dynamic>> cancelOrder(String orderId) async {
+    try {
+      final r = await http.patch(
+        Uri.parse('$baseUrl/api/orders/$orderId/cancel'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) { return {'error': e.toString()}; }
+  }
+
+  static Future<Map<String, dynamic>> getOrderById(String orderId) async {
+    try {
+      final r = await http.get(
+        Uri.parse('$baseUrl/api/orders/$orderId'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) { return {'error': e.toString()}; }
+  }
+
+  // ═══════════════ USERS — ADMIN ═══════════════
+
+  static Future<List<dynamic>> listUsers({String? role, String? status}) async {
+    try {
+      var url = '$baseUrl/api/users';
+      final params = <String>[];
+      if (role != null) params.add('role=$role');
+      if (status != null) params.add('status=$status');
+      if (params.isNotEmpty) url += '?' + params.join('&');
+      final r = await http.get(Uri.parse(url), headers: _headers).timeout(const Duration(seconds: 15));
+      if (r.statusCode == 200) return jsonDecode(r.body) as List<dynamic>;
+      return [];
+    } catch (e) { return []; }
+  }
+
+  static Future<Map<String, dynamic>> approveUser(String userId) async {
+    try {
+      final r = await http.patch(
+        Uri.parse('$baseUrl/api/users/$userId/approve'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) { return {'error': e.toString()}; }
+  }
+
+  static Future<Map<String, dynamic>> rejectUser(String userId) async {
+    try {
+      final r = await http.patch(
+        Uri.parse('$baseUrl/api/users/$userId/reject'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) { return {'error': e.toString()}; }
+  }
+
+  static Future<Map<String, dynamic>> changeUserRole({
+    required String userId,
+    required String role,
+  }) async {
+    try {
+      final r = await http.patch(
+        Uri.parse('$baseUrl/api/users/$userId/role'),
+        headers: _headers,
+        body: jsonEncode({'role': role}),
+      ).timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) { return {'error': e.toString()}; }
+  }
+
+  // ═══════════════ PRODUCTS — MERCHANT ═══════════════
+
+  static Future<Map<String, dynamic>> addProduct({
+    required String name,
+    required num price,
+    required String storeId,
+    String? category,
+    String? imageUrl,
+  }) async {
+    try {
+      final r = await http.post(
+        Uri.parse('$baseUrl/api/products'),
+        headers: _headers,
+        body: jsonEncode({
+          'name': name,
+          'price': price,
+          'storeId': storeId,
+          'category': category,
+          'imageUrl': imageUrl,
+        }),
+      ).timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) { return {'error': e.toString()}; }
+  }
+
+  static Future<Map<String, dynamic>> updateProduct({
+    required String productId,
+    Map<String, dynamic>? data,
+  }) async {
+    try {
+      final r = await http.patch(
+        Uri.parse('$baseUrl/api/products/$productId'),
+        headers: _headers,
+        body: jsonEncode(data ?? {}),
+      ).timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) { return {'error': e.toString()}; }
+  }
+
+  static Future<Map<String, dynamic>> deleteProduct(String productId) async {
+    try {
+      final r = await http.delete(
+        Uri.parse('$baseUrl/api/products/$productId'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) { return {'error': e.toString()}; }
+  }
+
+  // ═══════════════ DRIVER EARNINGS ═══════════════
+
+  static Future<Map<String, dynamic>> getDriverEarnings() async {
+    try {
+      final r = await http.get(
+        Uri.parse('$baseUrl/api/driver/earnings'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) { return {'error': e.toString()}; }
+  }
 }
