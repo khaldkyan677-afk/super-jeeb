@@ -1,461 +1,179 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'driver_theme.dart';
 
 class DriverOrdersScreen extends StatefulWidget {
   const DriverOrdersScreen({super.key});
-
   @override
   State<DriverOrdersScreen> createState() => _DriverOrdersScreenState();
 }
 
 class _DriverOrdersScreenState extends State<DriverOrdersScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tab;
-
-  final _available = [
-    {
-      'id': '5030',
-      'type': 'توصيل طرد',
-      'from': 'صنعاء - شارع حدة',
-      'to': 'صنعاء - شارع تعز',
-      'distance': '3.2 كم',
-      'fee': 1800,
-      'time': 'منذ دقيقة',
-    },
-    {
-      'id': '5031',
-      'type': 'تاكسي',
-      'from': 'صنعاء - الجامعة',
-      'to': 'صنعاء - المطار',
-      'distance': '8.5 كم',
-      'fee': 3500,
-      'time': 'منذ 3 دقائق',
-    },
-    {
-      'id': '5032',
-      'type': 'اشترِ لي',
-      'from': 'صيدلية النور',
-      'to': 'شارع بغداد',
-      'distance': '2.1 كم',
-      'fee': 2200,
-      'time': 'منذ 5 دقائق',
-    },
-  ];
-
-  final _active = [
-    {
-      'id': '5021',
-      'type': 'توصيل طرد',
-      'from': 'متجر الأناقة',
-      'to': 'شارع تعز',
-      'distance': '2.5 كم',
-      'fee': 1500,
-      'status': 'في الطريق',
-      'statusColor': Color(0xFF25D366),
-    },
-  ];
-
-  final _completed = [
-    {
-      'id': '5020',
-      'type': 'تاكسي',
-      'from': 'الجامعة',
-      'to': 'المطار',
-      'distance': '8.5 كم',
-      'fee': 3500,
-      'date': 'اليوم 10:30 ص',
-    },
-    {
-      'id': '5019',
-      'type': 'طرود',
-      'from': 'صيدلية',
-      'to': 'شارع بغداد',
-      'distance': '1.8 كم',
-      'fee': 1200,
-      'date': 'اليوم 09:15 ص',
-    },
-    {
-      'id': '5018',
-      'type': 'تاكسي',
-      'from': 'شارع حدة',
-      'to': 'شارع الستين',
-      'distance': '5.5 كم',
-      'fee': 2800,
-      'date': 'أمس 08:45 م',
-    },
-  ];
+  late TabController _tabs;
 
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 3, vsync: this);
+    _tabs = TabController(length: 2, vsync: this);
   }
 
   @override
-  void dispose() {
-    _tab.dispose();
-    super.dispose();
-  }
+  void dispose() { _tabs.dispose(); super.dispose(); }
+
+  final _delivery = [
+    _O('#5489', 'مطعم الأصالة', 'حي المنصورة', 'حي الروضة', '4,500', '2.3 كم', '15 د'),
+    _O('#5490', 'متجر موبايلات', 'شارع تعز', 'حي الشماسي', '3,200', '3.1 كم', '20 د'),
+    _O('#5491', 'صيدلية الحياة', 'حي الروضة', 'حي المظفر', '2,800', '1.8 كم', '10 د'),
+  ];
+
+  final _services = [
+    _O('#S120', 'نقل أغراض', 'حي القاهرة', 'حي السنينة', '5,000', '4.2 كم', '25 د'),
+    _O('#S121', 'مشوار', 'شارع جمال', 'مطار تعز', '7,000', '8.5 كم', '35 د'),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1B1C2A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2B2D42),
-        title: const Text(
-          'الطلبات',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: const BackButton(color: Colors.white),
-        bottom: TabBar(
-          controller: _tab,
-          indicatorColor: const Color(0xFFEF233C),
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white60,
-          labelStyle: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-          ),
-          tabs: [
-            Tab(text: 'متاحة (${_available.length})'),
-            Tab(text: 'جارية (${_active.length})'),
-            Tab(text: 'السجل (${_completed.length})'),
+      backgroundColor: DJ.bg,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: Row(
+                children: [
+                  Text('الطلبات', style: DJ.h1),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(color: DJ.softRed, borderRadius: BorderRadius.circular(12)),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.filter_list_rounded, color: DJ.primary, size: 16),
+                        const SizedBox(width: 4),
+                        Text('تصفية', style: GoogleFonts.cairo(color: DJ.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              height: 44,
+              decoration: BoxDecoration(color: DJ.card, borderRadius: BorderRadius.circular(14), boxShadow: DJ.shadowSoft),
+              child: TabBar(
+                controller: _tabs,
+                labelColor: Colors.white,
+                unselectedLabelColor: DJ.textMuted,
+                labelStyle: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.w800),
+                unselectedLabelStyle: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.w600),
+                indicator: BoxDecoration(color: DJ.primary, borderRadius: BorderRadius.circular(12)),
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicatorPadding: const EdgeInsets.all(4),
+                dividerColor: Colors.transparent,
+                tabs: const [
+                  Tab(text: 'طلبات التوصيل'),
+                  Tab(text: 'طلبات الخدمات'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: TabBarView(
+                controller: _tabs,
+                children: [
+                  _list(_delivery),
+                  _list(_services),
+                ],
+              ),
+            ),
           ],
         ),
-      ),
-      body: TabBarView(
-        controller: _tab,
-        children: [_availableList(), _activeList(), _completedList()],
       ),
     );
   }
 
-  Widget _availableList() {
-    if (_available.isEmpty) {
-      return const Center(
+  Widget _list(List<_O> list) {
+    if (list.isEmpty) {
+      return Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_off, size: 80, color: Colors.white24),
-            SizedBox(height: 15),
-            Text(
-              'لا توجد طلبات متاحة',
-              style: TextStyle(color: Colors.white54, fontSize: 14),
-            ),
+            Icon(Icons.inbox_rounded, color: DJ.textMuted, size: 64),
+            const SizedBox(height: 12),
+            Text('لا توجد طلبات', style: DJ.muted),
           ],
         ),
       );
     }
-    return ListView.builder(
-      padding: const EdgeInsets.all(15),
-      itemCount: _available.length,
-      itemBuilder: (context, i) => _availableCard(_available[i], i),
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+      itemCount: list.length,
+      separatorBuilder: (_, i) => const SizedBox(height: 10),
+      itemBuilder: (_, i) => _card(list[i]),
     );
   }
 
-  Widget _availableCard(Map<String, dynamic> o, int i) {
+  Widget _card(_O o) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.02),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: const Color(0xFF25D366).withValues(alpha: 0.3),
-          width: 1.5,
-        ),
-      ),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: DJ.card, borderRadius: BorderRadius.circular(18), boxShadow: DJ.shadowSoft),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
+              Text(o.id, style: GoogleFonts.cairo(fontWeight: FontWeight.w800, fontSize: 13)),
+              const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF25D366).withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.local_shipping,
-                  color: Color(0xFF25D366),
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(color: DJ.softNavy, borderRadius: BorderRadius.circular(8)),
+                child: Row(
                   children: [
-                    Text(
-                      o['type'],
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      o['time'],
-                      style: const TextStyle(
-                        color: Colors.white38,
-                        fontSize: 10,
-                      ),
-                    ),
+                    const Icon(Icons.near_me_rounded, color: DJ.secondary, size: 12),
+                    const SizedBox(width: 3),
+                    Text(o.distance, style: GoogleFonts.cairo(color: DJ.secondary, fontSize: 10, fontWeight: FontWeight.w700)),
                   ],
                 ),
               ),
-              Text(
-                '${o['fee']} YER',
-                style: const TextStyle(
-                  color: Color(0xFF25D366),
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const Divider(color: Colors.white10, height: 20),
-          _routeRow(
-            Icons.my_location,
-            'من',
-            o['from'],
-            const Color(0xFF25D366),
-          ),
-          const SizedBox(height: 6),
-          _routeRow(Icons.location_on, 'إلى', o['to'], const Color(0xFFEF233C)),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.straighten, color: Colors.white38, size: 12),
-              const SizedBox(width: 4),
-              Text(
-                o['distance'],
-                style: const TextStyle(color: Colors.white54, fontSize: 11),
-              ),
               const Spacer(),
-              const Icon(Icons.access_time, color: Colors.white38, size: 12),
-              const SizedBox(width: 4),
-              const Text(
-                'التقدير: 15 د',
-                style: TextStyle(color: Colors.white54, fontSize: 11),
-              ),
+              Text('${o.price} ري', style: DJ.price),
             ],
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 12),
+          _row(Icons.store_rounded, 'من:', o.from),
+          const SizedBox(height: 6),
+          _row(Icons.location_on_rounded, 'إلى:', o.to),
+          const SizedBox(height: 6),
+          _row(Icons.access_time_rounded, 'الوقت:', o.duration),
+          const SizedBox(height: 14),
           Row(
             children: [
               Expanded(
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF25D366),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                child: OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: DJ.border),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _active.add({
-                        ...o,
-                        'status': 'في الطريق',
-                        'statusColor': const Color(0xFF25D366),
-                      });
-                      _available.removeAt(i);
-                    });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('✅ تم قبول الطلب'),
-                        backgroundColor: Color(0xFF25D366),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.check, color: Colors.white, size: 18),
-                  label: const Text(
-                    'قبول',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.white30),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () {
-                  setState(() => _available.removeAt(i));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('⏭️ تم تجاوز الطلب'),
-                      backgroundColor: Colors.orange,
-                    ),
-                  );
-                },
-                child: const Text(
-                  'تجاوز',
-                  style: TextStyle(color: Colors.white70, fontSize: 12),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _activeList() {
-    if (_active.isEmpty) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.inbox, size: 80, color: Colors.white24),
-            SizedBox(height: 15),
-            Text(
-              'لا توجد طلبات جارية',
-              style: TextStyle(color: Colors.white54, fontSize: 14),
-            ),
-          ],
-        ),
-      );
-    }
-    return ListView.builder(
-      padding: const EdgeInsets.all(15),
-      itemCount: _active.length,
-      itemBuilder: (context, i) => _activeCard(_active[i], i),
-    );
-  }
-
-  Widget _activeCard(Map<String, dynamic> o, int i) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.02),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: const Color(0xFF25D366).withValues(alpha: 0.5),
-          width: 2,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF25D366).withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.local_shipping,
-                  color: Color(0xFF25D366),
-                  size: 20,
+                  child: Text('رفض', style: GoogleFonts.cairo(color: DJ.textMuted, fontWeight: FontWeight.w800, fontSize: 12)),
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  'طلب #${o['id']}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: (o['statusColor'] as Color).withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  o['status'],
-                  style: TextStyle(
-                    color: o['statusColor'] as Color,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const Divider(color: Colors.white10, height: 20),
-          _routeRow(
-            Icons.my_location,
-            'من',
-            o['from'],
-            const Color(0xFF25D366),
-          ),
-          const SizedBox(height: 6),
-          _routeRow(Icons.location_on, 'إلى', o['to'], const Color(0xFFEF233C)),
-          const SizedBox(height: 15),
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
+                flex: 2,
+                child: ElevatedButton(
+                  onPressed: () => _showActions(o),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFEF233C),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    backgroundColor: DJ.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    elevation: 0,
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _completed.add({
-                        'id': o['id'],
-                        'type': o['type'],
-                        'from': o['from'],
-                        'to': o['to'],
-                        'distance': o['distance'],
-                        'fee': o['fee'],
-                        'date': 'الآن',
-                      });
-                      _active.removeAt(i);
-                    });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('🏁 تم إنهاء الرحلة'),
-                        backgroundColor: Color(0xFF25D366),
-                      ),
-                    );
-                  },
-                  icon: const Icon(
-                    Icons.check_circle,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                  label: const Text(
-                    'إنهاء الرحلة',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: Text('قبول الطلب', style: GoogleFonts.cairo(fontWeight: FontWeight.w800, fontSize: 12)),
                 ),
               ),
             ],
@@ -465,101 +183,71 @@ class _DriverOrdersScreenState extends State<DriverOrdersScreen>
     );
   }
 
-  Widget _completedList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(15),
-      itemCount: _completed.length,
-      itemBuilder: (context, i) => _completedCard(_completed[i]),
-    );
-  }
-
-  Widget _completedCard(Map<String, dynamic> o) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.02),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xFF25D366).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(
-              Icons.check_circle,
-              color: Color(0xFF25D366),
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'طلب #${o['id']}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  '${o['from']} → ${o['to']}',
-                  style: const TextStyle(color: Colors.white54, fontSize: 10),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  o['date'],
-                  style: const TextStyle(color: Colors.white38, fontSize: 10),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            '+${o['fee']}',
-            style: const TextStyle(
-              color: Color(0xFF25D366),
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _routeRow(IconData icon, String label, String value, Color color) {
+  Widget _row(IconData ic, String label, String val) {
     return Row(
       children: [
-        Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.15),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: color, size: 12),
-        ),
+        Icon(ic, color: DJ.primary, size: 16),
         const SizedBox(width: 8),
-        Text(
-          '$label: ',
-          style: const TextStyle(color: Colors.white38, fontSize: 11),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(color: Colors.white70, fontSize: 12),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
+        Text(label, style: DJ.muted.copyWith(fontSize: 11)),
+        const SizedBox(width: 6),
+        Expanded(child: Text(val, style: DJ.body.copyWith(fontWeight: FontWeight.w700, fontSize: 12))),
       ],
     );
   }
+
+  void _showActions(_O o) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: DJ.card,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: DJ.border, borderRadius: BorderRadius.circular(4))),
+            const SizedBox(height: 20),
+            Text('مراحل الرحلة', style: DJ.h3),
+            const SizedBox(height: 16),
+            ..._stages.map((s) => _stageItem(s)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  final _stages = [
+    ('توجه إلى المتجر', Icons.directions_bike_rounded),
+    ('وصلت إلى المتجر', Icons.store_rounded),
+    ('استلمت الطلب', Icons.inventory_2_rounded),
+    ('في الطريق', Icons.local_shipping_rounded),
+    ('وصلت للعميل', Icons.pin_drop_rounded),
+    ('تم التسليم', Icons.check_circle_rounded),
+  ];
+
+  Widget _stageItem((String, IconData) s) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Container(
+            width: 40, height: 40,
+            decoration: BoxDecoration(color: DJ.softRed, borderRadius: BorderRadius.circular(12)),
+            child: Icon(s.$2, color: DJ.primary, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: Text(s.$1, style: DJ.body.copyWith(fontWeight: FontWeight.w700, fontSize: 13))),
+          Icon(Icons.chevron_left_rounded, color: DJ.textMuted),
+        ],
+      ),
+    );
+  }
+}
+
+class _O {
+  final String id, from, fromAddr, to, price, distance, duration;
+  _O(this.id, this.from, this.fromAddr, this.to, this.price, this.distance, this.duration);
 }

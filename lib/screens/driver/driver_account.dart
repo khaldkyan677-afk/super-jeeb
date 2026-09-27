@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'driver_theme.dart';
 
 class DriverAccountScreen extends StatelessWidget {
   const DriverAccountScreen({super.key});
@@ -6,441 +8,150 @@ class DriverAccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1B1C2A),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _header(),
-            const SizedBox(height: 20),
-            _financialCard(),
-            const SizedBox(height: 20),
-            _quickStats(),
-            const SizedBox(height: 20),
-            _menuSection('حسابي', [
-              _menu(
-                context,
-                Icons.person,
-                'تعديل الملف الشخصي',
-                'الاسم والصورة',
-              ),
-              _menu(
-                context,
-                Icons.description,
-                'وثائقي',
-                'الرخصة، الهوية',
-                color: Colors.blue,
-              ),
-              _menu(context, Icons.directions_car, 'مركبتي', 'النوع واللوحة'),
-              _menu(
-                context,
-                Icons.star,
-                'تقييماتي',
-                '4.9 من 5',
-                color: Colors.amber,
-              ),
-              _menu(
-                context,
-                Icons.emoji_events,
-                'إنجازاتي',
-                'الشارات والمكافآت',
-                color: const Color(0xFFD4AF37),
-              ),
-            ]),
-            _menuSection('المحفظة', [
-              _menu(
-                context,
-                Icons.account_balance_wallet,
-                'المحفظة',
-                'الرصيد والمديونية',
-                color: const Color(0xFF25D366),
-              ),
-              _menu(context, Icons.payment, 'طرق السحب', 'الكريمي، جيب'),
-              _menu(context, Icons.history, 'سجل الأرباح', 'كل المعاملات'),
-              _menu(context, Icons.request_quote, 'طلب سحب', 'تحويل للبنك'),
-            ]),
-            _menuSection('العمل', [
-              _menu(context, Icons.map, 'مناطق العمل', 'المناطق المفضلة'),
-              _menu(context, Icons.schedule, 'جدول التوفر', 'الأيام والساعات'),
-              _menu(
-                context,
-                Icons.category,
-                'أنواع الخدمة',
-                'تاكسي، فرزة، طرود',
-              ),
-              _menu(
-                context,
-                Icons.pause_circle,
-                'وضع الراحة',
-                'إيقاف مؤقت',
-                color: Colors.orange,
-              ),
-            ]),
-            _menuSection('الإعدادات', [
-              _menu(context, Icons.notifications, 'الإشعارات', 'تخصيص'),
-              _menu(context, Icons.settings, 'الإعدادات', 'عامة'),
-              _menu(context, Icons.lock, 'الأمان', 'كلمة السر'),
-              _menu(
-                context,
-                Icons.emergency,
-                'جهات الطوارئ',
-                'SOS',
-                color: const Color(0xFFEF233C),
-              ),
-            ]),
-            _menuSection('المساعدة', [
-              _menu(context, Icons.support_agent, 'الدعم الفني', 'تواصل مباشر'),
-              _menu(context, Icons.info, 'عن التطبيق', 'الإصدار'),
-            ]),
-            const SizedBox(height: 20),
-            _logoutButton(context),
-            const SizedBox(height: 40),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _header() {
-    return Container(
-      height: 250,
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF2B2D42), Color(0xFF1B1C2A)],
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(40),
-          bottomRight: Radius.circular(40),
-        ),
-      ),
-      child: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Opacity(
-                  opacity: 0.1,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.directions_car, color: Colors.white, size: 80),
-                      SizedBox(width: 30),
-                      Icon(
-                        Icons.delivery_dining,
-                        color: Colors.white,
-                        size: 80,
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF25D366),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const CircleAvatar(
-                    radius: 45,
-                    backgroundColor: Colors.white,
-                    child: Icon(
-                      Icons.person,
-                      size: 48,
-                      color: Color(0xFF2B2D42),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'الكابتن خالد وليد',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 5),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF25D366).withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.verified, color: Color(0xFF25D366), size: 14),
-                  SizedBox(width: 5),
-                  Text(
-                    'كابتن موثق',
-                    style: TextStyle(
-                      color: Color(0xFF25D366),
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _financialCard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFFEF233C), Color(0xFF8B1428)],
+      backgroundColor: DJ.bg,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('الحساب', style: DJ.h1),
+              const SizedBox(height: 16),
+              _profileCard(),
+              const SizedBox(height: 18),
+              _section('مركبتي', [
+                _item(Icons.directions_car_rounded, 'بيانات المركبة', ''),
+                _item(Icons.description_rounded, 'وثائق المركبة', ''),
+                _item(Icons.add_circle_outline_rounded, 'إضافة مركبة', ''),
+              ]),
+              const SizedBox(height: 14),
+              _section('خدماتي', [
+                _item(Icons.handyman_rounded, 'إدارة الخدمات', ''),
+                _item(Icons.location_city_rounded, 'مناطق العمل', ''),
+                _item(Icons.access_time_rounded, 'أوقات العمل', ''),
+                _item(Icons.attach_money_rounded, 'أسعار الخدمات', ''),
+              ]),
+              const SizedBox(height: 14),
+              _section('السجل والتقييمات', [
+                _item(Icons.history_rounded, 'سجل الرحلات', ''),
+                _item(Icons.star_rounded, 'التقييمات', '4.8 ★'),
+                _item(Icons.receipt_long_rounded, 'الفواتير', ''),
+              ]),
+              const SizedBox(height: 14),
+              _section('الإعدادات', [
+                _item(Icons.notifications_rounded, 'الإشعارات', ''),
+                _item(Icons.help_outline_rounded, 'الدعم والمساعدة', ''),
+                _item(Icons.policy_rounded, 'الشروط والسياسات', ''),
+                _item(Icons.info_outline_rounded, 'عن التطبيق', ''),
+              ]),
+              const SizedBox(height: 20),
+              _logout(context),
+            ],
           ),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Row(
-              children: [
-                Icon(
-                  Icons.warning_amber_rounded,
-                  color: Colors.white70,
-                  size: 22,
-                ),
-                SizedBox(width: 8),
-                Text(
-                  'المديونية الحالية',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              '-3,500 YER',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 15),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFFEF233C),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {},
-                    icon: const Icon(Icons.payments, size: 18),
-                    label: const Text(
-                      'تصفية',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white.withValues(alpha: 0.2),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.receipt_long,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                    label: const Text(
-                      'الكشف',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
         ),
       ),
     );
   }
 
-  Widget _quickStats() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
+  Widget _profileCard() {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [DJ.primary, DJ.secondary], begin: Alignment.topRight, end: Alignment.bottomLeft),
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [BoxShadow(color: DJ.primary.withValues(alpha: 0.25), blurRadius: 18, offset: const Offset(0, 6))],
+      ),
       child: Row(
         children: [
+          Container(
+            width: 64, height: 64,
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+            child: Icon(Icons.person_rounded, color: DJ.primary, size: 34),
+          ),
+          const SizedBox(width: 14),
           Expanded(
-            child: _stat(
-              '85',
-              'رحلة',
-              const Color(0xFFEF233C),
-              Icons.local_shipping,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('أحمد علي', style: GoogleFonts.cairo(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 4),
+                Text('مندوب توصيل', style: GoogleFonts.cairo(color: Colors.white70, fontSize: 12)),
+                const SizedBox(height: 2),
+                Text('+967 777 111 222', style: GoogleFonts.cairo(color: Colors.white70, fontSize: 11)),
+              ],
             ),
           ),
-          const SizedBox(width: 10),
-          Expanded(child: _stat('4.9', 'تقييم', Colors.amber, Icons.star)),
-          const SizedBox(width: 10),
-          Expanded(
-            child: _stat(
-              '3',
-              'سنوات',
-              const Color(0xFF25D366),
-              Icons.emoji_events,
-            ),
-          ),
+          const Icon(Icons.edit_rounded, color: Colors.white70, size: 20),
         ],
       ),
     );
   }
 
-  Widget _stat(String value, String label, Color color, IconData icon) {
+  Widget _section(String title, List<Widget> items) {
     return Container(
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.02),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.white10),
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      decoration: BoxDecoration(color: DJ.card, borderRadius: BorderRadius.circular(18), boxShadow: DJ.shadowSoft),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              color: color,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+            child: Text(title, style: DJ.h3.copyWith(fontSize: 13)),
           ),
-          const SizedBox(height: 3),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 9, color: Colors.white54),
-            textAlign: TextAlign.center,
-          ),
+          ...items,
         ],
       ),
     );
   }
 
-  Widget _menuSection(String title, List<Widget> items) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(25, 15, 25, 8),
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.white54,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1,
+  Widget _item(IconData ic, String label, String trailing) {
+    return InkWell(
+      onTap: () {},
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(color: DJ.softRed, borderRadius: BorderRadius.circular(10)),
+              child: Icon(ic, color: DJ.primary, size: 18),
             ),
-          ),
+            const SizedBox(width: 12),
+            Expanded(child: Text(label, style: DJ.body.copyWith(fontSize: 13, fontWeight: FontWeight.w600))),
+            if (trailing.isNotEmpty)
+              Text(trailing, style: GoogleFonts.cairo(color: DJ.primary, fontWeight: FontWeight.w800, fontSize: 12)),
+            const SizedBox(width: 6),
+            Icon(Icons.chevron_left_rounded, color: DJ.textMuted),
+          ],
         ),
-        ...items,
-      ],
+      ),
     );
   }
 
-  Widget _menu(
-    BuildContext context,
-    IconData icon,
-    String title,
-    String subtitle, {
-    Color? color,
-  }) {
-    final c = color ?? const Color(0xFFEF233C);
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.02),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: ListTile(
-        onTap: () {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('فتح: $title')));
+  Widget _logout(BuildContext context) {
+    return SizedBox(
+      height: 52,
+      child: OutlinedButton.icon(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              backgroundColor: DJ.card,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Text('تسجيل الخروج', style: DJ.h3),
+              content: Text('هل تريد الخروج من التطبيق؟', style: DJ.body),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context), child: Text('إلغاء', style: GoogleFonts.cairo(color: DJ.textMuted))),
+                TextButton(onPressed: () => Navigator.pop(context), child: Text('خروج', style: GoogleFonts.cairo(color: DJ.danger, fontWeight: FontWeight.w800))),
+              ],
+            ),
+          );
         },
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: c.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: c, size: 20),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: const TextStyle(fontSize: 10, color: Colors.white54),
-        ),
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          size: 14,
-          color: Colors.white30,
-        ),
-      ),
-    );
-  }
-
-  Widget _logoutButton(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: SizedBox(
-        width: double.infinity,
-        child: OutlinedButton.icon(
-          style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: Color(0xFFEF233C)),
-            minimumSize: const Size(0, 55),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-          ),
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.logout, color: Color(0xFFEF233C), size: 20),
-          label: const Text(
-            'تسجيل الخروج',
-            style: TextStyle(
-              color: Color(0xFFEF233C),
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+        icon: Icon(Icons.logout_rounded, color: DJ.danger),
+        label: Text('تسجيل الخروج', style: GoogleFonts.cairo(color: DJ.danger, fontSize: 14, fontWeight: FontWeight.w800)),
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: DJ.danger, width: 1.3),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
       ),
     );

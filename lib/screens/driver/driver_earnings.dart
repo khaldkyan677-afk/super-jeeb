@@ -1,439 +1,236 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'driver_theme.dart';
 
 class DriverEarningsScreen extends StatefulWidget {
   const DriverEarningsScreen({super.key});
-
   @override
   State<DriverEarningsScreen> createState() => _DriverEarningsScreenState();
 }
 
-class _DriverEarningsScreenState extends State<DriverEarningsScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tab;
+class _DriverEarningsScreenState extends State<DriverEarningsScreen> {
+  int _tab = 0;
+  final _tabs = ['اليوم', 'الأسبوع', 'الشهر'];
 
-  @override
-  void initState() {
-    super.initState();
-    _tab = TabController(length: 3, vsync: this);
-  }
+  final _data = {
+    'اليوم': ['24,750', '12', '2,063', '8,500', '16,250'],
+    'الأسبوع': ['156,300', '78', '2,004', '52,100', '104,200'],
+    'الشهر': ['642,800', '312', '2,060', '210,300', '432,500'],
+  };
 
-  @override
-  void dispose() {
-    _tab.dispose();
-    super.dispose();
-  }
+  final _transactions = [
+    ('#5489', 'توصيل طلب', 'اليوم 14:30', '+4,500', true),
+    ('#S120', 'نقل أغراض', 'اليوم 12:15', '+5,000', true),
+    ('سحب', 'طلب سحب الأرباح', 'أمس 20:00', '-15,000', false),
+    ('#5488', 'توصيل طلب', 'أمس 18:45', '+3,200', true),
+    ('#5487', 'توصيل طلب', 'أمس 16:20', '+2,800', true),
+  ];
 
   @override
   Widget build(BuildContext context) {
+    final d = _data[_tabs[_tab]]!;
     return Scaffold(
-      backgroundColor: const Color(0xFF1B1C2A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2B2D42),
-        title: const Text(
-          'أرباحي',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: const BackButton(color: Colors.white),
-        bottom: TabBar(
-          controller: _tab,
-          indicatorColor: const Color(0xFFEF233C),
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white60,
-          labelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
-          tabs: const [
-            Tab(text: 'اليوم'),
-            Tab(text: 'الأسبوع'),
-            Tab(text: 'الشهر'),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tab,
-        children: const [
-          _EarningsTab(period: 'today'),
-          _EarningsTab(period: 'week'),
-          _EarningsTab(period: 'month'),
-        ],
-      ),
-    );
-  }
-}
-
-class _EarningsTab extends StatelessWidget {
-  final String period;
-  const _EarningsTab({required this.period});
-
-  Map<String, dynamic> get _data {
-    switch (period) {
-      case 'today':
-        return {
-          'total': 12500,
-          'trips': 8,
-          'hours': 6,
-          'tips': 500,
-          'bonus': 1000,
-          'chart': [800, 1200, 1500, 2000, 1800, 2200, 3000],
-          'chartLabels': ['8ص', '10ص', '12م', '2م', '4م', '6م', '8م'],
-        };
-      case 'week':
-        return {
-          'total': 87500,
-          'trips': 52,
-          'hours': 42,
-          'tips': 3500,
-          'bonus': 5000,
-          'chart': [12000, 15000, 11000, 18000, 10000, 12500, 9000],
-          'chartLabels': [
-            'السبت',
-            'الأحد',
-            'الاثنين',
-            'الثلاثاء',
-            'الأربعاء',
-            'الخميس',
-            'الجمعة',
-          ],
-        };
-      default:
-        return {
-          'total': 375000,
-          'trips': 218,
-          'hours': 180,
-          'tips': 15000,
-          'bonus': 20000,
-          'chart': [45000, 52000, 48000, 55000, 60000, 58000, 57000],
-          'chartLabels': ['1', '5', '10', '15', '20', '25', '30'],
-        };
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final d = _data;
-    final maxChart = (d['chart'] as List).reduce((a, b) => a > b ? a : b);
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // بطاقة الإجمالي الرئيسية
-          Container(
-            padding: const EdgeInsets.all(25),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF25D366), Color(0xFF1a9e4f)],
-              ),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF25D366).withValues(alpha: 0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.attach_money,
-                      color: Colors.white70,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'إجمالي الأرباح',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 13,
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      period == 'today'
-                          ? 'اليوم'
-                          : period == 'week'
-                          ? 'هذا الأسبوع'
-                          : 'هذا الشهر',
-                      style: const TextStyle(
-                        color: Colors.white60,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  '${d['total']} YER',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    _miniStat('${d['trips']}', 'رحلة', Icons.local_shipping),
-                    const SizedBox(width: 15),
-                    _miniStat('${d['hours']}', 'ساعة', Icons.access_time),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // بطاقات فرعية
-          Row(
+      backgroundColor: DJ.bg,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                child: _subCard(
-                  'الإكراميات',
-                  '${d['tips']} YER',
-                  Icons.card_giftcard,
-                  Colors.amber,
-                ),
+              Text('أرباحي', style: DJ.h1),
+              const SizedBox(height: 14),
+              _tabsRow(),
+              const SizedBox(height: 16),
+              _mainCard(d),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  _miniCard('أرباح التوصيل', d[3] + ' ري', Icons.delivery_dining_rounded),
+                  const SizedBox(width: 10),
+                  _miniCard('أرباح الخدمات', d[4] + ' ري', Icons.handyman_rounded),
+                ],
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _subCard(
-                  'المكافآت',
-                  '${d['bonus']} YER',
-                  Icons.emoji_events,
-                  const Color(0xFFD4AF37),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('السجل المالي', style: DJ.h3),
+                  Text('عرض الكل', style: GoogleFonts.cairo(color: DJ.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+                ],
+              ),
+              const SizedBox(height: 10),
+              ..._transactions.map((t) => _txnCard(t)),
+              const SizedBox(height: 18),
+              SizedBox(
+                height: 52,
+                child: ElevatedButton.icon(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: DJ.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    elevation: 0,
+                  ),
+                  icon: const Icon(Icons.account_balance_rounded, size: 20),
+                  label: Text('طلب سحب الأرباح', style: GoogleFonts.cairo(fontWeight: FontWeight.w800, fontSize: 14)),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 25),
-
-          // رسم بياني
-          const Text(
-            'تفصيل الأرباح',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 15),
-          Container(
-            height: 200,
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.02),
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Colors.white10),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: (d['chart'] as List).asMap().entries.map((e) {
-                final height = (e.value / maxChart) * 130;
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      '${e.value ~/ 1000}K',
-                      style: const TextStyle(
-                        color: Colors.white38,
-                        fontSize: 8,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      width: 22,
-                      height: height.toDouble(),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Color(0xFF25D366), Color(0xFF1a9e4f)],
-                        ),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    SizedBox(
-                      width: 30,
-                      child: Text(
-                        (d['chartLabels'] as List)[e.key].toString(),
-                        style: const TextStyle(
-                          color: Colors.white54,
-                          fontSize: 8,
-                        ),
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                );
-              }).toList(),
-            ),
-          ),
-          const SizedBox(height: 25),
-
-          // سجل الرحلات
-          const Text(
-            'سجل الرحلات الأخيرة',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 15),
-          _tripRow('طلب #5021', '2.5 كم', 1500, '10:30 ص'),
-          _tripRow('طلب #5020', '4.2 كم', 2200, '09:15 ص'),
-          _tripRow('طلب #5019', '1.8 كم', 1200, '08:45 ص'),
-          _tripRow('طلب #5018', '5.5 كم', 2800, '08:00 ص'),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _miniStat(String value, String label, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.white70, size: 18),
-        const SizedBox(width: 6),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
+  Widget _tabsRow() {
+    return Container(
+      height: 44,
+      decoration: BoxDecoration(color: DJ.card, borderRadius: BorderRadius.circular(14), boxShadow: DJ.shadowSoft),
+      child: Row(
+        children: List.generate(_tabs.length, (i) {
+          final sel = _tab == i;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _tab = i),
+              child: Container(
+                margin: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: sel ? DJ.primary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                alignment: Alignment.center,
+                child: Text(_tabs[i], style: GoogleFonts.cairo(
+                  color: sel ? Colors.white : DJ.textMuted,
+                  fontSize: 13, fontWeight: FontWeight.w800,
+                )),
               ),
             ),
-            Text(
-              label,
-              style: const TextStyle(color: Colors.white60, fontSize: 10),
-            ),
-          ],
-        ),
-      ],
+          );
+        }),
+      ),
     );
   }
 
-  Widget _subCard(String title, String value, IconData icon, Color color) {
+  Widget _mainCard(List<String> d) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.02),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.white10),
+        gradient: const LinearGradient(colors: [DJ.primary, DJ.secondary], begin: Alignment.topRight, end: Alignment.bottomLeft),
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [BoxShadow(color: DJ.primary.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 8))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: color, size: 18),
+          Row(
+            children: [
+              const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 22),
+              const SizedBox(width: 8),
+              Text('إجمالي الأرباح', style: GoogleFonts.cairo(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+            ],
           ),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: const TextStyle(color: Colors.white54, fontSize: 11),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(d[0], style: GoogleFonts.cairo(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w800)),
+              const SizedBox(width: 6),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Text('ري', style: GoogleFonts.cairo(color: Colors.white70, fontSize: 14)),
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              color: color,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              _statPill(Icons.route_rounded, '${d[1]} رحلة'),
+              const SizedBox(width: 8),
+              _statPill(Icons.trending_up_rounded, 'متوسط ${d[2]} ري'),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _tripRow(String id, String distance, int amount, String time) {
+  Widget _statPill(IconData ic, String label) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.02),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white10),
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(20)),
       child: Row(
         children: [
-          const Icon(Icons.local_shipping, color: Color(0xFFEF233C), size: 20),
+          Icon(ic, color: Colors.white, size: 14),
+          const SizedBox(width: 6),
+          Text(label, style: GoogleFonts.cairo(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+        ],
+      ),
+    );
+  }
+
+  Widget _miniCard(String label, String val, IconData ic) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(color: DJ.card, borderRadius: BorderRadius.circular(16), boxShadow: DJ.shadowSoft),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: DJ.softRed, borderRadius: BorderRadius.circular(10)),
+              child: Icon(ic, color: DJ.primary, size: 18),
+            ),
+            const SizedBox(height: 10),
+            Text(val, style: GoogleFonts.cairo(fontWeight: FontWeight.w800, fontSize: 14)),
+            const SizedBox(height: 2),
+            Text(label, style: DJ.tiny),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _txnCard((String, String, String, String, bool) t) {
+    final isPositive = t.$5;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: DJ.card, borderRadius: BorderRadius.circular(16), boxShadow: DJ.shadowSoft),
+      child: Row(
+        children: [
+          Container(
+            width: 42, height: 42,
+            decoration: BoxDecoration(
+              color: isPositive ? DJ.softRed : DJ.softNavy,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              isPositive ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
+              color: isPositive ? DJ.primary : DJ.secondary, size: 20,
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  id,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 3),
                 Row(
                   children: [
-                    const Icon(
-                      Icons.straighten,
-                      color: Colors.white38,
-                      size: 11,
-                    ),
-                    const SizedBox(width: 3),
-                    Text(
-                      distance,
-                      style: const TextStyle(
-                        color: Colors.white38,
-                        fontSize: 10,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Icon(
-                      Icons.access_time,
-                      color: Colors.white38,
-                      size: 11,
-                    ),
-                    const SizedBox(width: 3),
-                    Text(
-                      time,
-                      style: const TextStyle(
-                        color: Colors.white38,
-                        fontSize: 10,
-                      ),
-                    ),
+                    Text(t.$1, style: GoogleFonts.cairo(fontWeight: FontWeight.w800, fontSize: 13)),
+                    const SizedBox(width: 6),
+                    Text(t.$2, style: DJ.muted.copyWith(fontSize: 11)),
                   ],
                 ),
+                const SizedBox(height: 3),
+                Text(t.$3, style: DJ.tiny),
               ],
             ),
           ),
-          Text(
-            '+$amount',
-            style: const TextStyle(
-              color: Color(0xFF25D366),
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text(t.$4, style: GoogleFonts.cairo(
+            fontWeight: FontWeight.w800, fontSize: 14,
+            color: isPositive ? DJ.success : DJ.danger,
+          )),
         ],
       ),
     );
