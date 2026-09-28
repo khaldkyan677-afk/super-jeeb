@@ -11,6 +11,16 @@ const userSchema = new mongoose.Schema({
     default: 'client' 
   },
   wallet: { type: Number, default: 0 },
+  defaultPaymentMethod: { type: String, default: 'cash' },
+  defaultPayoutAccountId: { type: mongoose.Schema.Types.ObjectId, ref: 'PayoutAccount' },
+  phoneVerified: { type: Boolean, default: false },
+  emailVerified: { type: Boolean, default: false },
+  totalSpent: { type: Number, default: 0 },
+  totalEarned: { type: Number, default: 0 },
+  referralCode: { type: String, unique: true, sparse: true },
+  referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  loyaltyPoints: { type: Number, default: 0 },
+  loyaltyTier: { type: String, enum: ['bronze', 'silver', 'gold'], default: 'bronze' },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
     isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now }
