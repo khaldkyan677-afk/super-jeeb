@@ -1,4 +1,5 @@
 const express = require('express');
+const { errorLogger } = require('./middleware/logging');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -16,6 +17,12 @@ app.use(helmet());
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
 app.use('/api', limiter);
 
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/driver', require('./routes/driverRoutes'));
+app.use('/api/logs', require('./routes/logRoutes'));
+app.use('/api/withdrawals', require('./routes/withdrawalRoutes'));
+app.use('/api/otp', require('./routes/otpRoutes'));
+app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/favorites', require('./routes/favoriteRoutes'));
 app.use('/api/ratings', require('./routes/ratingRoutes'));
@@ -36,4 +43,6 @@ app.get('/api/health', (req, res) => { res.status(200).json({ status: 'OK', mess
 app.use((err, req, res, next) => { console.error(err.stack); res.status(500).json({ message: 'Something went wrong!' }); });
 
 const PORT = process.env.PORT || 5000;
+app.use(errorLogger);
+
 app.listen(PORT, () => { console.log(`Server running on port ${PORT}`); });
