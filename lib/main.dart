@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'widgets/sj_logo.dart';
 import 'widgets/store_logo_animated.dart';
 import 'widgets/custom_keypad.dart';
 import 'theme/app_theme.dart';
-import 'screens/client/taxi_screen.dart';
 
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 
 import 'dart:async';
 
 import 'screens/email_auth_screen.dart';
-import 'screens/dev_selector_screen.dart';
 import 'screens/dev_selector_screen.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -20,10 +17,7 @@ import 'firebase_options.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:super_jeeb/widgets/password_field.dart';
 
-import 'screens/client/client_app.dart';
-import 'screens/welcome_after_login.dart';
 import 'screens/role_router.dart';
-import 'screens/admin/admin_app.dart';
 import 'services/security_service.dart';
 import 'services/auth_service.dart';
 
@@ -807,7 +801,6 @@ class _AdminGateScreenState extends State<AdminGateScreen> {
   bool _loading = false;
 
   static const String _adminEmail = 'khaled20010405@gmail.com';
-  static const String _backupEmail = 'khaldkyan677@gmail.com';
   static const String _secretPassword = 'SJ2026KHALED';
 
   void _openForgotPassword(BuildContext context) {
@@ -828,6 +821,21 @@ class _AdminGateScreenState extends State<AdminGateScreen> {
     final e = _email.text.trim().toLowerCase();
     final p = _pass.text;
 
+    // 1. نطلب من السيرفر أولاً
+    try {
+      final res = await ApiService.login(email: e, password: p);
+      if (!mounted) return;
+      if (res['token'] != null && res['role'] == 'admin') {
+        ApiService.setToken(res['token'] as String);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const DevSelectorScreen()),
+        );
+        return;
+      }
+    } catch (_) {}
+
+    // 2. احتياطي: الفحص المحلي
     if (e == _adminEmail && p == _secretPassword) {
       if (mounted) {
         Navigator.pushReplacement(
@@ -837,7 +845,7 @@ class _AdminGateScreenState extends State<AdminGateScreen> {
       }
     } else {
       setState(() {
-        _error = 'البيانات غير صحيحة';
+        _error = 'البريد أو كلمة المرور غير صحيحة';
         _loading = false;
       });
     }

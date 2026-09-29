@@ -7,7 +7,10 @@ class ApiService {
   ApiService._();
   static final ApiService instance = ApiService._();
 
-  static const String baseUrl = 'https://8080-cs-3051c663-cf57-42cb-974c-f26f566307a6.cs-europe-west1-onse.cloudshell.dev';
+  static String get baseUrl {
+    if (kIsWeb) return Uri.base.origin;
+    return 'https://8080-cs-3051c663-cf57-42cb-974c-f26f566307a6.cs-europe-west1-onse.cloudshell.dev';
+  }
 
   static String? _authToken;
   static String? _deviceId;
@@ -17,9 +20,15 @@ class ApiService {
   static String? get deviceId => _deviceId;
 
   static Map<String, String> get _headers {
-    final h = <String, String>{'Content-Type': 'application/json'};
+    final h = <String, String>{};
     if (_authToken != null) h['Authorization'] = 'Bearer $_authToken';
     if (_deviceId != null) h['x-device-id'] = _deviceId!;
+    return h;
+  }
+
+  static Map<String, String> get _jsonHeaders {
+    final h = _headers;
+    h['Content-Type'] = 'application/json';
     return h;
   }
 
@@ -368,7 +377,7 @@ class ApiService {
       final params = <String>[];
       if (role != null) params.add('role=$role');
       if (status != null) params.add('status=$status');
-      if (params.isNotEmpty) url += '?' + params.join('&');
+      if (params.isNotEmpty) url += '?${params.join('&')}';
       final r = await http.get(Uri.parse(url), headers: _headers).timeout(const Duration(seconds: 15));
       if (r.statusCode == 200) return jsonDecode(r.body) as List<dynamic>;
       return [];
@@ -466,6 +475,77 @@ class ApiService {
         Uri.parse('$baseUrl/api/driver/earnings'),
         headers: _headers,
       ).timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) { return {'error': e.toString()}; }
+  }
+
+  // ═══════════════ PAYMENTS ═══════════════
+
+  static Future<List<dynamic>> listPaymentMethods() async {
+    try {
+      final r = await http.get(Uri.parse('$baseUrl/api/payments/methods'), headers: _headers)
+          .timeout(const Duration(seconds: 15));
+      if (r.statusCode == 200) return jsonDecode(r.body) as List<dynamic>;
+      return [];
+    } catch (e) { return []; }
+  }
+
+  static Future<Map<String, dynamic>> addPaymentMethod(Map<String, dynamic> data) async {
+    try {
+      final r = await http.post(Uri.parse('$baseUrl/api/payments/methods'),
+          headers: _jsonHeaders, body: jsonEncode(data))
+          .timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) { return {'error': e.toString()}; }
+  }
+
+  static Future<Map<String, dynamic>> updatePaymentMethod(String id, Map<String, dynamic> data) async {
+    try {
+      final r = await http.patch(Uri.parse('$baseUrl/api/payments/methods/$id'),
+          headers: _jsonHeaders, body: jsonEncode(data))
+          .timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) { return {'error': e.toString()}; }
+  }
+
+  static Future<List<dynamic>> listTransactions({String? status, String? type}) async {
+    try {
+      var url = '$baseUrl/api/payments/transactions';
+      final params = <String>[];
+      if (status != null) params.add('status=$status');
+      if (type != null) params.add('type=$type');
+      if (params.isNotEmpty) url += '?${params.join('&')}';
+      final r = await http.get(Uri.parse(url), headers: _headers)
+          .timeout(const Duration(seconds: 15));
+      if (r.statusCode == 200) return jsonDecode(r.body) as List<dynamic>;
+      return [];
+    } catch (e) { return []; }
+  }
+
+  static Future<Map<String, dynamic>> paymentStats() async {
+    try {
+      final r = await http.get(Uri.parse('$baseUrl/api/payments/stats'), headers: _headers)
+          .timeout(const Duration(seconds: 15));
+      return jsonDecode(r.body);
+    } catch (e) { return {'error': e.toString()}; }
+  }
+
+  static Future<List<dynamic>> listAllWithdrawals({String? status}) async {
+    try {
+      var url = '$baseUrl/api/withdrawals/admin/all';
+      if (status != null) url += '?status=$status';
+      final r = await http.get(Uri.parse(url), headers: _headers)
+          .timeout(const Duration(seconds: 15));
+      if (r.statusCode == 200) return jsonDecode(r.body) as List<dynamic>;
+      return [];
+    } catch (e) { return []; }
+  }
+
+  static Future<Map<String, dynamic>> processWithdrawal(String id, Map<String, dynamic> data) async {
+    try {
+      final r = await http.patch(Uri.parse('$baseUrl/api/withdrawals/admin/$id/process'),
+          headers: _jsonHeaders, body: jsonEncode(data))
+          .timeout(const Duration(seconds: 15));
       return jsonDecode(r.body);
     } catch (e) { return {'error': e.toString()}; }
   }

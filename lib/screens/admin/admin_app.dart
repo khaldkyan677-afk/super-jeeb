@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'add_merchant_screen.dart';
 
-import 'package:google_fonts/google_fonts.dart';
 
 import 'admin_management.dart';
 import 'admin_settings.dart';
 import 'admin_reports.dart';
+import 'admin_payments.dart';
 import 'admin_staff.dart';
 import '../../services/cache_service.dart';
 import '../../widgets/sj_logo.dart';
@@ -289,6 +289,18 @@ class AdminHomeTab extends StatelessWidget {
           ),
           const SizedBox(height: 15),
           _vaultCard(),
+
+        const SizedBox(height: 25),
+        _qa(
+          context,
+          Icons.payments,
+          'الدفع',
+          const Color(0xFFF0C107),
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AdminPaymentsScreen()),
+          ),
+        ),
           const SizedBox(height: 25),
           const Text(
             '⚡ إجراءات سريعة',
