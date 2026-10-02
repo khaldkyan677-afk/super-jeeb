@@ -1,0 +1,4 @@
+const Wallet = require('../models/Wallet');
+exports.getMyWallet = async (req, res) => { try { let wallet = await Wallet.findOne({ userId: req.user._id }); if (!wallet) wallet = await Wallet.create({ userId: req.user._id }); res.json(wallet); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.requestTopup = async (req, res) => { try { const { amount } = req.body; const wallet = await Wallet.findOneAndUpdate({ userId: req.user._id }, { $inc: { balance: amount } }, { new: true, upsert: true }); res.json(wallet); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.getTransactions = async (req, res) => { try { const wallet = await Wallet.findOne({ userId: req.user._id }); res.json(wallet ? wallet.transactions : []); } catch (e) { res.status(500).json({ message: e.message }); } };

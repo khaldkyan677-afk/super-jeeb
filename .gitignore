@@ -1,47 +1,32 @@
+# Node
+node_modules/
+npm-debug.log*
+*.log
+
+# Environment
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Archive
+_archive/
+*.bak
+*.bak2
+*.bak3
+*.backup
+*.backup-clean
+*.bak-clean
+*.bak-before-bypass
+*.old
+
 # Flutter
 .dart_tool/
-.packages
 build/
 .flutter-plugins
 .flutter-plugins-dependencies
 
-# IDE
-.idea/
-.vscode/
-*.iml
-*.swp
-
-# نظام
+# Misc
 .DS_Store
-Thumbs.db
-
-# أسرار
-.env
-*.key
-*.secret
-
-# Android
-android/app/debug
-android/app/profile
-android/app/release
-android/.gradle/
-android/local.properties
-android/key.properties
-*.jks
-*.keystore
-
-# iOS
-ios/Pods/
-ios/.symlinks/
-ios/Flutter/Flutter.framework
-ios/Flutter/Flutter.podspec
-
-# Web
-web/favicon.png
-build/
-
-# Logs
-*.log
-lib/firebase_options.dart
-server/node_modules/
-server/.env
+DB_Store
