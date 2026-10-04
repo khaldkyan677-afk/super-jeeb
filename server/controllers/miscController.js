@@ -5,7 +5,7 @@ const Product = require('../models/Product');
 // عميل يلغي طلب
 exports.cancelOrder = async (req, res) => {
   try {
-    const o = await Order.findByIdAndUpdate(req.params.id, { status: 'cancelled' }, { new: true });
+    const o = await Order.findByIdAndUpdate(req.params.id, { status: 'cancelled' }, { returnDocument: 'after' });
     if (!o) return res.status(404).json({ message: 'الطلب غير موجود' });
     res.json(o);
   } catch (e) { res.status(500).json({ message: e.message }); }
@@ -40,7 +40,7 @@ exports.approveUser = async (req, res) => {
     const u = await User.findByIdAndUpdate(
       req.params.id,
       { status: 'approved' },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!u) return res.status(404).json({ message: 'المستخدم غير موجود' });
     res.json(u);
@@ -53,7 +53,7 @@ exports.rejectUser = async (req, res) => {
     const u = await User.findByIdAndUpdate(
       req.params.id,
       { status: 'rejected' },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!u) return res.status(404).json({ message: 'المستخدم غير موجود' });
     res.json(u);
@@ -67,7 +67,7 @@ exports.changeUserRole = async (req, res) => {
     if (!['client','merchant','driver','admin'].includes(role)) {
       return res.status(400).json({ message: 'دور غير صحيح' });
     }
-    const u = await User.findByIdAndUpdate(req.params.id, { role }, { new: true });
+    const u = await User.findByIdAndUpdate(req.params.id, { role }, { returnDocument: 'after' });
     res.json(u);
   } catch (e) { res.status(500).json({ message: e.message }); }
 };
@@ -84,7 +84,7 @@ exports.addProduct = async (req, res) => {
 // منتجات: تعديل
 exports.updateProduct = async (req, res) => {
   try {
-    const p = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const p = await Product.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
     if (!p) return res.status(404).json({ message: 'المنتج غير موجود' });
     res.json(p);
   } catch (e) { res.status(500).json({ message: e.message }); }

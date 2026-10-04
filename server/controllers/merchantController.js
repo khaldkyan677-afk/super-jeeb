@@ -31,7 +31,7 @@ exports.createMerchant = async (req, res) => {
 
 exports.updateMerchant = async (req, res) => {
   try {
-    const m = await Merchant.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const m = await Merchant.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
     if (!m) return res.status(404).json({ error: 'Not found' });
     res.json(m);
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -47,7 +47,7 @@ exports.deleteMerchant = async (req, res) => {
 
 exports.verifyMerchant = async (req, res) => {
   try {
-    const m = await Merchant.findByIdAndUpdate(req.params.id, { isVerified: true }, { new: true });
+    const m = await Merchant.findByIdAndUpdate(req.params.id, { isVerified: true }, { returnDocument: 'after' });
     res.json(m);
   } catch (e) { res.status(500).json({ error: e.message }); }
 };

@@ -30,7 +30,7 @@ exports.addPaymentMethod = async (req, res) => {
 
 exports.updatePaymentMethod = async (req, res) => {
   try {
-    const m = await PaymentMethod.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const m = await PaymentMethod.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
     if (!m) return res.status(404).json({ message: 'غير موجود' });
     res.json(m);
   } catch (e) { res.status(500).json({ message: e.message }); }

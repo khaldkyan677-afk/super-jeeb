@@ -20,7 +20,7 @@ exports.createRate = async (req, res) => {
 
 exports.updateRate = async (req, res) => {
   try {
-    const r = await ExchangeRate.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const r = await ExchangeRate.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
     if (!r) return res.status(404).json({ error: 'Not found' });
     res.json(r);
   } catch (e) { res.status(500).json({ error: e.message }); }

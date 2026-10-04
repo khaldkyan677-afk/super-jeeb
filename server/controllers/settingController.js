@@ -34,7 +34,7 @@ exports.updateSetting = async (req, res) => {
     const s = await Setting.findOneAndUpdate(
       { key: req.params.key },
       { ...req.body, updatedBy: req.user._id, updatedAt: new Date() },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!s) return res.status(404).json({ error: 'Not found' });
     res.json(s);

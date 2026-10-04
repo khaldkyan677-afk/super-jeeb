@@ -39,7 +39,7 @@ exports.updatePayoutAccount = async (req, res) => {
     const acc = await PayoutAccount.findOneAndUpdate(
       { _id: req.params.id, userId: req.user._id },
       req.body,
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!acc) return res.status(404).json({ message: 'غير موجود' });
     res.json(acc);
@@ -145,7 +145,7 @@ exports.processWithdrawal = async (req, res) => {
       );
     }
 
-    const updated = await Withdrawal.findByIdAndUpdate(wd._id, update, { new: true });
+    const updated = await Withdrawal.findByIdAndUpdate(wd._id, update, { returnDocument: 'after' });
 
     await AuditLog.create({
       userId: req.user._id,
@@ -174,7 +174,7 @@ exports.verifyPayoutAccount = async (req, res) => {
     const acc = await PayoutAccount.findByIdAndUpdate(
       req.params.id,
       { isVerified: true },
-      { new: true }
+      { returnDocument: 'after' }
     );
     res.json(acc);
   } catch (e) { res.status(500).json({ message: e.message }); }

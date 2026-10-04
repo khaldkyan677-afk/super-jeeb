@@ -27,7 +27,7 @@ exports.updateAddress = async (req, res) => {
   try {
     const a = await Address.findOneAndUpdate(
       { _id: req.params.id, userId: req.user._id },
-      req.body, { new: true }
+      req.body, { returnDocument: 'after' }
     );
     if (!a) return res.status(404).json({ error: 'Not found' });
     if (a.isDefault) {

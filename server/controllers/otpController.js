@@ -33,7 +33,6 @@ exports.sendOtp = async (req, res) => {
     });
 
     // TODO: إرسال SMS حقيقي
-    console.log('OTP for', phone, '=>', code);
 
     res.json({ message: 'تم إرسال الكود', expiresIn: 300 });
   } catch (e) { res.status(500).json({ message: e.message }); }

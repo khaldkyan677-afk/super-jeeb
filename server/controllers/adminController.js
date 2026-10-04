@@ -22,7 +22,7 @@ exports.createAdmin = async (req, res) => {
 
 exports.updateAdmin = async (req, res) => {
   try {
-    const a = await Admin.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const a = await Admin.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
     if (!a) return res.status(404).json({ error: 'Not found' });
     res.json(a);
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -38,7 +38,7 @@ exports.deleteAdmin = async (req, res) => {
 
 exports.unlockAdmin = async (req, res) => {
   try {
-    const a = await Admin.findByIdAndUpdate(req.params.id, { loginAttempts: 0, lockedUntil: null }, { new: true });
+    const a = await Admin.findByIdAndUpdate(req.params.id, { loginAttempts: 0, lockedUntil: null }, { returnDocument: 'after' });
     if (!a) return res.status(404).json({ error: 'Not found' });
     res.json(a);
   } catch (e) { res.status(500).json({ error: e.message }); }

@@ -25,7 +25,7 @@ exports.createDistrict = async (req, res) => {
 
 exports.updateDistrict = async (req, res) => {
   try {
-    const d = await District.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const d = await District.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
     if (!d) return res.status(404).json({ error: 'Not found' });
     res.json(d);
   } catch (e) { res.status(500).json({ error: e.message }); }

@@ -17,7 +17,7 @@ exports.createRefund = async (req, res) => {
 
 exports.updateRefundStatus = async (req, res) => {
   try {
-    const r = await Refund.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
+    const r = await Refund.findByIdAndUpdate(req.params.id, { status: req.body.status }, { returnDocument: 'after' });
     if (!r) return res.status(404).json({ error: 'Not found' });
     res.json(r);
   } catch (e) { res.status(500).json({ error: e.message }); }

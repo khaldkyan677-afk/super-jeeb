@@ -20,7 +20,7 @@ exports.createCity = async (req, res) => {
 
 exports.updateCity = async (req, res) => {
   try {
-    const c = await City.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const c = await City.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
     if (!c) return res.status(404).json({ error: 'Not found' });
     res.json(c);
   } catch (e) { res.status(500).json({ error: e.message }); }

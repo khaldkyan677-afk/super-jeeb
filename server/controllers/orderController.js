@@ -28,7 +28,7 @@ exports.getMyOrders = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    const order = await Order.findByIdAndUpdate(req.params.id, { status }, { returnDocument: 'after' });
     res.json(order);
   } catch (error) {
     res.status(500).json({ message: error.message });

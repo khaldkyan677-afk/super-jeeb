@@ -20,7 +20,7 @@ exports.createAccount = async (req, res) => {
 
 exports.updateAccount = async (req, res) => {
   try {
-    const a = await OfficialAccount.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const a = await OfficialAccount.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
     if (!a) return res.status(404).json({ error: 'Not found' });
     res.json(a);
   } catch (e) { res.status(500).json({ error: e.message }); }
