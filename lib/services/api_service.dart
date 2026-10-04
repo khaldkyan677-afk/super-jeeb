@@ -9,7 +9,7 @@ class ApiService {
 
   static String get baseUrl {
     if (kIsWeb) return Uri.base.origin;
-    return 'https://8080-cs-3051c663-cf57-42cb-974c-f26f566307a6.cs-europe-west1-onse.cloudshell.dev';
+    return '';
   }
 
   static String? _authToken;

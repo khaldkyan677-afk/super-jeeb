@@ -50,6 +50,17 @@ class _AdminSplashState extends State<AdminSplash>
   @override
   void initState() {
     super.initState();
+    _c = AnimationController(duration: const Duration(milliseconds: 1500), vsync: this);
+    _scale = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _c, curve: Curves.easeOutBack),
+    );
+    _iconsFade = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _c, curve: const Interval(0.0, 0.5)),
+    );
+    _logoFade = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _c, curve: const Interval(0.5, 1.0)),
+    );
+    _c.forward();
     Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
         Navigator.pushReplacement(

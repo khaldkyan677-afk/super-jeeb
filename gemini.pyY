@@ -1,0 +1,6 @@
+import osimport os import google.generativeai as genai import google.generativeai as genai# 🔑 جلب المفتاح المخزن في البيئة 
+api_key = os.environ.get("GEMINI_API_KEY") genai.configure(api_key=api_key)
+
+# 🤖 إرسال طلب اختبار للنموذج
+model = genai.GnerativeModel("gemini-1.5-flash") response = model.generate_content("مرحباً! هل الاتصال بمشروع سوبر جيب جاهز؟") 
+print(response.text)
