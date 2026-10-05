@@ -80,6 +80,12 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(buildPath));
+app.use('/v2', express.static(buildPath));
+app.use('/v2', (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  if (req.method !== 'GET') return next();
+  res.sendFile(path.join(buildPath, 'index.html'));
+});
 app.use((req, res, next) => {
   if (req.path.startsWith('/api/')) return next();
   if (req.method !== 'GET') return next();

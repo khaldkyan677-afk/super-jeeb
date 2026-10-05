@@ -209,18 +209,35 @@ class _PaymentMethodsTabState extends State<PaymentMethodsTab> {
   void _showAddDialog() {
     final name = TextEditingController();
     final code = TextEditingController();
+    final typeCtrl = TextEditingController(text: 'wallet');
+    final accountName = TextEditingController();
+    final accountNumber = TextEditingController();
+    final iban = TextEditingController();
+    final instructions = TextEditingController();
     showDialog(
       context: context,
       builder: (dialogCtx) => AlertDialog(
         backgroundColor: kSurface,
-        title: Text('إضافة طريقة دفع', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.w800)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: name, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'الاسم', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
-            const SizedBox(height: 10),
-            TextField(controller: code, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'الكود (بالإنجليزية)', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
-          ],
+        title: Text('إضافة وسيلة دفع', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.w800)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: name, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'الاسم', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
+              const SizedBox(height: 10),
+              TextField(controller: code, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'الكود', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
+              const SizedBox(height: 10),
+              TextField(controller: typeCtrl, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'النوع: wallet/cash/bank/card', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
+              const SizedBox(height: 10),
+              TextField(controller: accountName, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'اسم صاحب الحساب', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
+              const SizedBox(height: 10),
+              TextField(controller: accountNumber, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'رقم الحساب', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
+              const SizedBox(height: 10),
+              TextField(controller: iban, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'IBAN', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
+              const SizedBox(height: 10),
+              TextField(controller: instructions, maxLines: 2, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'تعليمات', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
+            ],
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(dialogCtx), child: Text('إلغاء', style: GoogleFonts.cairo(color: Colors.white54))),
@@ -230,17 +247,24 @@ class _PaymentMethodsTabState extends State<PaymentMethodsTab> {
               final c = code.text.trim();
               final messenger = ScaffoldMessenger.of(context);
               if (n.isEmpty || c.isEmpty) {
-                messenger.showSnackBar(SnackBar(content: Text('الاسم والكود مطلوبان', style: GoogleFonts.cairo()), backgroundColor: kRed));
+                messenger.showSnackBar(SnackBar(content: Text('الرجاء ملء الحقول', style: GoogleFonts.cairo()), backgroundColor: kRed));
                 return;
               }
-              final res = await ApiService.addPaymentMethod({'name': n, 'code': c, 'type': 'wallet'});
+              final res = await ApiService.addPaymentMethod({
+                'name': n, 'code': c,
+                'type': typeCtrl.text.trim(),
+                'accountName': accountName.text.trim(),
+                'accountNumber': accountNumber.text.trim(),
+                'iban': iban.text.trim(),
+                'instructions': instructions.text.trim(),
+              });
               if (!dialogCtx.mounted) return;
               Navigator.pop(dialogCtx);
               if (res.containsKey('error')) {
-                messenger.showSnackBar(SnackBar(content: Text('فشل: ${res['error']}', style: GoogleFonts.cairo()), backgroundColor: kRed));
+                messenger.showSnackBar(SnackBar(content: Text('خطأ: ${res['error']}', style: GoogleFonts.cairo()), backgroundColor: kRed));
                 return;
               }
-              messenger.showSnackBar(SnackBar(content: Text('✓ تمت الإضافة', style: GoogleFonts.cairo()), backgroundColor: kGreen));
+              messenger.showSnackBar(SnackBar(content: Text('تم الحفظ ✓', style: GoogleFonts.cairo()), backgroundColor: kGreen));
               _load();
             },
             child: Text('حفظ', style: GoogleFonts.cairo(color: kRed, fontWeight: FontWeight.w800)),
