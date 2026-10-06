@@ -19,6 +19,7 @@ class ApiService {
   static void setDeviceId(String id) => _deviceId = id;
   static String? get deviceId => _deviceId;
 
+  static Map<String, String> get get_headers => _headers;
   static Map<String, String> get _headers {
     final h = <String, String>{};
     if (_authToken != null) h['Authorization'] = 'Bearer $_authToken';

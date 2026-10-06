@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import '../../../services/api_service.dart';
 import 'dart:convert';
 import 'track_order_screen.dart';
 
@@ -18,6 +19,41 @@ class RequestFormScreen extends StatefulWidget {
 }
 
 class _RequestFormScreenState extends State<RequestFormScreen> {
+  List<Map<String, dynamic>> _methods = [];
+  bool _loadingMethods = true;
+  String? _selectedMethodId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMethods();
+  }
+
+  Future<void> _loadMethods() async {
+    try {
+      final url = Uri.parse('${ApiService.baseUrl}/api/payments/methods');
+      final r = await http.get(url, headers: ApiService.get_headers);
+      if (r.statusCode == 200) {
+        final data = jsonDecode(r.body);
+        final list = (data is Map && data['data'] is List)
+            ? (data['data'] as List)
+            : (data is List ? data : []);
+        if (mounted) {
+          setState(() {
+            _methods = list.cast<Map<String, dynamic>>()
+                .where((m) => m['isActive'] != false)
+                .toList();
+            _loadingMethods = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => _loadingMethods = false);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _loadingMethods = false);
+    }
+  }
+
   final _c1 = TextEditingController();
   final _c2 = TextEditingController();
   final _c3 = TextEditingController();
@@ -25,23 +61,7 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
   String _option = '';
   List<Map<String, dynamic>> _stores = [];
   String? _selectedStore;
-  String _payMethod = 'كاش';
 
-  @override
-  void initState() {
-    super.initState();
-    _loadStores();
-  }
-
-  Future<void> _loadStores() async {
-    try {
-      final r = await http.get(Uri.base.resolve('/api/stores'));
-      if (r.statusCode == 200) {
-        final list = jsonDecode(r.body) as List;
-        if (mounted) setState(() => _stores = list.cast<Map<String, dynamic>>());
-      }
-    } catch (_) {}
-  }
 
   List<Map<String, dynamic>> get _fields {
     switch (widget.serviceType) {
@@ -104,7 +124,7 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
         children: [
           _hero(),
           const SizedBox(height: 20),
-          ..._fields.map(_buildField).toList(),
+          ..._fields.map(_buildField),
           if (widget.serviceType == 'اشتري لي') ...[
             const SizedBox(height: 20),
             Text('اختر المتجر', style: GoogleFonts.cairo(color: Colors.grey, fontSize: 13)),
@@ -124,6 +144,7 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
           Text('طريقة الدفع', style: GoogleFonts.cairo(color: Colors.grey, fontSize: 13)),
           const SizedBox(height: 8),
           _buildPayMethods(),
+          _buildPaymentDetails(),
           const SizedBox(height: 30),
           _buildButton(),
           const SizedBox(height: 30),
@@ -169,7 +190,7 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
     final total = budget + delivery + commission;
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: _kSurface, borderRadius: BorderRadius.circular(14), border: Border.all(color: _kRed.withOpacity(0.3))),
+      decoration: BoxDecoration(color: _kSurface, borderRadius: BorderRadius.circular(14), border: Border.all(color: _kRed.withValues(alpha: 0.3))),
       child: Column(
         children: [
           _costRow('قيمة المشتريات', budget),
@@ -207,7 +228,7 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: _kRed.withOpacity(0.15), shape: BoxShape.circle),
+                decoration: BoxDecoration(color: _kRed.withValues(alpha: 0.15), shape: BoxShape.circle),
                 child: const Icon(Icons.check_circle, color: _kRed, size: 44),
               ),
               const SizedBox(height: 14),
@@ -250,6 +271,70 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
     );
   }
 
+  Widget _buildPaymentDetails() {
+    if (_selectedMethodId == null) return const SizedBox.shrink();
+    final m = _methods.firstWhere((x) => x['_id'] == _selectedMethodId,
+        orElse: () => {});
+    if (m.isEmpty) return const SizedBox.shrink();
+    final type = m['type'] as String? ?? 'cash';
+    if (type == 'cash') return const SizedBox.shrink();
+
+    final rows = <Widget>[];
+    if ((m['accountName'] ?? '').toString().isNotEmpty) {
+      rows.add(_detailRow('اسم الحساب', m['accountName'].toString()));
+    }
+    if ((m['accountNumber'] ?? '').toString().isNotEmpty) {
+      rows.add(_detailRow('رقم الحساب', m['accountNumber'].toString()));
+    }
+    if ((m['iban'] ?? '').toString().isNotEmpty) {
+      rows.add(_detailRow('IBAN', m['iban'].toString()));
+    }
+    if ((m['instructions'] ?? '').toString().isNotEmpty) {
+      rows.add(Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Text(m['instructions'].toString(),
+            style: const TextStyle(color: Colors.grey, fontSize: 12)),
+      ));
+    }
+    if (rows.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: _kSurface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _kRed.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('تفاصيل الدفع',
+              style: TextStyle(
+                  color: _kRed, fontSize: 13, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 8),
+          ...rows,
+        ],
+      ),
+    );
+  }
+
+  Widget _detailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        children: [
+          Text('$label: ',
+              style: const TextStyle(color: Colors.grey, fontSize: 12)),
+          Expanded(
+            child: Text(value,
+                style: const TextStyle(color: Colors.white, fontSize: 12)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPayMethods() {
     final methods = [
       {'label': 'كاش', 'icon': Icons.payments_outlined},
@@ -259,22 +344,29 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
     return Row(
       children: methods.map((m) {
         final label = m['label'] as String;
-        final sel = _payMethod == label;
+        final sel = _selectedMethodId == m['_id'];
+        final iconMap = {
+          'cash': Icons.payments_outlined,
+          'wallet': Icons.account_balance_wallet_outlined,
+          'card': Icons.credit_card,
+          'bank': Icons.account_balance_outlined,
+        };
+        final icon = iconMap[m['type']] ?? Icons.payments_outlined;
         return Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: GestureDetector(
-              onTap: () => setState(() => _payMethod = label),
+              onTap: () => setState(() => _selectedMethodId = m['_id'] as String?),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 decoration: BoxDecoration(
-                  color: sel ? _kRed.withOpacity(0.15) : _kSurface,
+                  color: sel ? _kRed.withValues(alpha: 0.15) : _kSurface,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: sel ? _kRed : Colors.white12),
                 ),
                 child: Column(
                   children: [
-                    Icon(m['icon'] as IconData, color: sel ? _kRed : Colors.grey, size: 24),
+                    Icon(icon, color: sel ? _kRed : Colors.grey, size: 24),
                     const SizedBox(height: 6),
                     Text(label, style: GoogleFonts.cairo(color: sel ? Colors.white : Colors.grey, fontSize: 12, fontWeight: sel ? FontWeight.w700 : FontWeight.w500)),
                   ],
@@ -291,7 +383,7 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [_kRed.withOpacity(0.3), _kSurface], begin: Alignment.topRight, end: Alignment.bottomLeft),
+        gradient: LinearGradient(colors: [_kRed.withValues(alpha: 0.3), _kSurface], begin: Alignment.topRight, end: Alignment.bottomLeft),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -374,7 +466,7 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
         decoration: BoxDecoration(
           color: _kRed,
           borderRadius: BorderRadius.circular(14),
-          boxShadow: [BoxShadow(color: _kRed.withOpacity(0.4), blurRadius: 16, offset: const Offset(0, 6))],
+          boxShadow: [BoxShadow(color: _kRed.withValues(alpha: 0.4), blurRadius: 16, offset: const Offset(0, 6))],
         ),
         child: Center(child: Text('إرسال الطلب', style: GoogleFonts.cairo(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700))),
       ),

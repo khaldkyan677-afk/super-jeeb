@@ -10,6 +10,37 @@ class CartCheckoutScreen extends StatefulWidget {
 class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
   int _step = 0; // 0=cart, 1=address, 2=payment, 3=confirm
   int? _selectedPaymentIndex;
+  int? _selectedCartIndex;
+  int _selectedAddressIndex = 0;
+  final List<Map<String, dynamic>> _addresses = [
+      {
+        'title': 'المنزل',
+        'address': 'صنعاء - شارع حدة - جوار مسجد النور',
+        'default': true,
+        'icon': Icons.home,
+      },
+      {
+        'title': 'العمل',
+        'address': 'صنعاء - شارع تعز - مجمع الأعمال',
+        'default': false,
+        'icon': Icons.work,
+      },
+    {
+      'title': 'موقعي الحالي',
+      'address': 'تحديد الموقع من الخريطة',
+      'default': false,
+      'icon': Icons.my_location,
+    },
+  ];
+
+  List<int> get _effSelectedCarts =>
+      _selectedCartIndex == null ? [] : [_selectedCartIndex!];
+  bool _isCartSelected(int i) => _selectedCartIndex == i;
+  void _toggleCart(int i) {
+    setState(() {
+      _selectedCartIndex = (_selectedCartIndex == i) ? null : i;
+    });
+  }
 
   final List<Map<String, dynamic>> _carts = [
     {
@@ -191,7 +222,34 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
     );
   }
 
-  Widget _cartCard(int cartIndex, Map<String, dynamic> cart) {
+void _confirmDeleteCart(int cartIndex) {
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('حذف السلة'),
+      content: const Text('هل تريد حذف كل منتجات هذه السلة؟'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx),
+          child: const Text('إلغاء'),
+        ),
+        TextButton(
+          onPressed: () {
+            setState(() {
+              _carts.removeAt(cartIndex);
+              if (_selectedCartIndex == cartIndex) _selectedCartIndex = null;
+            });
+            Navigator.pop(ctx);
+          },
+          child: const Text('حذف', style: TextStyle(color: Colors.red)),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _cartCard(int cartIndex, Map<String, dynamic> cart) {
+  final selected = _isCartSelected(cartIndex);
     final items = cart['items'] as List;
     final delivery = cart['delivery'] as int;
     int subtotal = 0;
@@ -200,7 +258,9 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
     }
     final total = subtotal + delivery;
 
-    return Container(
+    return GestureDetector(
+      onTap: () => _toggleCart(cartIndex),
+      child: Container(
       margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -215,15 +275,21 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
         children: [
           Row(
             children: [
+              Icon(
+                selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                color: selected ? const Color(0xFFFFD166) : Colors.grey,
+                size: 22,
+              ),
+              const SizedBox(width: 8),
               const Icon(Icons.storefront, color: Color(0xFFEF233C), size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   cart['merchant'],
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFFFFFFFF),
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -242,6 +308,22 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
                   ),
                 ),
               ),
+          const SizedBox(width: 6),
+          GestureDetector(
+            onTap: () => _confirmDeleteCart(cartIndex),
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEF233C).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.delete_outline,
+                color: Color(0xFFEF233C),
+                size: 18,
+              ),
+            ),
+          ),
             ],
           ),
           const Divider(height: 20),
@@ -270,6 +352,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
             ],
           ),
         ],
+      ),
       ),
     );
   }
@@ -369,20 +452,6 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
   }
 
   Widget _buildAddress() {
-    final addresses = [
-      {
-        'title': 'المنزل',
-        'address': 'صنعاء - شارع حدة - جوار مسجد النور',
-        'default': true,
-        'icon': Icons.home,
-      },
-      {
-        'title': 'العمل',
-        'address': 'صنعاء - شارع تعز - مجمع الأعمال',
-        'default': false,
-        'icon': Icons.work,
-      },
-    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,7 +465,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
           ),
         ),
         const SizedBox(height: 15),
-        ...addresses.map((a) => _addressCard(a)),
+        ..._addresses.asMap().entries.map((e) => _addressCard(e.value, e.key)),
         const SizedBox(height: 15),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
@@ -435,15 +504,17 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
     );
   }
 
-  Widget _addressCard(Map<String, dynamic> a) {
-    final isDefault = a['default'] as bool;
-    return Container(
+Widget _addressCard(Map<String, dynamic> a, int index) {
+  final isSelected = _selectedAddressIndex == index;
+  return GestureDetector(
+    onTap: () => setState(() => _selectedAddressIndex = index),
+    child: Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
-        border: isDefault
+        border: isSelected
             ? Border.all(color: const Color(0xFFEF233C), width: 1.5)
             : null,
       ),
@@ -475,7 +546,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    if (isDefault) ...[
+                    if (isSelected) ...[
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -508,17 +579,17 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
             ),
           ),
           Icon(
-            isDefault ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-            color: isDefault ? const Color(0xFFEF233C) : Colors.grey,
+            isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+            color: isSelected ? const Color(0xFFEF233C) : Colors.grey,
             size: 22,
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 
-  Widget _buildPayment() {
-    final methods = [
+List<Map<String, dynamic>> _sjMethods() => [
       {
         'title': 'كاش عند الاستلام',
         'subtitle': 'ادفع للمندوب نقداً',
@@ -537,7 +608,10 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
         'icon': Icons.credit_card,
         'color': const Color(0xFFFFFFFF),
       },
-    ];
+];
+
+  Widget _buildPayment() {
+  final methods = _sjMethods();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -680,21 +754,50 @@ Widget _paymentCard(Map<String, dynamic> m, int index) {
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
               const Divider(height: 30),
-              _summaryRow('عدد المتاجر', '${_carts.length}'),
-              _summaryRow(
-                'عدد المنتجات',
-                '${_carts.fold<int>(0, (sum, c) => sum + (c['items'] as List).length)}',
-              ),
-              _summaryRow(
-                'المجموع الكلي',
-                '${_carts.fold<int>(0, (sum, c) {
-                  int cartTotal = 0;
-                  for (var item in (c['items'] as List)) {
-                    cartTotal += (item['price'] as int) * (item['qty'] as int);
-                  }
-                  return sum + cartTotal + (c['delivery'] as int);
-                })} YER',
-              ),
+          ..._effSelectedCarts.map((i) {
+            final c = _carts[i];
+            int ct = 0;
+            for (var it in (c['items'] as List)) {
+              ct += (it['price'] as int) * (it['qty'] as int);
+            }
+            final cartTotal = ct + (c['delivery'] as int);
+            final merchantName = c['merchant'] as String;
+            final nItems = (c['items'] as List).length;
+            return _summaryRow(
+              '🏪 $merchantName ($nItems منتج)',
+              '$cartTotal YER',
+            );
+          }),
+          _summaryRow('📍 العنوان', _addresses[_selectedAddressIndex]['title'] as String),
+          const Divider(height: 20),
+          _summaryRow('عدد الطلبات المختارة', '${_effSelectedCarts.length}'),
+          _summaryRow(
+            'عدد المنتجات المختارة',
+            '${_effSelectedCarts.fold<int>(0, (sum, i) => sum + ((_carts[i]['items'] as List).length))}',
+          ),
+          _summaryRow(
+            'قيمة التوصيل',
+            '${_effSelectedCarts.fold<int>(0, (sum, i) => sum + (_carts[i]['delivery'] as int))} YER',
+          ),
+          _summaryRow('المندوب', 'بانتظار تعيين مندوب'),
+          _summaryRow('وقت التسليم المتوقع', '—'),
+          _summaryRow(
+            'طريقة الدفع',
+            _selectedPaymentIndex == null
+                ? '—'
+                : _sjMethods()[_selectedPaymentIndex!]['title'] as String,
+          ),
+          _summaryRow(
+            'الإجمالي المختار',
+            '${_effSelectedCarts.fold<int>(0, (sum, i) {
+              final c = _carts[i];
+              int cartTotal = 0;
+              for (var item in (c['items'] as List)) {
+                cartTotal += (item['price'] as int) * (item['qty'] as int);
+              }
+              return sum + cartTotal + (c['delivery'] as int);
+            })} YER',
+          ),
             ],
           ),
         ),
@@ -746,7 +849,23 @@ Widget _paymentCard(Map<String, dynamic> m, int index) {
       ),
       child: SafeArea(
         top: false,
-        child: SizedBox(
+        child: Row(
+          children: [
+            if (_step > 0)
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey.shade300,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  ),
+                  onPressed: () { setState(() => _step--); },
+                  child: const Text('السابق', style: TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.bold)),
+                ),
+              ),
+            if (_step > 0) const SizedBox(width: 10),
+            Expanded(
+              child: SizedBox(
           width: double.infinity,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -757,6 +876,18 @@ Widget _paymentCard(Map<String, dynamic> m, int index) {
               ),
             ),
             onPressed: () {
+              if (_step == 0 && _effSelectedCarts.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('الرجاء اختيار سلة واحدة على الأقل')),
+                );
+                return;
+              }
+              if (_step == 2 && _selectedPaymentIndex == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('الرجاء اختيار طريقة الدفع')),
+                );
+                return;
+              }
               if (_step < 3) {
                 setState(() => _step++);
               } else {
@@ -778,6 +909,9 @@ Widget _paymentCard(Map<String, dynamic> m, int index) {
               ),
             ),
           ),
+              ),
+            ),
+          ],
         ),
       ),
     );
