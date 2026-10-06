@@ -9,6 +9,7 @@ class CartCheckoutScreen extends StatefulWidget {
 
 class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
   int _step = 0; // 0=cart, 1=address, 2=payment, 3=confirm
+  int? _selectedPaymentIndex;
 
   final List<Map<String, dynamic>> _carts = [
     {
@@ -506,11 +507,10 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
               ],
             ),
           ),
-          Radio<bool>(
-            value: true,
-            groupValue: isDefault,
-            activeColor: const Color(0xFFEF233C),
-            onChanged: (_) {},
+          Icon(
+            isDefault ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+            color: isDefault ? const Color(0xFFEF233C) : Colors.grey,
+            size: 22,
           ),
         ],
       ),
@@ -551,7 +551,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
           ),
         ),
         const SizedBox(height: 15),
-        ...methods.map((m) => _paymentCard(m)),
+        ...methods.asMap().entries.map((e) => _paymentCard(e.value, e.key)),
         const SizedBox(height: 20),
         Container(
           padding: const EdgeInsets.all(15),
@@ -601,9 +601,11 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
     );
   }
 
-  Widget _paymentCard(Map<String, dynamic> m) {
+Widget _paymentCard(Map<String, dynamic> m, int index) {
     final color = m['color'] as Color;
-    return Container(
+    return GestureDetector(
+      onTap: () { setState(() { _selectedPaymentIndex = index; }); },
+      child: Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -640,12 +642,13 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
               ],
             ),
           ),
-          const Icon(
-            Icons.radio_button_unchecked,
-            color: Colors.grey,
+        Icon(
+          _selectedPaymentIndex == index ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+          color: _selectedPaymentIndex == index ? const Color(0xFFFFD166) : Colors.grey,
             size: 22,
           ),
         ],
+      ),
       ),
     );
   }
