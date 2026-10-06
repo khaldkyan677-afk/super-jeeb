@@ -193,6 +193,7 @@ class _PaymentMethodsTabState extends State<PaymentMethodsTab> {
               ],
             ),
           ),
+          IconButton(icon: const Icon(Icons.edit, color: Colors.white54, size: 20), onPressed: () => _showEditDialog(m)),
           Switch(
             value: isActive,
             activeThumbColor: kGreen,
@@ -200,6 +201,79 @@ class _PaymentMethodsTabState extends State<PaymentMethodsTab> {
               await ApiService.updatePaymentMethod(m['_id'], {'isActive': v});
               _load();
             },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditDialog(dynamic m) {
+    final name = TextEditingController(text: m['name'] ?? '');
+    final code = TextEditingController(text: m['code'] ?? '');
+    final typeCtrl = TextEditingController(text: m['type'] ?? 'wallet');
+    final accountName = TextEditingController(text: m['accountName'] ?? '');
+    final accountNumber = TextEditingController(text: m['accountNumber'] ?? '');
+    final iban = TextEditingController(text: m['iban'] ?? '');
+    final instructions = TextEditingController(text: m['instructions'] ?? '');
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: kSurface,
+        title: Text('تعديل وسيلة دفع', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.w800)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: name, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'الاسم', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
+              const SizedBox(height: 10),
+              TextField(controller: code, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'الكود', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
+              const SizedBox(height: 10),
+              TextField(controller: typeCtrl, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'النوع', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
+              const SizedBox(height: 10),
+              TextField(controller: accountName, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'اسم صاحب الحساب', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
+              const SizedBox(height: 10),
+              TextField(controller: accountNumber, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'رقم الحساب', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
+              const SizedBox(height: 10),
+              TextField(controller: iban, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'IBAN', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
+              const SizedBox(height: 10),
+              TextField(controller: instructions, maxLines: 2, style: GoogleFonts.cairo(color: Colors.white), decoration: InputDecoration(hintText: 'تعليمات', hintStyle: GoogleFonts.cairo(color: Colors.white54))),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await ApiService.deletePaymentMethod(m['_id']);
+              if (!dialogCtx.mounted) return;
+              Navigator.pop(dialogCtx);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم الحذف', style: GoogleFonts.cairo()), backgroundColor: kRed));
+              _load();
+            },
+            child: Text('حذف', style: GoogleFonts.cairo(color: kRed)),
+          ),
+          TextButton(onPressed: () => Navigator.pop(dialogCtx), child: Text('إلغاء', style: GoogleFonts.cairo(color: Colors.white54))),
+          TextButton(
+            onPressed: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              final res = await ApiService.updatePaymentMethod(m['_id'], {
+                'name': name.text.trim(),
+                'code': code.text.trim(),
+                'type': typeCtrl.text.trim(),
+                'accountName': accountName.text.trim(),
+                'accountNumber': accountNumber.text.trim(),
+                'iban': iban.text.trim(),
+                'instructions': instructions.text.trim(),
+              });
+              if (!dialogCtx.mounted) return;
+              Navigator.pop(dialogCtx);
+              if (res.containsKey('error')) {
+                messenger.showSnackBar(SnackBar(content: Text('خطأ: ${res['error']}', style: GoogleFonts.cairo()), backgroundColor: kRed));
+                return;
+              }
+              messenger.showSnackBar(SnackBar(content: Text('تم التحديث ✓', style: GoogleFonts.cairo()), backgroundColor: kGreen));
+              _load();
+            },
+            child: Text('حفظ', style: GoogleFonts.cairo(color: kGreen, fontWeight: FontWeight.w800)),
           ),
         ],
       ),

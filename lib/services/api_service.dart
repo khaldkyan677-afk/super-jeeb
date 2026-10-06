@@ -507,6 +507,17 @@ class ApiService {
       return jsonDecode(r.body);
     } catch (e) { return {'error': e.toString()}; }
   }
+  static Future<Map<String, dynamic>> deletePaymentMethod(String id) async {
+    final r = await http.delete(
+      Uri.parse('$baseUrl/api/payments/methods/$id'),
+      headers: _headers,
+    ).timeout(const Duration(seconds: 15));
+    if (r.statusCode >= 200 && r.statusCode < 300) {
+      return {'ok': true};
+    }
+    return {'error': 'HTTP ${r.statusCode}'};
+  }
+
 
   static Future<List<dynamic>> listTransactions({String? status, String? type}) async {
     try {
