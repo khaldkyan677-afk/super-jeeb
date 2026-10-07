@@ -218,7 +218,7 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
   void _showConfirmDialog() {
     showDialog(
       context: context,
-      builder: (_) => Dialog(
+      builder: (ctx) => Dialog(
         backgroundColor: _kSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
@@ -240,7 +240,7 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
                 children: [
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () => Navigator.pop(ctx),
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(color: _kBg, borderRadius: BorderRadius.circular(12)),
@@ -252,7 +252,7 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        Navigator.pop(ctx);
                         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => TrackOrderScreen(serviceType: widget.serviceType)));
                       },
                       child: Container(
@@ -336,14 +336,15 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
   }
 
   Widget _buildPayMethods() {
-    final methods = [
-      {'label': 'كاش', 'icon': Icons.payments_outlined},
-      {'label': 'محفظة', 'icon': Icons.account_balance_wallet_outlined},
-      {'label': 'دفع مسبق', 'icon': Icons.credit_card},
-    ];
+    if (_loadingMethods) {
+      return const Padding(padding: EdgeInsets.all(8), child: Center(child: CircularProgressIndicator()));
+    }
+    if (_methods.isEmpty) {
+      return const Padding(padding: EdgeInsets.all(8), child: Text('لا توجد طرق دفع', style: TextStyle(color: Colors.grey)));
+    }
     return Row(
-      children: methods.map((m) {
-        final label = m['label'] as String;
+      children: _methods.map((m) {
+        final label = (m['name'] ?? '') as String;
         final sel = _selectedMethodId == m['_id'];
         final iconMap = {
           'cash': Icons.payments_outlined,

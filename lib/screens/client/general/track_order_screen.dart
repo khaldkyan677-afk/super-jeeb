@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../client_app.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 const _kRed = Color(0xFFEF233C);
@@ -113,7 +114,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
 
   Widget _buildCancel() {
     return GestureDetector(
-      onTap: () => Navigator.pop(context),
+      onTap: () => Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const ClientApp()), (route) => false),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(color: _kSurface, borderRadius: BorderRadius.circular(14), border: Border.all(color: _kRed.withOpacity(0.4))),

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../../services/api_service.dart';
 
 class CartCheckoutScreen extends StatefulWidget {
   const CartCheckoutScreen({super.key});
@@ -8,10 +11,43 @@ class CartCheckoutScreen extends StatefulWidget {
 }
 
 class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _loadMethods();
+  }
+
+  Future<void> _loadMethods() async {
+    try {
+      final url = Uri.parse('${ApiService.baseUrl}/api/payments/methods');
+      final r = await http.get(url, headers: ApiService.get_headers);
+      if (r.statusCode == 200) {
+        final data = jsonDecode(r.body);
+        final list = (data is Map && data['data'] is List)
+            ? (data['data'] as List)
+            : (data is List ? data : []);
+        if (mounted) {
+          setState(() {
+            _methods = list.cast<Map<String, dynamic>>()
+                .where((m) => m['isActive'] != false)
+                .toList();
+            _loadingMethods = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => _loadingMethods = false);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _loadingMethods = false);
+    }
+  }
+
   int _step = 0; // 0=cart, 1=address, 2=payment, 3=confirm
   int? _selectedPaymentIndex;
   int? _selectedCartIndex;
   int _selectedAddressIndex = 0;
+  List<Map<String, dynamic>> _methods = [];
+  bool _loadingMethods = true;
   final List<Map<String, dynamic>> _addresses = [
       {
         'title': 'المنزل',
@@ -589,29 +625,9 @@ Widget _addressCard(Map<String, dynamic> a, int index) {
   );
   }
 
-List<Map<String, dynamic>> _sjMethods() => [
-      {
-        'title': 'كاش عند الاستلام',
-        'subtitle': 'ادفع للمندوب نقداً',
-        'icon': Icons.payments,
-        'color': const Color(0xFF25D366),
-      },
-      {
-        'title': 'محفظة إلكترونية',
-        'subtitle': 'الكريمي، جيب، جوالي',
-        'icon': Icons.account_balance_wallet,
-        'color': const Color(0xFFEF233C),
-      },
-      {
-        'title': 'بطاقة بنكية',
-        'subtitle': 'Visa / Mastercard',
-        'icon': Icons.credit_card,
-        'color': const Color(0xFFFFFFFF),
-      },
-];
 
   Widget _buildPayment() {
-  final methods = _sjMethods();
+    final methods = _methods;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -676,15 +692,27 @@ List<Map<String, dynamic>> _sjMethods() => [
   }
 
 Widget _paymentCard(Map<String, dynamic> m, int index) {
-    final color = m['color'] as Color;
-    return GestureDetector(
-      onTap: () { setState(() { _selectedPaymentIndex = index; }); },
-      child: Container(
+  final type = (m['type'] ?? 'cash') as String;
+  final iconMap = {
+    'cash': Icons.payments_outlined,
+    'wallet': Icons.account_balance_wallet_outlined,
+    'card': Icons.credit_card,
+    'bank': Icons.account_balance_outlined,
+  };
+  final icon = iconMap[type] ?? Icons.payments_outlined;
+  final color = const Color(0xFFFFF23C);
+  final name = (m['name'] ?? '') as String;
+  final provider = (m['provider'] ?? '') as String;
+  final sel = _selectedPaymentIndex == index;
+  return GestureDetector(
+    onTap: () => setState(() => _selectedPaymentIndex = index),
+    child: Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
+        border: sel ? Border.all(color: color, width: 2) : null,
       ),
       child: Row(
         children: [
@@ -694,38 +722,33 @@ Widget _paymentCard(Map<String, dynamic> m, int index) {
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(m['icon'] as IconData, color: color, size: 24),
+            child: Icon(icon, color: color, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  m['title'],
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                Text(name,
+                    style: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 3),
-                Text(
-                  m['subtitle'],
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
-                ),
+                Text(provider,
+                    style: const TextStyle(
+                        fontSize: 11, color: Colors.grey)),
               ],
             ),
           ),
-        Icon(
-          _selectedPaymentIndex == index ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-          color: _selectedPaymentIndex == index ? const Color(0xFFFFD166) : Colors.grey,
+          Icon(
+            sel ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+            color: sel ? color : Colors.grey,
             size: 22,
           ),
         ],
       ),
-      ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildConfirm() {
     return Column(
@@ -765,7 +788,7 @@ Widget _paymentCard(Map<String, dynamic> m, int index) {
             final nItems = (c['items'] as List).length;
             return _summaryRow(
               '🏪 $merchantName ($nItems منتج)',
-              '$cartTotal YER',
+              '$ct YER',
             );
           }),
           _summaryRow('📍 العنوان', _addresses[_selectedAddressIndex]['title'] as String),
@@ -785,7 +808,7 @@ Widget _paymentCard(Map<String, dynamic> m, int index) {
             'طريقة الدفع',
             _selectedPaymentIndex == null
                 ? '—'
-                : _sjMethods()[_selectedPaymentIndex!]['title'] as String,
+                : _methods[_selectedPaymentIndex!]['name'] ?? '',
           ),
           _summaryRow(
             'الإجمالي المختار',

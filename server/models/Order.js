@@ -26,7 +26,17 @@ const orderSchema = new mongoose.Schema({
   cancelledAt: { type: Date },
   cancelReason: { type: String },
   address: { type: String },
-  notes: { type: String }
+  notes: { type: String },
+  paymentMethodId: { type: mongoose.Schema.Types.ObjectId, ref: 'PaymentMethod' },
+  receiptImage: { type: String },
+  verificationStatus: {
+    type: String,
+    enum: ['none', 'pending', 'verified', 'rejected'],
+    default: 'none'
+  },
+  rejectionReason: { type: String },
+  verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  verifiedAt: { type: Date }
 });
 
 module.exports = mongoose.model('Order', orderSchema);

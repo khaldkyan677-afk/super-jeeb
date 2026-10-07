@@ -9,8 +9,10 @@ const connectDB = require('./config/db');
 dotenv.config();
 connectDB();
 
+const path = require('path');
 const app = express();
 app.set('trust proxy', 1);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Disable all caching for development
 app.use((req, res, next) => {
@@ -28,6 +30,7 @@ const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
 app.use('/api', limiter);
 
 app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/driver', require('./routes/driverRoutes'));
 app.use('/api/logs', require('./routes/logRoutes'));
 app.use('/api/withdrawals', require('./routes/withdrawalRoutes'));
@@ -69,7 +72,6 @@ app.use(errorLogger);
 
 
 // === Static files (Flutter web) ===
-const path = require('path');
 const buildPath = path.join(require('os').homedir(), 'super-jeeb/build/web');
 
 // MIME types for Flutter assets
