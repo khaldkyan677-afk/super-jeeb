@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../services/api_service.dart';
@@ -642,6 +643,11 @@ Widget _addressCard(Map<String, dynamic> a, int index) {
         ),
         const SizedBox(height: 15),
         ...methods.asMap().entries.map((e) => _paymentCard(e.value, e.key)),
+        const SizedBox(height: 10),
+        if (_selectedPaymentIndex != null &&
+            _selectedPaymentIndex! < _methods.length &&
+            (_methods[_selectedPaymentIndex!]['type'] ?? 'cash') != 'cash')
+          _paymentDetailsCard(_methods[_selectedPaymentIndex!]),
         const SizedBox(height: 20),
         Container(
           padding: const EdgeInsets.all(15),
@@ -688,6 +694,64 @@ Widget _addressCard(Map<String, dynamic> a, int index) {
           ),
         ),
       ],
+    );
+  }
+
+Widget _paymentDetailsCard(Map<String, dynamic> m) {
+    final rows = <Widget>[];
+    if ((m['accountName'] ?? '').toString().isNotEmpty) {
+      rows.add(_detailRow('اسم الحساب', m['accountName'].toString()));
+    }
+    if ((m['accountNumber'] ?? '').toString().isNotEmpty) {
+      rows.add(_detailRow('رقم الحساب', m['accountNumber'].toString()));
+    }
+    if ((m['iban'] ?? '').toString().isNotEmpty) {
+      rows.add(_detailRow('IBAN', m['iban'].toString()));
+    }
+    if ((m['instructions'] ?? '').toString().isNotEmpty) {
+      rows.add(Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Text(m['instructions'].toString(),
+            style: const TextStyle(color: Colors.grey, fontSize: 12)),
+      ));
+    }
+    if (rows.isEmpty) return const SizedBox.shrink();
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEF233C).withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFEF233C).withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('تفاصيل الدفع',
+              style: TextStyle(
+                  color: Color(0xFFEF233C),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700)),
+          const SizedBox(height: 8),
+          ...rows,
+        ],
+      ),
+    );
+  }
+
+  Widget _detailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        children: [
+          Text('$label: ',
+              style: const TextStyle(color: Colors.grey, fontSize: 12)),
+          Expanded(
+            child: Text(value,
+                style: const TextStyle(color: Colors.black, fontSize: 12)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -750,7 +814,80 @@ Widget _paymentCard(Map<String, dynamic> m, int index) {
   );
 }
 
-  Widget _buildConfirm() {
+  String? _receiptBase64;
+  String? _receiptName;
+  bool _uploadingReceipt = false;
+
+  Future<void> _pickReceipt() async {
+    setState(() => _uploadingReceipt = true);
+    try {
+      final picked = await FilePicker.pickFiles(type: FileType.image);
+      if (picked != null && picked.isNotEmpty) {
+        final f = picked.first;
+        final bytes = await f.readAsBytes();
+        if (bytes != null) {
+          if (bytes.length > 5 * 1024 * 1024) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('حجم الصورة يتجاوز 5 MB')),
+              );
+            }
+            setState(() => _uploadingReceipt = false);
+            return;
+          }
+          setState(() {
+            _receiptBase64 = base64Encode(bytes);
+            _receiptName = f.name;
+          });
+        }
+      }
+    } catch (_) {}
+    if (mounted) setState(() => _uploadingReceipt = false);
+  }
+
+  Widget _buildReceiptUploader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 12),
+        const Text('صورة سند التحويل',
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: _uploadingReceipt ? null : _pickReceipt,
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF23C).withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFFFD166)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.receipt_long, color: Color(0xFFFFD166)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    _receiptName == null
+                        ? 'اضغط لرفع صورة السند'
+                        : 'تم رفع: $_receiptName',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+                if (_uploadingReceipt)
+                  const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2)),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+Widget _buildConfirm() {
     return Column(
       children: [
         Container(
@@ -810,6 +947,14 @@ Widget _paymentCard(Map<String, dynamic> m, int index) {
                 ? '—'
                 : _methods[_selectedPaymentIndex!]['name'] ?? '',
           ),
+          if (_selectedPaymentIndex != null &&
+              _selectedPaymentIndex! < _methods.length &&
+              (_methods[_selectedPaymentIndex!]['type'] ?? 'cash') != 'cash')
+            _paymentDetailsCard(_methods[_selectedPaymentIndex!]),
+          if (_selectedPaymentIndex != null &&
+              _selectedPaymentIndex! < _methods.length &&
+              (_methods[_selectedPaymentIndex!]['type'] ?? 'cash') != 'cash')
+            _buildReceiptUploader(),
           _summaryRow(
             'الإجمالي المختار',
             '${_effSelectedCarts.fold<int>(0, (sum, i) {

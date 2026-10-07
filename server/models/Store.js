@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const storeSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  merchantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Merchant' },
   logoUrl: { type: String },
   coverUrl: { type: String },
   rating: { type: Number, default: 5 },
