@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../providers/cart_provider.dart';
+import '../cart_checkout.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'models/product.dart';
 import 'services/supermarket_service.dart';
@@ -23,12 +26,23 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
   String _query = '';
   int _selCat = 0;
   final List<String> _cats = ['الكل'];
-  final Map<String, int> _cart = {};
+  CartProvider get _cartP => context.read<CartProvider>();
   final Set<String> _favorites = {};
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final sid = widget.store['_id']?.toString() ?? '';
+        _cartP.setStore(
+          storeId: sid,
+          storeName: widget.store['name']?.toString() ?? '',
+          merchantId: widget.store['merchantId']?.toString(),
+          deliveryFee: (widget.store['deliveryFee'] ?? 0).toDouble(),
+        );
+      }
+    });
     _load();
   }
 
@@ -60,23 +74,24 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
     return list;
   }
 
-  int get _cartCount => _cart.values.fold(0, (a, b) => a + b);
-  double get _cartTotal {
-    double t = 0;
-    _cart.forEach((id, qty) {
-      final match = _products.where((x) => x.id == id);
-      if (match.isNotEmpty) t += match.first.price * qty;
-    });
-    return t;
-  }
+  int get _cartCount => _cartP.count;
+  double get _cartTotal => _cartP.subtotal;
 
-  void _addToCart(Product p) => setState(() => _cart[p.id] = (_cart[p.id] ?? 0) + 1);
-  void _removeFromCart(Product p) {
-    setState(() {
-      final q = _cart[p.id] ?? 0;
-      if (q <= 1) { _cart.remove(p.id); } else { _cart[p.id] = q - 1; }
-    });
+  void _addToCart(Product p) {
+    final sid = widget.store['_id']?.toString() ?? '';
+    if (_cartP.storeId != sid) {
+      _cartP.setStore(
+        storeId: sid,
+        storeName: widget.store['name']?.toString() ?? '',
+        merchantId: widget.store['merchantId']?.toString(),
+        deliveryFee: (widget.store['deliveryFee'] ?? 0).toDouble(),
+      );
+    }
+    _cartP.add(CartItem(
+      productId: p.id, name: p.name, price: p.price.toDouble(), qty: 1,
+    ));
   }
+  void _removeFromCart(Product p) { _cartP.remove(p.id); }
   void _toggleFav(Product p) {
     setState(() {
       if (_favorites.contains(p.id)) { _favorites.remove(p.id); } else { _favorites.add(p.id); }
@@ -84,7 +99,8 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+Widget build(BuildContext context) {
+    context.watch<CartProvider>();
     return Scaffold(
       backgroundColor: _kBg,
       body: Stack(
@@ -318,7 +334,7 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
   }
 
   Widget _buildProductCard(Product p) {
-    final qty = _cart[p.id] ?? 0;
+    final qty = _cartP.items.firstWhere((x) => x.productId == p.id, orElse: () => CartItem(productId: p.id, name: p.name, price: 0, qty: 0)).qty;
     final isFav = _favorites.contains(p.id);
     return Container(
       decoration: BoxDecoration(color: _kSurface, borderRadius: BorderRadius.circular(16)),
@@ -408,6 +424,8 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
   Widget _buildCartBar() {
     return Positioned(
       bottom: 16, left: 16, right: 16,
+      child: GestureDetector(
+      onTap: () { Navigator.push(context, MaterialPageRoute(builder: (_) => const CartCheckoutScreen())); },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
@@ -429,6 +447,7 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
           ],
         ),
       ),
+        ),
     );
   }
 }

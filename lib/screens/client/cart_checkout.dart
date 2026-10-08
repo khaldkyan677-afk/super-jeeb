@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/cart_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -79,40 +81,26 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
     });
   }
 
-  final List<Map<String, dynamic>> _carts = [
-    {
-      'merchant': 'متجر الأناقة',
-      'merchantId': 1,
-      'delivery': 1500,
-      'items': [
-        {
-          'name': 'قميص رجالي',
-          'price': 8000,
-          'qty': 1,
-          'icon': Icons.checkroom,
-        },
-        {
-          'name': 'بنطلون جينز',
-          'price': 12000,
-          'qty': 1,
-          'icon': Icons.checkroom,
-        },
-      ],
-    },
-    {
-      'merchant': 'متجر الإلكترونيات',
-      'merchantId': 2,
-      'delivery': 2000,
-      'items': [
-        {
-          'name': 'هاتف ذكي',
-          'price': 150000,
-          'qty': 1,
-          'icon': Icons.phone_android,
-        },
-      ],
-    },
-  ];
+  List<Map<String, dynamic>> get _carts {
+    final p = context.read<CartProvider>();
+    final sids = p.storeIds;
+    if (sids.isEmpty) return [];
+    return sids.map((sid) {
+      final items = p.itemsFor(sid);
+      return {
+        'merchant': p.storeNameFor(sid),
+        'merchantId': p.merchantIdFor(sid),
+        'storeId': sid,
+        'delivery': p.deliveryFeeFor(sid).toInt(),
+        'items': items.map((it) => {
+          'name': it.name,
+          'price': it.price.toInt(),
+          'qty': it.qty,
+          'icon': Icons.shopping_bag,
+        }).toList(),
+      };
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
