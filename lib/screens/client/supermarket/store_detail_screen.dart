@@ -87,9 +87,17 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
         deliveryFee: (widget.store['deliveryFee'] ?? 0).toDouble(),
       );
     }
-    _cartP.add(CartItem(
-      productId: p.id, name: p.name, price: p.price.toDouble(), qty: 1,
-    ));
+    try {
+      _cartP.add(CartItem(
+        productId: p.id, name: p.name, price: p.price.toDouble(), qty: 1,
+      ));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+        );
+      }
+    }
   }
   void _removeFromCart(Product p) { _cartP.remove(p.id); }
   void _toggleFav(Product p) {

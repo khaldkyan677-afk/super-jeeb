@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'client_app.dart';
 import 'package:provider/provider.dart';
 import '../../providers/cart_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -123,12 +124,12 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             if (_step > 0) {
               setState(() => _step--);
             } else {
-              Navigator.pop(context);
+          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const ClientApp()), (route) => false);
             }
           },
         ),

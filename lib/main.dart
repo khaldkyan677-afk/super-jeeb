@@ -60,7 +60,7 @@ class SuperJeebApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => CartProvider(),
+      create: (_) => CartProvider()..init(),
       child: MaterialApp(
         title: 'Super Jeeb',
         debugShowCheckedModeBanner: false,

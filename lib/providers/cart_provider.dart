@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CartItem {
   final String productId;
@@ -63,6 +65,62 @@ class CartProvider extends ChangeNotifier {
     return t;
   }
 
+  // ====== Persistence ======
+  static const _kKey = 'cart_v1';
+  static const int maxStores = 15;
+
+  Future<void> init() async {
+    final sp = await SharedPreferences.getInstance();
+    final raw = sp.getString(_kKey);
+    if (raw == null) return;
+    try {
+      final data = jsonDecode(raw) as Map<String, dynamic>;
+      final stores = data['stores'] as Map<String, dynamic>? ?? {};
+      _itemsByStore.clear();
+      _storeNames.clear();
+      _merchantIds.clear();
+      _deliveryFees.clear();
+      stores.forEach((sid, sd) {
+        final m = sd as Map<String, dynamic>;
+        _storeNames[sid] = m['name'] as String? ?? '';
+        _merchantIds[sid] = m['merchantId'] as String?;
+        _deliveryFees[sid] = (m['deliveryFee'] as num?)?.toDouble() ?? 0;
+        final items = (m['items'] as List).cast<Map<String, dynamic>>();
+        _itemsByStore[sid] = items.map((it) => CartItem(
+          productId: it['productId'] as String,
+          name: it['name'] as String,
+          price: (it['price'] as num).toDouble(),
+          qty: it['qty'] as int,
+        )).toList();
+      });
+      _currentStoreId = data['current'] as String?;
+      _save();
+    notifyListeners();
+    } catch (_) {}
+  }
+
+  Future<void> _save() async {
+    final sp = await SharedPreferences.getInstance();
+    final stores = <String, dynamic>{};
+    for (final sid in _itemsByStore.keys) {
+      stores[sid] = {
+        'name': _storeNames[sid] ?? '',
+        'merchantId': _merchantIds[sid],
+        'deliveryFee': _deliveryFees[sid] ?? 0,
+        'items': _itemsByStore[sid]!.map((e) => {
+          'productId': e.productId,
+          'name': e.name,
+          'price': e.price,
+          'qty': e.qty,
+        }).toList(),
+      };
+    }
+    await sp.setString(_kKey, jsonEncode({
+      'stores': stores,
+      'current': _currentStoreId,
+    }));
+  }
+
   // ====== Mutations ======
   void setStore({
     required String storeId,
@@ -74,19 +132,26 @@ class CartProvider extends ChangeNotifier {
     _merchantIds[storeId] = merchantId;
     _deliveryFees[storeId] = deliveryFee;
     _currentStoreId = storeId;
+    _save();
     notifyListeners();
   }
 
   void setCurrentStore(String storeId) {
     if (_currentStoreId != storeId) {
       _currentStoreId = storeId;
-      notifyListeners();
+      _save();
+    notifyListeners();
     }
   }
 
   void add(CartItem item, {String? storeId}) {
     final sid = storeId ?? _currentStoreId;
     if (sid == null) return;
+    // فحص حد 15 سلة
+    if (!_itemsByStore.containsKey(sid) &&
+        _itemsByStore.length >= maxStores) {
+      throw Exception('وصلت للحد الأقصى ($maxStores متجر)');
+    }
     final list = List<CartItem>.from(_itemsByStore[sid] ?? []);
     final idx = list.indexWhere((e) => e.productId == item.productId);
     if (idx < 0) {
@@ -102,6 +167,7 @@ class CartProvider extends ChangeNotifier {
       );
     }
     _itemsByStore[sid] = list;
+    _save();
     notifyListeners();
   }
 
@@ -128,6 +194,7 @@ class CartProvider extends ChangeNotifier {
     } else {
       _itemsByStore[sid] = list;
     }
+    _save();
     notifyListeners();
   }
 
@@ -137,6 +204,7 @@ class CartProvider extends ChangeNotifier {
     _merchantIds.remove(sid);
     _deliveryFees.remove(sid);
     if (_currentStoreId == sid) _currentStoreId = null;
+    _save();
     notifyListeners();
   }
 
@@ -146,6 +214,7 @@ class CartProvider extends ChangeNotifier {
     _merchantIds.clear();
     _deliveryFees.clear();
     _currentStoreId = null;
+    _save();
     notifyListeners();
   }
 }
