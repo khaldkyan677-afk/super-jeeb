@@ -1129,7 +1129,7 @@ Widget _buildConfirm() {
       Navigator.of(context).pop();
 
       if (r.statusCode == 201) {
-        provider.clear();
+        provider.clearStore(sid);
         _showSuccessDialog();
       } else {
         String msg = 'فشل إنشاء الطلب';
