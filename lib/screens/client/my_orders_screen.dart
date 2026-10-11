@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'order_tracking_screen.dart';
+import '../../services/api_service.dart';
 
 class MyOrdersScreen extends StatefulWidget {
   const MyOrdersScreen({super.key});
@@ -13,45 +14,58 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tab;
 
-  final _allOrders = [
-    {
-      'id': '5021',
-      'merchant': 'متجر الأناقة',
-      'total': 20000,
-      'status': 'in_progress',
-      'date': 'اليوم - 10:30 ص',
-      'items': ['قميص رجالي', 'بنطلون جينز'],
-    },
-    {
-      'id': '5020',
-      'merchant': 'متجر الإلكترونيات',
-      'total': 150000,
-      'status': 'delivered',
-      'date': 'أمس - 03:15 م',
-      'items': ['هاتف ذكي'],
-    },
-    {
-      'id': '5019',
-      'merchant': 'صيدلية الحياة',
-      'total': 4500,
-      'status': 'cancelled',
-      'date': 'أمس - 11:00 ص',
-      'items': ['أدوية'],
-    },
-    {
-      'id': '5018',
-      'merchant': 'متجر العطور',
-      'total': 8500,
-      'status': 'delivered',
-      'date': 'منذ 3 أيام',
-      'items': ['عطر فاخر'],
-    },
-  ];
+  List<Map<String, dynamic>> _orders = [];
+  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
     _tab = TabController(length: 4, vsync: this);
+    _loadOrders();
+  }
+
+  Future<void> _loadOrders() async {
+    setState(() => _loading = true);
+    final raw = await ApiService.getMyOrders();
+    if (!mounted) return;
+    setState(() {
+      _orders = raw.map((o) => _mapOrder(o as Map<String, dynamic>)).toList();
+      _loading = false;
+    });
+  }
+
+  Map<String, dynamic> _mapOrder(Map<String, dynamic> o) {
+    final store = o['storeId'];
+    String storeName = '(متجر)';
+    String? storeLogo;
+    double rating = 0;
+    if (store is Map) {
+      storeName = (store['name'] ?? '(متجر)').toString();
+      storeLogo = store['logoUrl']?.toString();
+      rating = ((store['rating'] ?? 0) as num).toDouble();
+    }
+    final st = (o['status'] ?? 'pending').toString();
+    final displayStatus = ['pending', 'accepted', 'preparing', 'ready', 'on_the_way'].contains(st) ? 'in-progress' : st;
+    return {
+      'id': o['_id']?.toString() ?? '',
+      'merchant': storeName,
+      'logo': storeLogo,
+      'rating': rating,
+      'total': o['total'] ?? 0,
+      'status': displayStatus,
+      'rawStatus': st,
+      'date': _formatDate(o['createdAt']),
+      'items': (o['items'] as List? ?? []).map((e) => (e as Map)['name']?.toString() ?? '').toList(),
+      'pin': o['pin']?.toString() ?? '',
+      'address': o['address']?.toString() ?? '',
+    };
+  }
+
+  String _formatDate(dynamic d) {
+    if (d == null) return '';
+    final dt = DateTime.tryParse(d.toString())?.toLocal();
+    if (dt == null) return '';
+    return '${dt.year}/${dt.month}/${dt.day}  ${dt.hour}:${dt.minute.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -105,9 +119,12 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
   }
 
   Widget _buildList(String filter) {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
     final orders = filter == 'all'
-        ? _allOrders
-        : _allOrders.where((o) => o['status'] == filter).toList();
+        ? _orders
+        : _orders.where((o) => o['status'] == filter).toList();
 
     if (orders.isEmpty) {
       return const Center(

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
   customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   merchantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  storeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Store' },
   driverId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   items: [{ name: String, price: Number, quantity: Number }],
   total: { type: Number, required: true },

@@ -2,10 +2,11 @@ const Order = require('../models/Order');
 
 exports.createOrder = async (req, res) => {
   try {
-    const { merchantId, items, total } = req.body;
+    const { merchantId, storeId, items, total } = req.body;
     const order = await Order.create({
       customerId: req.user._id,
       merchantId,
+      storeId,
       items,
       total,
       pin: Math.floor(1000 + Math.random() * 9000).toString()
@@ -18,7 +19,9 @@ exports.createOrder = async (req, res) => {
 
 exports.getMyOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ customerId: req.user._id }).sort({ createdAt: -1 });
+    const orders = await Order.find({ customerId: req.user._id })
+      .populate('storeId', 'name logoUrl rating location.address')
+      .sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
