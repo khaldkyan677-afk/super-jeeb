@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'client_app.dart';
+import 'my_orders_screen.dart';
 import 'package:provider/provider.dart';
 import '../../providers/cart_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -1179,8 +1180,8 @@ Widget _buildConfirm() {
               ),
               onPressed: () {
                 Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const ClientApp()),
-                  (route) => false,
+                  MaterialPageRoute(builder: (_) => const MyOrdersScreen()),
+                  (route) => route.isFirst,
                 );
               },
               child: const Text('حسناً', style: TextStyle(color: Colors.white)),
