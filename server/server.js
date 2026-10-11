@@ -22,7 +22,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json({ type: ["application/json", "text/plain"] }));
+app.use(express.json({ limit: '10mb', type: ["application/json", "text/plain"] }));
 app.use(cors());
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 

@@ -13,6 +13,7 @@ class ApiService {
   }
 
   static String? _authToken;
+  static String? get authToken => _authToken;
   static String? _deviceId;
 
   static void setToken(String? token) => _authToken = token;

@@ -37,7 +37,7 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'بيانات الدخول غير صحيحة' });
 
-    if (user.role !== 'admin' && user.status !== 'approved') {
+    if (user.role !== 'client' && user.role !== 'admin' && user.status !== 'approved') {
       const msg = user.status === 'rejected'
         ? 'تم رفض حسابك. تواصل مع الدعم'
         : 'حسابك قيد المراجعة. سيتم إشعارك عند الموافقة';
@@ -71,7 +71,7 @@ exports.firebaseLogin = async (req, res) => {
       });
     }
 
-    if (user.role !== 'admin' && user.status !== 'approved') {
+    if (user.role !== 'client' && user.role !== 'admin' && user.status !== 'approved') {
       const msg = user.status === 'rejected'
         ? 'تم رفض حسابك. تواصل مع الدعم'
         : 'حسابك قيد المراجعة. سيتم إشعارك عند الموافقة';

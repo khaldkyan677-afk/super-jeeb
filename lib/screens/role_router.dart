@@ -21,9 +21,16 @@ class _RoleRouterScreenState extends State<RoleRouterScreen> {
     final auth = AuthService.instance;
     await auth.loadCachedRole();
     var role = auth.role;
-    if (role == null && auth.isLoggedIn) {
-      final res = await auth.syncAfterLogin();
-      role = res?['role'] as String?;
+    if (auth.isLoggedIn) {
+      try {
+        final res = await auth.syncAfterLogin();
+        if (res?['role'] != null) {
+          role = res!['role'] as String;
+        }
+      } catch (e) {
+        debugPrint("SYNC ERROR: $e");
+        // الإنترنت مقطوع → استخدم الدور المحفوظ
+      }
     }
     if (!mounted) return;
     Widget next;

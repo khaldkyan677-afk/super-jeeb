@@ -144,32 +144,56 @@ class AuthService extends ChangeNotifier {
   // 4) تسجيل خروج
   // ============================================================
   Future<Map<String, dynamic>?> _syncWithServer() async {
-    final user = _firebaseUser;
-    if (user == null || user.email == null) return null;
+    print('SYNC-TRACE: called');
+    final user = _auth.currentUser ?? _firebaseUser;
+    print('SYNC-TRACE: user=' + (user?.uid ?? 'null'));
+    if (user == null) return null;
+    final email = user.email ??
+        (user.phoneNumber != null
+            ? '${user.phoneNumber}@phone.superjeeb'
+            : '${user.uid}@uid.superjeeb');
     final res = await ApiService.firebaseLogin(
-      email: user.email!,
+      email: email,
       uid: user.uid,
-      name: user.displayName,
+      name: user.displayName ?? user.phoneNumber ?? 'مستخدم',
       phone: user.phoneNumber,
     );
     if (res['token'] == null) return res;
     _role = res['role'] as String?;
     _status = res['status'] as String?;
     ApiService.setToken(res['token'] as String);
-    final p = await SharedPreferences.getInstance();
-    await p.setString(_kRole, _role ?? 'client');
-    await p.setString(_kStatus, _status ?? 'pending');
-    await p.setString(_kToken, res['token'] as String);
+    try {
+      final a = SharedPreferencesAsync();
+      await a.setString(_kRole, _role ?? 'client');
+      await a.setString(_kStatus, _status ?? 'pending');
+      await a.setString(_kToken, res['token'] as String);
+      debugPrint('[SYNC] async saved OK');
+    } catch (e) {
+      debugPrint('[SYNC] async error: $e');
+      final p = await SharedPreferences.getInstance();
+      await p.setString(_kRole, _role ?? 'client');
+      await p.setString(_kStatus, _status ?? 'pending');
+      await p.setString(_kToken, res['token'] as String);
+    }
     notifyListeners();
     return res;
   }
 
   Future<void> loadCachedRole() async {
-    final p = await SharedPreferences.getInstance();
-    _role = p.getString(_kRole);
-    _status = p.getString(_kStatus);
-    final t = p.getString(_kToken);
-    if (t != null) ApiService.setToken(t);
+    try {
+      final a = SharedPreferencesAsync();
+      _role = await a.getString(_kRole);
+      _status = await a.getString(_kStatus);
+      final t = await a.getString(_kToken);
+      if (t != null) ApiService.setToken(t);
+    } catch (_) {}
+    if (_role == null || ApiService.authToken == null) {
+      final p = await SharedPreferences.getInstance();
+      _role ??= p.getString(_kRole);
+      _status ??= p.getString(_kStatus);
+      final t = p.getString(_kToken);
+      if (t != null && ApiService.authToken == null) ApiService.setToken(t);
+    }
     notifyListeners();
   }
 

@@ -1074,7 +1074,80 @@ Widget _buildConfirm() {
     );
   }
 
-  void _confirmOrder() {
+  Future<void> _confirmOrder() async {
+    final provider = context.read<CartProvider>();
+    final sids = provider.storeIds;
+    if (sids.isEmpty) return;
+    if (_selectedPaymentIndex == null ||
+        _selectedPaymentIndex! >= _methods.length) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('الرجاء اختيار طريقة الدفع')),
+      );
+      return;
+    }
+    final selectedMethod = _methods[_selectedPaymentIndex!];
+    final isCash = (selectedMethod['type'] ?? 'cash') == 'cash';
+    if (!isCash && _receiptBase64 == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('الرجاء رفع صورة سند التحويل')),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final sid = sids.first;
+      final items = provider.itemsFor(sid);
+      final body = {
+        'merchantId': provider.merchantIdFor(sid),
+        'storeId': sid,
+        'items': items.map((it) => {
+          'name': it.name,
+          'price': it.price,
+          'quantity': it.qty,
+        }).toList(),
+        'total': provider.totalFor(sid),
+        'deliveryFee': provider.deliveryFeeFor(sid),
+        'address': _addresses[_selectedAddressIndex]['address'] ?? '',
+        'notes': '',
+        'paymentMethodId': selectedMethod['_id'],
+        'receiptImage': _receiptBase64,
+      };
+
+      final r = await http.post(
+        Uri.parse('${ApiService.baseUrl}/api/orders'),
+        headers: {...ApiService.get_headers, 'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      if (!mounted) return;
+      Navigator.of(context).pop();
+
+      if (r.statusCode == 201) {
+        provider.clear();
+        _showSuccessDialog();
+      } else {
+        String msg = 'فشل إنشاء الطلب';
+        try {
+          final d = jsonDecode(r.body);
+          if (d is Map && d['message'] != null) msg = d['message'].toString();
+          else if (d is Map && d['error'] != null) msg = d['error'].toString();
+        } catch (_) {}
+        _showErrorDialog(msg);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      _showErrorDialog('خطأ في الاتصال: ${e.toString()}');
+    }
+  }
+
+  void _showSuccessDialog() {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1089,23 +1162,15 @@ Widget _buildConfirm() {
                 color: const Color(0xFF25D366).withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.check,
-                color: Color(0xFF25D366),
-                size: 50,
-              ),
+              child: const Icon(Icons.check, color: Color(0xFF25D366), size: 50),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'تم إنشاء الطلب بنجاح!',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
+            const Text('تم إنشاء الطلب بنجاح!',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
-            const Text(
-              'يمكنك تتبع الطلب من شاشة "طلباتي"',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
+            const Text('سيتم إرسال طلبك إلى التاجر قريباً',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: Colors.grey)),
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -1113,13 +1178,32 @@ Widget _buildConfirm() {
                 minimumSize: const Size(double.infinity, 45),
               ),
               onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const ClientApp()),
+                  (route) => false,
+                );
               },
               child: const Text('حسناً', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showErrorDialog(String msg) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('خطأ'),
+        content: Text(msg),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('حسناً'),
+          ),
+        ],
       ),
     );
   }

@@ -51,6 +51,11 @@ Future<void> main() async {
 
   ApiService.setDeviceId(deviceId);
 
+  // استرجاع التوكن المحفوظ قبل فتح التطبيق
+  try {
+    await AuthService.instance.loadCachedRole();
+  } catch (_) {}
+
   runApp(const SuperJeebApp());
 }
 
@@ -341,6 +346,22 @@ class _LoginScreenState extends State<LoginScreen> {
         phoneNumber: phone.startsWith('+') ? phone : '+$phone',
         verificationCompleted: (credential) async {
           await fb_auth.FirebaseAuth.instance.signInWithCredential(credential);
+                // مزامنة فورية مع السيرفر
+                // استدعاء مباشر للسيرفر
+                try {
+                  final fu = fb_auth.FirebaseAuth.instance.currentUser;
+                  if (fu != null) {
+                    final em = fu.email ?? (fu.phoneNumber != null ? fu.phoneNumber! + "@phone.superjeeb" : fu.uid + "@uid.superjeeb");
+                    await ApiService.firebaseLogin(
+                      email: em,
+                      uid: fu.uid,
+                      name: fu.displayName ?? fu.phoneNumber ?? "مستخدم",
+                      phone: fu.phoneNumber,
+                    );
+                  }
+                } catch (e) {
+                  // تجاهل — سنُعالج لاحقاً
+                }
         },
         verificationFailed: (e) {
           if (mounted) {
@@ -392,6 +413,29 @@ class _LoginScreenState extends State<LoginScreen> {
           smsCode: code,
         );
         await fb_auth.FirebaseAuth.instance.signInWithCredential(credential);
+            // استدعاء السيرفر لجلب JWT
+            try {
+              final fu = fb_auth.FirebaseAuth.instance.currentUser;
+              if (fu != null) {
+                final em = fu.email ?? (fu.phoneNumber != null ? fu.phoneNumber! + "@phone.superjeeb" : fu.uid + "@uid.superjeeb");
+                final res = await ApiService.firebaseLogin(
+                  email: em,
+                  uid: fu.uid,
+                  name: fu.displayName ?? fu.phoneNumber ?? "مستخدم",
+                  phone: fu.phoneNumber,
+                );
+                final tok = res["token"] as String?;
+                if (tok != null) {
+                  ApiService.setToken(tok);
+                  final sp = await SharedPreferences.getInstance();
+                  await sp.setString("sj_token", tok);
+                  await sp.setString("sj_role", (res["role"] as String?) ?? "client");
+                  await sp.setString("sj_status", (res["status"] as String?) ?? "pending");
+                }
+              }
+            } catch (e) {
+              debugPrint("VERIFY-OTP-LOGIN: $e");
+            }
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
