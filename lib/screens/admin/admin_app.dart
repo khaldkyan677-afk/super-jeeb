@@ -6,6 +6,7 @@ import 'add_merchant_screen.dart';
 import 'admin_management.dart';
 import 'sections_screen.dart';
 import 'stores_screen.dart';
+import 'pending_orders_screen.dart';
 import 'admin_settings.dart';
 import 'admin_reports.dart';
 import 'admin_payments.dart';
@@ -331,6 +332,15 @@ class AdminHomeTab extends StatelessWidget {
           title: const Text('إدارة المتاجر', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 14),
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StoresScreen())),
+        ),
+        const SizedBox(height: 10),
+        ListTile(
+          tileColor: const Color(0xFF3D0018),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          leading: const Icon(Icons.receipt_long, color: Colors.amber),
+          title: const Text('الطلبات المعلقة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 14),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PendingOrdersScreen())),
         ),
           const SizedBox(height: 25),
           const Text(

@@ -37,3 +37,43 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getAllOrders = async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.status) filter.status = req.query.status;
+    if (req.query.verificationStatus) filter.verificationStatus = req.query.verificationStatus;
+    const orders = await Order.find(filter)
+      .populate('storeId', 'name logoUrl')
+      .populate('customerId', 'name phone')
+      .sort({ createdAt: -1 })
+      .limit(100);
+    res.json(orders);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.verifyOrder = async (req, res) => {
+  try {
+    const { action, reason } = req.body;
+    const update = {
+      verifiedBy: req.user._id,
+      verifiedAt: new Date(),
+    };
+    if (action === 'accept') {
+      update.verificationStatus = 'verified';
+      update.status = 'accepted';
+      update.paymentStatus = 'paid';
+      update.paidAt = new Date();
+    } else if (action === 'reject') {
+      update.verificationStatus = 'rejected';
+      update.status = 'cancelled';
+      update.rejectionReason = reason || '';
+      update.cancelledAt = new Date();
+    } else {
+      return res.status(400).json({ message: 'Invalid action' });
+    }
+    const order = await Order.findByIdAndUpdate(req.params.id, update, { new: true });
+    if (!order) return res.status(404).json({ message: 'Not found' });
+    res.json(order);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
