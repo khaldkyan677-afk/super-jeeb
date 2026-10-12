@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../../services/api_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class BecomeMerchantScreen extends StatefulWidget {
@@ -41,11 +44,49 @@ class _S extends State<BecomeMerchantScreen> {
           style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF233C),
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: const Color(0xFF25D366),
-              content: Text('تم إرسال طلبك، سيتم التواصل معك', style: GoogleFonts.cairo(color: Colors.white))));
-          },
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                final nav = Navigator.of(context);
+                if (_store.text.trim().isEmpty) {
+                  messenger.showSnackBar(SnackBar(
+                    backgroundColor: Colors.red,
+                    content: Text('اكتب اسم المتجر', style: GoogleFonts.cairo(color: Colors.white)),
+                  ));
+                  return;
+                }
+                try {
+                  final token = ApiService.authToken;
+                  final r = await http.post(
+                    Uri.parse('${ApiService.baseUrl}/api/merchants'),
+                    headers: {
+                      'Content-Type': 'application/json',
+                      if (token != null) 'Authorization': 'Bearer $token',
+                    },
+                    body: jsonEncode({
+                      'storeName': _store.text.trim(),
+                      'category': _category,
+                      'location': {'address': ''},
+                    }),
+                  );
+                  if (r.statusCode < 300) {
+                    messenger.showSnackBar(SnackBar(
+                      backgroundColor: const Color(0xFF25D366),
+                      content: Text('تم إرسال طلبك', style: GoogleFonts.cairo(color: Colors.white)),
+                    ));
+                    nav.pop();
+                  } else {
+                    messenger.showSnackBar(SnackBar(
+                      backgroundColor: Colors.red,
+                      content: Text('فشل: ${r.statusCode}', style: GoogleFonts.cairo(color: Colors.white)),
+                    ));
+                  }
+                } catch (e) {
+                  messenger.showSnackBar(SnackBar(
+                    backgroundColor: Colors.red,
+                    content: Text('$e', style: GoogleFonts.cairo(color: Colors.white)),
+                  ));
+                }
+              },
           child: Text('إرسال الطلب', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)))),
       ]));
   }

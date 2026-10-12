@@ -3,6 +3,8 @@ const router = express.Router();
 const c = require('../controllers/merchantController');
 const { protect, authorize } = require('../middleware/auth');
 
+router.route('/all').get(protect, authorize('admin'), c.getAllMerchantsAdmin);
+
 router.route('/')
   .get(c.getAllMerchants)
   .post(protect, c.createMerchant);

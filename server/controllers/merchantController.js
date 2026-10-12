@@ -1,3 +1,4 @@
+require('../models/User');
 const Merchant = require('../models/Merchant');
 
 exports.getAllMerchants = async (req, res) => {
@@ -47,7 +48,31 @@ exports.deleteMerchant = async (req, res) => {
 
 exports.verifyMerchant = async (req, res) => {
   try {
-    const m = await Merchant.findByIdAndUpdate(req.params.id, { isVerified: true }, { returnDocument: 'after' });
+    const { action, reason } = req.body;
+    const update = {};
+    if (action === 'accept') {
+      update.verificationStatus = 'verified';
+      update.isActive = true;
+    } else if (action === 'reject') {
+      update.verificationStatus = 'rejected';
+      update.rejectionReason = reason || '';
+      update.isActive = false;
+    } else {
+      return res.status(400).json({ error: 'Invalid action' });
+    }
+    const m = await Merchant.findByIdAndUpdate(req.params.id, update, { returnDocument: 'after' });
+    if (!m) return res.status(404).json({ error: 'Not found' });
     res.json(m);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getAllMerchantsAdmin = async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.verificationStatus) filter.verificationStatus = req.query.verificationStatus;
+    const list = await Merchant.find(filter)
+      .populate('userId', 'name phone')
+      .sort({ createdAt: -1 });
+    res.json(list);
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
