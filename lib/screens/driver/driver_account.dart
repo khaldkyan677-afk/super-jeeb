@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'driver_theme.dart';
 import '../../services/auth_service.dart';
+import '../client/client_app.dart';
 
 class DriverAccountScreen extends StatelessWidget {
   const DriverAccountScreen({super.key});
@@ -21,6 +22,20 @@ class DriverAccountScreen extends StatelessWidget {
               _profileCard(),
               const SizedBox(height: 18),
               _section('مركبتي', [
+        InkWell(
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ClientApp())),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
+            child: Row(
+              children: const [
+                Icon(Icons.shopping_bag_rounded, color: Colors.green, size: 22),
+                SizedBox(width: 12),
+                Expanded(child: Text('تصفح كعميل', style: TextStyle(color: Colors.white, fontSize: 16))),
+                Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 14),
+              ],
+            ),
+          ),
+        ),
                 _item(Icons.directions_car_rounded, 'بيانات المركبة', ''),
                 _item(Icons.description_rounded, 'وثائق المركبة', ''),
                 _item(Icons.add_circle_outline_rounded, 'إضافة مركبة', ''),

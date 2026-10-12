@@ -64,7 +64,18 @@ exports.verifyMerchant = async (req, res) => {
     if (!m) return res.status(404).json({ error: 'Not found' });
     if (action === 'accept') {
       const User = require('../models/User');
-      await User.findByIdAndUpdate(m.userId, { role: 'merchant' });
+      await User.findByIdAndUpdate(m.userId, { role: 'merchant', status: 'approved' });
+      const Store = require('../models/Store');
+      const existing = await Store.findOne({ merchantId: m.userId });
+      if (!existing) {
+        await Store.create({
+          name: m.storeName,
+          merchantId: m.userId,
+          category: m.category || '',
+          location: m.location || {},
+          isActive: true,
+        });
+      }
     }
     res.json(m);
   } catch (e) { res.status(500).json({ error: e.message }); }

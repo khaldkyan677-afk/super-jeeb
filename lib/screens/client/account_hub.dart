@@ -6,6 +6,7 @@ import 'notifications_screen.dart';
 import 'favorites_screen.dart';
 import 'help_screen.dart';
 import 'general/become_merchant_screen.dart';
+import '../../services/auth_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../merchant/merchant_app.dart';
@@ -46,7 +47,7 @@ class AccountHubScreen extends StatelessWidget {
                             onTap: () => Navigator.push(ctx, MaterialPageRoute(builder: (_) => const MerchantApp())),
                             child: Container(
                               padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(color: const Color(0xFF25D366).withOpacity(0.15), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFF25D366).withOpacity(0.5))),
+                              decoration: BoxDecoration(color: const Color(0xFF25D366).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFF25D366).withValues(alpha: 0.5))),
                               child: Row(children: [const Icon(Icons.storefront, color: Color(0xFF25D366), size: 22), const SizedBox(width: 8), Expanded(child: Text('دخول كتاجر', style: GoogleFonts.cairo(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)))]),
                             ),
                           ),
@@ -57,7 +58,7 @@ class AccountHubScreen extends StatelessWidget {
                             onTap: () => Navigator.push(ctx, MaterialPageRoute(builder: (_) => const DriverApp())),
                             child: Container(
                               padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(color: const Color(0xFFF0C107).withOpacity(0.15), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFFF0C107).withOpacity(0.5))),
+                              decoration: BoxDecoration(color: const Color(0xFFF0C107).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFFF0C107).withValues(alpha: 0.5))),
                               child: Row(children: [const Icon(Icons.delivery_dining, color: Color(0xFFF0C107), size: 22), const SizedBox(width: 8), Expanded(child: Text('دخول كمندوب', style: GoogleFonts.cairo(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)))]),
                             ),
                           ),
@@ -144,6 +145,10 @@ class AccountHubScreen extends StatelessWidget {
               ),
             ]),
             const SizedBox(height: 15),
+              if (Navigator.canPop(context)) ...[
+                const SizedBox(height: 15),
+                _backToRoleButton(context),
+              ],
             _logoutButton(context),
             const SizedBox(height: 40),
           ],
@@ -177,8 +182,8 @@ class AccountHubScreen extends StatelessWidget {
               child: Icon(Icons.person, size: 55, color: Color(0xFFFFFFFF)),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'خالد الأحمدي',
+            Text(
+              AuthService.instance.getUserName(),
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -201,8 +206,8 @@ class AccountHubScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            const Text(
-              'client@superjeeb.com',
+            Text(
+              AuthService.instance.getUserEmail(),
               style: TextStyle(color: Colors.white60, fontSize: 11),
             ),
           ],
@@ -212,6 +217,19 @@ class AccountHubScreen extends StatelessWidget {
   }
 
   Widget _upgradeSection(BuildContext context) {
+    final role = AuthService.instance.role ?? 'client';
+    if (role == 'merchant') {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: _backCard(context, 'العودة لتطبيق التاجر', Icons.storefront, const Color(0xFF25D366)),
+      );
+    }
+    if (role == 'driver') {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: _backCard(context, 'العودة لتطبيق المندوب', Icons.delivery_dining, Colors.orange),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Row(
@@ -220,8 +238,8 @@ class AccountHubScreen extends StatelessWidget {
             child: _upgradeCard(
               context,
               icon: Icons.storefront,
-              title: 'قدّم كتاجر',
-              subtitle: 'افتح متجرك',
+              title: 'كن تاجر',
+              subtitle: 'ابدأ ببيع منتجاتك',
               color: const Color(0xFF25D366),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BecomeMerchantScreen())),
             ),
@@ -231,13 +249,45 @@ class AccountHubScreen extends StatelessWidget {
             child: _upgradeCard(
               context,
               icon: Icons.delivery_dining,
-              title: 'قدّم كمندوب',
-              subtitle: 'انضم ككابتن',
+              title: 'كن مندوب',
+              subtitle: 'ابدأ بالتوصيل',
               color: Colors.orange,
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BecomeDriverScreen())),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _backCard(BuildContext context, String title, IconData icon, Color color) {
+    return InkWell(
+      onTap: () {
+        final role = AuthService.instance.role ?? 'client';
+        if (role == 'merchant') {
+          Navigator.of(context, rootNavigator: true).pushReplacement(
+            MaterialPageRoute(builder: (_) => const MerchantApp(skipLogin: true)));
+        } else if (role == 'driver') {
+          Navigator.of(context, rootNavigator: true).pushReplacement(
+            MaterialPageRoute(builder: (_) => const DriverApp(skipLogin: true)));
+        }
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 26),
+            const SizedBox(width: 12),
+            Expanded(child: Text(title, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 15))),
+            Icon(Icons.arrow_forward_ios, color: color, size: 14),
+          ],
+        ),
       ),
     );
   }
@@ -392,6 +442,22 @@ class AccountHubScreen extends StatelessWidget {
           size: 14,
           color: Colors.grey.shade400,
         ),
+      ),
+    );
+  }
+
+  Widget _backToRoleButton(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF25D366).withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF25D366)),
+      ),
+      child: ListTile(
+        leading: const Icon(Icons.storefront_rounded, color: Color(0xFF25D366), size: 28),
+        title: const Text('العودة لتطبيق التاجر', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        trailing: const Icon(Icons.arrow_forward_ios, color: Color(0xFF25D366), size: 16),
+        onTap: () => Navigator.pop(context),
       ),
     );
   }

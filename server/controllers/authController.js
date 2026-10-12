@@ -37,10 +37,10 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'بيانات الدخول غير صحيحة' });
 
-    if (user.role !== 'client' && user.role !== 'admin' && user.status !== 'approved') {
+    if (user.status === 'rejected' || user.status === 'banned') {
       const msg = user.status === 'rejected'
-        ? 'تم رفض حسابك. تواصل مع الدعم'
-        : 'حسابك قيد المراجعة. سيتم إشعارك عند الموافقة';
+        ? 'عذراً، تم رفض طلبك. للاستفسار: تواصل مع الدعم.'
+        : 'عذراً، هذا الحساب محظور. تواصل مع الدعم.';
       return res.status(403).json({ message: msg, status: user.status });
     }
 

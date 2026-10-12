@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../client/client_app.dart';
 import 'merchant_theme.dart';
 
 class MerchantAccountScreen extends StatelessWidget {
@@ -21,6 +22,9 @@ class MerchantAccountScreen extends StatelessWidget {
               const SizedBox(height: 18),
               _section('إدارة المتجر', [
                 _item(Icons.storefront_rounded, 'بيانات المتجر', () {}),
+        _item(Icons.shopping_bag_rounded, 'تصفح كعميل', () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const ClientApp()));
+        }),
                 _item(Icons.business_center_rounded, 'الفروع', () {}),
                 _item(Icons.group_rounded, 'الموظفون والصلاحيات', () {}),
                 _item(Icons.attach_money_rounded, 'الحساب المالي', () {}),

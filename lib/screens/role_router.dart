@@ -36,10 +36,10 @@ class _RoleRouterScreenState extends State<RoleRouterScreen> {
     Widget next;
     switch (role) {
       case 'merchant':
-        next = const MerchantApp();
+        next = const MerchantApp(skipLogin: true);
         break;
       case 'driver':
-        next = const DriverApp();
+        next = const DriverApp(skipLogin: true);
         break;
       default:
         next = const ClientApp();

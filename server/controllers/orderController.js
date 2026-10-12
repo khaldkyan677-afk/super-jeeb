@@ -77,3 +77,25 @@ exports.verifyOrder = async (req, res) => {
     res.json(order);
   } catch (e) { res.status(500).json({ message: e.message }); }
 };
+
+exports.getMerchantOrders = async (req, res) => {
+  try {
+    const Merchant = require('../models/Merchant');
+    const merchant = await Merchant.findOne({ userId: req.user._id });
+    if (!merchant) return res.status(404).json({ message: 'Merchant not found' });
+
+    const Store = require('../models/Store');
+    const stores = await Store.find({ merchantId: req.user._id, isActive: true });
+    const storeIds = stores.map(s => s._id);
+
+    const filter = { storeId: { $in: storeIds } };
+    if (req.query.status) filter.status = req.query.status;
+
+    const orders = await Order.find(filter)
+      .populate('storeId', 'name')
+      .populate('customerId', 'name phone')
+      .sort({ createdAt: -1 });
+
+    res.json(orders);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};

@@ -10,6 +10,8 @@ router.route('/')
   .post(protect, createOrder)
   .get(protect, getMyOrders);
 
+router.route('/merchant').get(protect, authorize('merchant', 'admin'), require('../controllers/orderController').getMerchantOrders);
+
 router.route('/all')
   .get(protect, authorize('admin'), getAllOrders);
 
