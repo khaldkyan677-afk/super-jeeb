@@ -62,6 +62,10 @@ exports.verifyMerchant = async (req, res) => {
     }
     const m = await Merchant.findByIdAndUpdate(req.params.id, update, { returnDocument: 'after' });
     if (!m) return res.status(404).json({ error: 'Not found' });
+    if (action === 'accept') {
+      const User = require('../models/User');
+      await User.findByIdAndUpdate(m.userId, { role: 'merchant' });
+    }
     res.json(m);
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
