@@ -4,6 +4,7 @@ import 'add_merchant_screen.dart';
 
 
 import 'admin_management.dart';
+import 'sections_screen.dart';
 import 'admin_settings.dart';
 import 'admin_reports.dart';
 import 'admin_payments.dart';
@@ -311,6 +312,15 @@ class AdminHomeTab extends StatelessWidget {
             context,
             MaterialPageRoute(builder: (_) => const AdminPaymentsScreen()),
           ),
+        ),
+        const SizedBox(height: 15),
+        ListTile(
+          tileColor: const Color(0xFF3D0018),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          leading: const Icon(Icons.category, color: Colors.amber),
+          title: const Text('إدارة الأقسام', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 14),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SectionsScreen())),
         ),
           const SizedBox(height: 25),
           const Text(

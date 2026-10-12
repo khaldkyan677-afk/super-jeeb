@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../../../services/api_service.dart';
 
 class SupermarketService {
   Future<List<Map<String, dynamic>>> getStoresByCategory(String category) async {
     try {
-      final uri = Uri.base.resolve('/api/stores');
+      final uri = Uri.parse('${ApiService.baseUrl}/api/stores');
       final r = await http.get(uri);
       if (r.statusCode == 200) {
         final d = jsonDecode(r.body) as List;
@@ -17,7 +18,7 @@ class SupermarketService {
 
   Future<List<Map<String, dynamic>>> getProductsByStore(String storeId) async {
     try {
-      final uri = Uri.base.resolve('/api/products/store/$storeId');
+      final uri = Uri.parse('${ApiService.baseUrl}/api/products/store/$storeId');
       final r = await http.get(uri);
       if (r.statusCode == 200) {
         final d = jsonDecode(r.body) as List;
@@ -29,7 +30,7 @@ class SupermarketService {
 
   Future<bool> toggleFavorite(String storeId) async {
     try {
-      final uri = Uri.base.resolve('/api/favorites/$storeId');
+      final uri = Uri.parse('${ApiService.baseUrl}/api/favorites/$storeId');
       final r = await http.post(uri);
       return r.statusCode == 200 || r.statusCode == 201;
     } catch (_) { return false; }
