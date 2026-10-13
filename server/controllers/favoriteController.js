@@ -1,4 +1,6 @@
 const Favorite = require('../models/Favorite');
+require('../models/Store');
+require('../models/User');
 exports.toggle = async (req, res) => {
   try {
     const { storeId } = req.params;
@@ -13,7 +15,7 @@ exports.toggle = async (req, res) => {
 };
 exports.getMyFavorites = async (req, res) => {
   try {
-    const favs = await Favorite.find({ userId: req.user._id });
+    const favs = await Favorite.find({ userId: req.user._id }).populate('storeId');
     res.json(favs);
   } catch (e) { res.status(500).json({ message: e.message }); }
 };

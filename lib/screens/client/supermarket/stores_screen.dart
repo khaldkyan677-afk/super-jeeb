@@ -25,15 +25,37 @@ class _StoresScreenState extends State<StoresScreen> {
   @override
   void initState() { super.initState(); _load(); }
 
-  void _toggleFavorite(String id) {
-    setState(() {
-      if (_favorites.contains(id)) { _favorites.remove(id); } else { _favorites.add(id); }
-    });
+  Future<void> _toggleFavorite(String id) async {
+    if (id.isEmpty) return;
+    final svc = SupermarketService();
+    await svc.toggleFavorite(id);
+    if (mounted) {
+      setState(() {
+        if (_favorites.contains(id)) {
+          _favorites.remove(id);
+        } else {
+          _favorites.add(id);
+        }
+      });
+    }
+  }
+
+  Future<void> _loadFavorites() async {
+    final svc = SupermarketService();
+    final list = await svc.getFavorites();
+    final ids = <String>{};
+    for (final item in list) {
+      final s = item['storeId'];
+      if (s is Map && s['_id'] != null) ids.add(s['_id'].toString());
+      else if (s is String) ids.add(s);
+    }
+    if (mounted) setState(() { _favorites.clear(); _favorites.addAll(ids); });
   }
 
   Future<void> _load() async {
+    _loadFavorites();
     setState(() => _loading = true);
-    final s = await SupermarketService().getStoresByCategory('متاجر');
+    final s = await SupermarketService().getStoresByCategory('mall');
     if (mounted) setState(() { _all = s; _loading = false; });
   }
 

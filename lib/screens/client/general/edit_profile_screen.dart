@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../../services/auth_service.dart';
+import '../../../services/api_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 const _kRed = Color(0xFFEF233C);
@@ -13,10 +17,19 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final _name = TextEditingController(text: 'خالد الأحمدي');
-  final _phone = TextEditingController(text: '+967 777 123 456');
-  final _email = TextEditingController(text: 'client@superjeeb.com');
+  final _name = TextEditingController();
+  final _phone = TextEditingController();
+  final _email = TextEditingController();
   String _city = 'صنعاء';
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _name.text = AuthService.instance.getUserName();
+    _phone.text = AuthService.instance.getUserPhone();
+    _email.text = AuthService.instance.getUserEmail();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,14 +127,43 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _saveBtn() {
-    return GestureDetector(
-      onTap: () {
+  Future<void> _doSave() async {
+    setState(() => _saving = true);
+    try {
+      final r = await http.put(
+        Uri.parse('\${ApiService.baseUrl}/api/auth/me'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (ApiService.authToken != null) 'Authorization': 'Bearer \${ApiService.authToken}',
+        },
+        body: jsonEncode({
+          'name': _name.text.trim(),
+          'email': _email.text.trim(),
+        }),
+      );
+      if (!mounted) return;
+      if (r.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تم حفظ بياناتك بنجاح', style: GoogleFonts.cairo(color: Colors.white)), backgroundColor: _kGreen),
+          SnackBar(content: Text('تم حفط التعديلات بنجاح', style: GoogleFonts.cairo(color: Colors.white)), backgroundColor: _kGreen),
         );
         Navigator.pop(context);
-      },
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('فشل الحفط: \${r.statusCode}', style: GoogleFonts.cairo(color: Colors.white)), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('خطأ: \$e', style: GoogleFonts.cairo(color: Colors.white)), backgroundColor: Colors.red),
+      );
+    }
+    if (mounted) setState(() => _saving = false);
+  }
+
+  Widget _saveBtn() {
+    return GestureDetector(
+        onTap: _saving ? null : _doSave,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(

@@ -33,7 +33,7 @@ class _GroceryScreenState extends State<GroceryScreen> {
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final s = await SupermarketService().getStoresByCategory('بقالة');
+    final s = await SupermarketService().getStoresByCategory('grocery');
     if (mounted) setState(() { _all = s; _loading = false; });
   }
 

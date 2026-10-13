@@ -33,7 +33,7 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final s = await SupermarketService().getStoresByCategory('مطاعم');
+    final s = await SupermarketService().getStoresByCategory('restaurant');
     if (mounted) setState(() { _all = s; _loading = false; });
   }
 

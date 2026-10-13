@@ -91,3 +91,15 @@ exports.firebaseLogin = async (req, res) => {
 exports.getMe = async (req, res) => {
   res.json(req.user);
 };
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    const update = {};
+    if (name) update.name = name;
+    if (email) update.email = email;
+    const u = await User.findByIdAndUpdate(req.user._id, update, { returnDocument: 'after' });
+    if (!u) return res.status(404).json({ message: 'Not found' });
+    res.json({ _id: u._id, name: u.name, email: u.email, phone: u.phone, role: u.role, status: u.status });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};

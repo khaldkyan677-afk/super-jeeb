@@ -33,7 +33,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final s = await SupermarketService().getStoresByCategory('صيدلية');
+    final s = await SupermarketService().getStoresByCategory('pharmacy');
     if (mounted) setState(() { _all = s; _loading = false; });
   }
 

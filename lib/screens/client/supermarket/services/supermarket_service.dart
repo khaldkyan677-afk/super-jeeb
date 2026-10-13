@@ -30,9 +30,27 @@ class SupermarketService {
 
   Future<bool> toggleFavorite(String storeId) async {
     try {
-      final uri = Uri.parse('${ApiService.baseUrl}/api/favorites/$storeId');
-      final r = await http.post(uri);
+      final token = ApiService.authToken;
+      final r = await http.post(
+        Uri.parse('${ApiService.baseUrl}/api/favorites/$storeId'),
+        headers: { if (token != null) 'Authorization': 'Bearer $token' },
+      );
       return r.statusCode == 200 || r.statusCode == 201;
     } catch (_) { return false; }
+  }
+
+  Future<List<Map<String, dynamic>>> getFavorites() async {
+    try {
+      final token = ApiService.authToken;
+      final r = await http.get(
+        Uri.parse('${ApiService.baseUrl}/api/favorites'),
+        headers: { if (token != null) 'Authorization': 'Bearer $token' },
+      );
+      if (r.statusCode == 200) {
+        final d = jsonDecode(r.body) as List;
+        return d.cast<Map<String, dynamic>>();
+      }
+    } catch (_) {}
+    return [];
   }
 }

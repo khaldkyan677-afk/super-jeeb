@@ -1,33 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'supermarket/services/supermarket_service.dart';
+import 'supermarket/store_detail_screen.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
-
   @override
   State<FavoritesScreen> createState() => _FavoritesScreenState();
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  final List<Map<String, dynamic>> _favorites = [
-    {
-      'name': 'قميص رجالي فاخر',
-      'price': 8000,
-      'merchant': 'متجر الأناقة',
-      'icon': Icons.checkroom,
-    },
-    {
-      'name': 'هاتف ذكي حديث',
-      'price': 150000,
-      'merchant': 'متجر الإلكترونيات',
-      'icon': Icons.phone_android,
-    },
-    {
-      'name': 'عطر شرقي فاخر',
-      'price': 12000,
-      'merchant': 'متجر العطور',
-      'icon': Icons.spa,
-    },
-  ];
+  final _svc = SupermarketService();
+  List<Map<String, dynamic>> _favorites = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    final list = await _svc.getFavorites();
+    if (mounted) setState(() { _favorites = list; _loading = false; });
+  }
+
+  Future<void> _remove(String storeId) async {
+    await _svc.toggleFavorite(storeId);
+    _load();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,147 +37,88 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2D42),
+        leading: const BackButton(color: Colors.white),
         title: Row(
           children: [
-            const Icon(Icons.favorite, color: Color(0xFFEF233C), size: 22),
+            const Icon(Icons.favorite, color: Color(0xFFFFE233), size: 22),
             const SizedBox(width: 8),
-            const Text(
-              'المفضلة',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text('المفضلة', style: GoogleFonts.cairo(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: const Color(0xFFEF233C),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                '${_favorites.length}',
-                style: const TextStyle(color: Colors.white, fontSize: 10),
-              ),
+              decoration: BoxDecoration(color: const Color(0xFFFFE233), borderRadius: BorderRadius.circular(10)),
+              child: Text('${_favorites.length}', style: GoogleFonts.cairo(color: Colors.black, fontSize: 11, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
-        leading: const BackButton(color: Colors.white),
       ),
-      body: _favorites.isEmpty
-          ? const Center(
+      body: _loading
+        ? const Center(child: CircularProgressIndicator())
+        : _favorites.isEmpty
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.favorite_border, size: 80, color: Colors.grey),
-                  SizedBox(height: 15),
-                  Text(
-                    'لا توجد منتجات في المفضلة',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
+                  const Icon(Icons.favorite_border, size: 80, color: Colors.grey),
+                  const SizedBox(height: 15),
+                  Text('لا توجد متاجر في المفضلة', style: GoogleFonts.cairo(color: Colors.grey, fontSize: 14)),
                 ],
               ),
             )
-          : ListView.builder(
-              padding: const EdgeInsets.all(15),
-              itemCount: _favorites.length,
-              itemBuilder: (context, i) => _card(i),
+          : RefreshIndicator(
+              onRefresh: _load,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(15),
+                itemCount: _favorites.length,
+                itemBuilder: (_, i) => _card(_favorites[i]),
+              ),
             ),
     );
   }
 
-  Widget _card(int i) {
-    final p = _favorites[i];
+  Widget _card(Map<String, dynamic> s) {
+    final store = s['storeId'] is Map ? s['storeId'] as Map<String, dynamic> : s;
+    final name = (store['name'] ?? '').toString();
+    final rating = (store['rating'] ?? 4.5).toString();
+    final id = (store['_id'] ?? s['storeId'] ?? '').toString();
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8)],
       ),
       child: Row(
         children: [
           Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8F9FA),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              p['icon'] as IconData,
-              color: const Color(0xFF2B2D42),
-              size: 32,
-            ),
+            width: 70, height: 70,
+            decoration: BoxDecoration(color: const Color(0xFFF8F9FA), borderRadius: BorderRadius.circular(12)),
+            child: const Icon(Icons.storefront, color: Color(0xFF2B2D42), size: 32),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  p['name'],
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
+                Text(name, style: GoogleFonts.cairo(color: const Color(0xFF2B2D42), fontSize: 15, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                Text(
-                  p['merchant'],
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${p['price']} YER',
-                  style: const TextStyle(
-                    color: Color(0xFFEF233C),
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                Row(children: [
+                  const Icon(Icons.star, color: Color(0xFFFFE233), size: 14),
+                  const SizedBox(width: 4),
+                  Text(rating, style: GoogleFonts.cairo(color: Colors.grey, fontSize: 12)),
+                ]),
               ],
             ),
           ),
-          Column(
-            children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.favorite,
-                  color: Color(0xFFEF233C),
-                  size: 22,
-                ),
-                onPressed: () {
-                  setState(() => _favorites.removeAt(i));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('تم الإزالة من المفضلة'),
-                      backgroundColor: Color(0xFFEF233C),
-                    ),
-                  );
-                },
-              ),
-              IconButton(
-                icon: const Icon(
-                  Icons.add_shopping_cart,
-                  color: Color(0xFF25D366),
-                  size: 22,
-                ),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('🛒 تم الإضافة للسلة'),
-                      backgroundColor: Color(0xFF25D366),
-                    ),
-                  );
-                },
-              ),
-            ],
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Colors.red),
+            onPressed: () => _remove(id),
+          ),
+          IconButton(
+            icon: const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 14),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(
+              builder: (_) => StoreDetailScreen(store: store))),
           ),
         ],
       ),
