@@ -1,3 +1,4 @@
+import 'role_router.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -58,6 +59,10 @@ if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('تم الدخول بنجاح!'), backgroundColor: AppTheme.green),
         );
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const RoleRouterScreen()));
+        }
       }
     } on FirebaseAuthException catch (e) {
       String msg = 'حدث خطأ';

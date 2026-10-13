@@ -3,6 +3,7 @@ import '../services/auth_service.dart';
 import 'client/client_app.dart';
 import 'merchant/merchant_app.dart';
 import 'driver/driver_app.dart';
+import 'suspended_screen.dart';
 
 class RoleRouterScreen extends StatefulWidget {
   const RoleRouterScreen({super.key});
@@ -26,6 +27,13 @@ class _RoleRouterScreenState extends State<RoleRouterScreen> {
         final res = await auth.syncAfterLogin();
         if (res?['role'] != null) {
           role = res!['role'] as String;
+      final st = res?['status'] as String?;
+      if (st == 'rejected' || st == 'banned') {
+        if (!mounted) return;
+        Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (_) => SuspendedScreen(message: res?['message'] ?? '')));
+        return;
+      }
         }
       } catch (e) {
         debugPrint("SYNC ERROR: $e");

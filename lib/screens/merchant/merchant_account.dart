@@ -1,10 +1,46 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../services/api_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../client/client_app.dart';
 import 'merchant_theme.dart';
 
-class MerchantAccountScreen extends StatelessWidget {
+class MerchantAccountScreen extends StatefulWidget {
   const MerchantAccountScreen({super.key});
+  @override
+  State<MerchantAccountScreen> createState() => _MerchantAccountScreenState();
+}
+
+class _MerchantAccountScreenState extends State<MerchantAccountScreen> {
+  String _name = 'المتجر';
+  String _phone = '';
+  int _newOrders = 0, _preparing = 0, _delivered = 0;
+  double _revenue = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final r = await http.get(
+        Uri.parse('\${ApiService.baseUrl}/api/merchants/me/store'),
+        headers: ApiService.get_headers);
+      if (r.statusCode == 200) {
+        final d = jsonDecode(r.body);
+        setState(() {
+          _name = d['store']?['name'] ?? _name;
+          _newOrders = d['stats']?['newOrders'] ?? 0;
+          _preparing = d['stats']?['preparing'] ?? 0;
+          _delivered = d['stats']?['delivered'] ?? 0;
+          _revenue = (d['stats']?['totalRevenue'] ?? 0).toDouble();
+        });
+      }
+    } catch (e) { debugPrint('LOAD_ERR: \$e'); }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,11 +108,11 @@ class MerchantAccountScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('متجر الفواكه الطازجة', style: GoogleFonts.cairo(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
+                Text(_name, style: GoogleFonts.cairo(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 4),
                 Text('خالد يحيى', style: GoogleFonts.cairo(color: Colors.white70, fontSize: 12)),
                 const SizedBox(height: 2),
-                Text('+967 777 000 000', style: GoogleFonts.cairo(color: Colors.white70, fontSize: 11)),
+                Text(_phone.isEmpty ? '' : _phone, style: GoogleFonts.cairo(color: Colors.white70, fontSize: 11)),
               ],
             ),
           ),

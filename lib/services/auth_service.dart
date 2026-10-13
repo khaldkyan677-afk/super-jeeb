@@ -14,6 +14,8 @@ class AuthService extends ChangeNotifier {
   User? _firebaseUser;
 
   String? _role;
+  String _savedName = '';
+  String _savedEmail = '';
   String? _status;
   String? get role => _role;
   String? get status => _status;
@@ -33,9 +35,9 @@ class AuthService extends ChangeNotifier {
   String? get error => _error;
   String? get pendingPhone => _pendingPhone;
   bool get isLoggedIn => _firebaseUser != null;
-  String getUserName() => _firebaseUser?.displayName ?? 'مستخدم';
+  String getUserName() => _savedName.isNotEmpty ? _savedName : (_firebaseUser?.displayName ?? 'مستخدم');
   String getUserPhone() => _firebaseUser?.phoneNumber ?? '';
-  String getUserEmail() => _firebaseUser?.email ?? '';
+  String getUserEmail() => _savedEmail.isNotEmpty ? _savedEmail : (_firebaseUser?.email ?? '');
   String get userId => _firebaseUser?.uid ?? '';
 
   // ============================================================
@@ -160,6 +162,8 @@ class AuthService extends ChangeNotifier {
     );
     if (res['token'] == null) return res;
     _role = res['role'] as String?;
+      _savedName = (res['name'] ?? '').toString();
+      _savedEmail = (res['email'] ?? '').toString();
     _status = res['status'] as String?;
     ApiService.setToken(res['token'] as String);
     try {

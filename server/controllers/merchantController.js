@@ -91,3 +91,45 @@ exports.getAllMerchantsAdmin = async (req, res) => {
     res.json(list);
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
+
+exports.getMyStore = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const Order = require('../models/Order');
+    const store = await Store.findOne({ merchantId: req.user._id });
+    if (!store) return res.status(404).json({ message: 'Store not found' });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const [newCount, preparing, delivered, totalRevenue, todayOrders] = await Promise.all([
+      Order.countDocuments({ storeId: store._id, status: 'pending' }),
+      Order.countDocuments({ storeId: store._id, status: { $in: ['accepted', 'preparing', 'ready'] } }),
+      Order.countDocuments({ storeId: store._id, status: 'delivered' }),
+      Order.aggregate([
+        { $match: { storeId: store._id, status: 'delivered' } },
+        { $group: { _id: null, sum: { $sum: '$total' } } }
+      ]),
+      Order.countDocuments({ storeId: store._id, createdAt: { $gte: today } }),
+    ]);
+
+    res.json({
+      store: {
+        _id: store._id,
+        name: store.name,
+        category: store.category,
+        logoUrl: store.logoUrl,
+        coverUrl: store.coverUrl,
+        rating: store.rating,
+        isActive: store.isActive,
+      },
+      stats: {
+        newOrders: newCount,
+        preparing: preparing,
+        delivered: delivered,
+        totalRevenue: totalRevenue[0]?.sum || 0,
+        todayOrders: todayOrders,
+      },
+    });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};

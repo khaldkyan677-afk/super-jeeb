@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'merchant_theme.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../services/api_service.dart';
 
 class MerchantHomeScreen extends StatefulWidget {
   const MerchantHomeScreen({super.key});
@@ -10,6 +13,33 @@ class MerchantHomeScreen extends StatefulWidget {
 
 class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
   final bool _open = true;
+  String _storeName = 'المتجر';
+  int _newOrders = 0, _preparing = 0, _delivered = 0;
+  double _revenue = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final r = await http.get(
+        Uri.parse('\${ApiService.baseUrl}/api/merchants/me/store'),
+        headers: ApiService.get_headers);
+      if (r.statusCode == 200) {
+        final d = jsonDecode(r.body);
+        setState(() {
+          _storeName = d['store']?['name'] ?? _storeName;
+          _newOrders = d['stats']?['newOrders'] ?? 0;
+          _preparing = d['stats']?['preparing'] ?? 0;
+          _delivered = d['stats']?['delivered'] ?? 0;
+          _revenue = (d['stats']?['totalRevenue'] ?? 0).toDouble();
+        });
+      }
+    } catch (e) { debugPrint('LOAD_ERR: \$e'); }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +102,7 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('متجر الفواكه الطازجة', style: MJ.h3),
+        Text(_storeName, style: MJ.h3),
               const SizedBox(height: 3),
               Row(
                 children: [

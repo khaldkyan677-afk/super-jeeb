@@ -2,6 +2,10 @@ import 'general/search_screen.dart';
 import 'general/cart_screen.dart';
 import 'general/account_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../driver/driver_app.dart';
+import '../merchant/merchant_app.dart';
+import '../../services/auth_service.dart';
 import 'home_screen.dart';
 import 'taxi_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -43,6 +47,53 @@ class ClientMainNav extends StatefulWidget {
 
 class _ClientMainNavState extends State<ClientMainNav> {
   int _index = 0;
+  Timer? _roleTimer;
+
+  @override
+  void initState() {
+    _loadTab();
+    super.initState();
+    _roleTimer = Timer.periodic(const Duration(seconds: 30), (_) => _checkRole());
+  }
+
+  @override
+  void dispose() {
+    _roleTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadTab() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      final t = p.getInt('sj_last_tab') ?? 0;
+      if (mounted) setState(() => _index = t);
+    } catch (_) {}
+  }
+
+  Future<void> _saveTab(int i) async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setInt('sj_last_tab', i);
+    } catch (_) {}
+  }
+
+  Future<void> _checkRole() async {
+    try {
+      final res = await AuthService.instance.syncAfterLogin();
+      final role = res?['role'] as String?;
+      if (role == 'merchant') {
+        if (!mounted) return;
+        _roleTimer?.cancel();
+        Navigator.of(context, rootNavigator: true).pushReplacement(
+          MaterialPageRoute(builder: (_) => const MerchantApp(skipLogin: true)));
+      } else if (role == 'driver') {
+        if (!mounted) return;
+        _roleTimer?.cancel();
+        Navigator.of(context, rootNavigator: true).pushReplacement(
+          MaterialPageRoute(builder: (_) => const DriverApp(skipLogin: true)));
+      }
+    } catch (e) { debugPrint('ROLE_POLL_ERR: $e'); }
+  }
   final _pages = const [
     ClientHomeScreen(),
     ClientSearch(),
@@ -56,7 +107,7 @@ class _ClientMainNavState extends State<ClientMainNav> {
       body: _pages[_index],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _index,
-        onTap: (i) => setState(() => _index = i),
+          onTap: (i) { setState(() => _index = i); _saveTab(i); },
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
         selectedItemColor: const Color(0xFFEF233C),
