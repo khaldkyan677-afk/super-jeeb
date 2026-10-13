@@ -16,6 +16,16 @@ class AuthService extends ChangeNotifier {
   String? _role;
   String _savedName = '';
   String _savedEmail = '';
+
+  void updateLocalName(String name) {
+    _savedName = name;
+    notifyListeners();
+  }
+
+  void updateLocalEmail(String email) {
+    _savedEmail = email;
+    notifyListeners();
+  }
   String? _status;
   String? get role => _role;
   String? get status => _status;

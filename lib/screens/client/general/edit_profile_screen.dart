@@ -131,10 +131,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => _saving = true);
     try {
       final r = await http.put(
-        Uri.parse('\${ApiService.baseUrl}/api/auth/me'),
+        Uri.parse('${ApiService.baseUrl}/api/auth/me'),
         headers: {
           'Content-Type': 'application/json',
-          if (ApiService.authToken != null) 'Authorization': 'Bearer \${ApiService.authToken}',
+          if (ApiService.authToken != null) 'Authorization': 'Bearer ${ApiService.authToken}',
         },
         body: jsonEncode({
           'name': _name.text.trim(),
@@ -143,13 +143,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
       if (!mounted) return;
       if (r.statusCode == 200) {
+        AuthService.instance.updateLocalName(_name.text.trim());
+        AuthService.instance.updateLocalEmail(_email.text.trim());
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('تم حفط التعديلات بنجاح', style: GoogleFonts.cairo(color: Colors.white)), backgroundColor: _kGreen),
         );
         Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل الحفط: \${r.statusCode}', style: GoogleFonts.cairo(color: Colors.white)), backgroundColor: Colors.red),
+          SnackBar(content: Text('فشل الحفط: ${r.statusCode}', style: GoogleFonts.cairo(color: Colors.white)), backgroundColor: Colors.red),
         );
       }
     } catch (e) {

@@ -10,7 +10,10 @@ const generateToken = (id) => {
 exports.register = async (req, res) => {
   try {
     const { name, email, phone, password, role } = req.body;
-    const userExists = await User.findOne({ $or: [{ email }, { phone }] });
+    const conditions = [];
+    if (email) conditions.push({ email });
+    if (phone) conditions.push({ phone });
+    const userExists = conditions.length > 0 ? await User.findOne({ $or: conditions }) : null;
     if (userExists) return res.status(400).json({ message: 'المستخدم موجود مسبقاً' });
 
     const salt = await bcrypt.genSalt(10);
@@ -94,10 +97,12 @@ exports.getMe = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, phone, bio } = req.body;
     const update = {};
     if (name) update.name = name;
     if (email) update.email = email;
+    if (phone) update.phone = phone;
+    if (bio != null) update.bio = bio;
     const u = await User.findByIdAndUpdate(req.user._id, update, { returnDocument: 'after' });
     if (!u) return res.status(404).json({ message: 'Not found' });
     res.json({ _id: u._id, name: u.name, email: u.email, phone: u.phone, role: u.role, status: u.status });

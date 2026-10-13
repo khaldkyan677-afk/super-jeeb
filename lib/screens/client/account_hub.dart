@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../services/api_service.dart';
 import 'package:super_jeeb/widgets/password_field.dart';
 
 import 'settings_screen.dart';
@@ -17,11 +20,29 @@ import 'about_screen.dart';
 import 'my_orders_screen.dart';
 import 'coupons_screen.dart';
 
-class AccountHubScreen extends StatelessWidget {
+class AccountHubScreen extends StatefulWidget {
   const AccountHubScreen({super.key});
+  @override
+  State<AccountHubScreen> createState() => _AccountHubScreenState();
+}
+
+class _AccountHubScreenState extends State<AccountHubScreen> {
+  @override
+  void initState() {
+    super.initState();
+    AuthService.instance.syncAfterLogin().catchError((_) => <String, dynamic>{});
+  }
 
   @override
+  @override
   Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: AuthService.instance,
+      builder: (context, _) => _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D12),
       body: SingleChildScrollView(
@@ -562,10 +583,57 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final _name = TextEditingController(text: 'خالد الأحمدي');
-  final _email = TextEditingController(text: 'client@superjeeb.com');
-  final _phone = TextEditingController(text: '777000001');
-  final _bio = TextEditingController();
+  final _name = TextEditingController();
+  final _email = TextEditingController();
+  final _phone = TextEditingController();
+  bool _saving = false;
+
+  Future<void> _doSave() async {
+    setState(() => _saving = true);
+    try {
+      final r = await http.put(
+        Uri.parse('${ApiService.baseUrl}/api/auth/me'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (ApiService.authToken != null) 'Authorization': 'Bearer ${ApiService.authToken}',
+        },
+        body: jsonEncode({
+          'name': _name.text.trim(),
+          'email': _email.text.trim(),
+        }),
+      );
+      if (!mounted) return;
+      if (r.statusCode == 200) {
+        AuthService.instance.updateLocalName(_name.text.trim());
+        AuthService.instance.updateLocalEmail(_email.text.trim());
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ تم حفظ التعديلات'),
+            backgroundColor: Color(0xFF25D366),
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('فشل: ${r.statusCode}'), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('خطأ: $e'), backgroundColor: Colors.red),
+      );
+    }
+    if (mounted) setState(() => _saving = false);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _name.text = AuthService.instance.getUserName();
+    _email.text = AuthService.instance.getUserEmail();
+    _phone.text = AuthService.instance.getUserPhone();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -611,8 +679,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _field(_email, 'البريد الإلكتروني', Icons.email),
             const SizedBox(height: 15),
             _field(_phone, 'رقم الهاتف', Icons.phone),
-            const SizedBox(height: 15),
-            _field(_bio, 'نبذة عنك', Icons.description, maxLines: 3),
             const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
@@ -624,14 +690,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('✅ تم حفظ التعديلات'),
-                      backgroundColor: Color(0xFF25D366),
-                    ),
-                  );
-                },
+              onPressed: _saving ? null : _doSave,
                 icon: const Icon(Icons.save, color: Colors.white),
                 label: const Text(
                   'حفظ التعديلات',

@@ -12,6 +12,7 @@ class EmailAuthScreen extends StatefulWidget {
 }
 
 class _EmailAuthScreenState extends State<EmailAuthScreen> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoginMode = true;
@@ -21,6 +22,7 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -47,7 +49,7 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
               final fu = FirebaseAuth.instance.currentUser;
         if (fu != null) {
           try {
-            final r = await http.post(Uri.base.resolve('/api/auth/firebase-login'), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'email': fu.email ?? email, 'uid': fu.uid, 'name': fu.displayName ?? '', 'phone': fu.phoneNumber ?? ''})).timeout(const Duration(seconds: 15));
+            final r = await http.post(Uri.base.resolve('/api/auth/firebase-login'), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'email': fu.email ?? email, 'uid': fu.uid, 'name': _nameController.text.trim().isNotEmpty ? _nameController.text.trim() : (fu.displayName ?? ''), 'phone': fu.phoneNumber ?? ''})).timeout(const Duration(seconds: 15));
             if (r.statusCode == 403) {
               await FirebaseAuth.instance.signOut();
               setState(() => _error = jsonDecode(r.body)['message'] ?? 'حسابك قيد المراجعة');
@@ -147,6 +149,35 @@ if (mounted) {
               const SizedBox(height: 30),
 
               // حقل البريد
+            // الاسم (عند التسجيل فقط)
+            if (!_isLoginMode) ...[
+              TextField(
+                controller: _nameController,
+                keyboardType: TextInputType.name,
+                style: TextStyle(color: AppTheme.white, fontFamily: 'Cairo'),
+                decoration: InputDecoration(
+                  hintText: 'الاسم الكامل',
+                  hintStyle: TextStyle(color: Colors.white38, fontFamily: 'Cairo'),
+                  prefixIcon: const Icon(Icons.person_outline, color: AppTheme.red),
+                  filled: true,
+                  fillColor: AppTheme.surface,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: const BorderSide(color: Colors.white12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: const BorderSide(color: AppTheme.red, width: 1.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,

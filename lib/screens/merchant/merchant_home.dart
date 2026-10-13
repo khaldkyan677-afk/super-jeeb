@@ -26,7 +26,7 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
   Future<void> _load() async {
     try {
       final r = await http.get(
-        Uri.parse('\${ApiService.baseUrl}/api/merchants/me/store'),
+        Uri.parse('${ApiService.baseUrl}/api/merchants/me/store'),
         headers: ApiService.get_headers);
       if (r.statusCode == 200) {
         final d = jsonDecode(r.body);

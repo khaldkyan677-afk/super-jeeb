@@ -192,7 +192,7 @@ class ApiService {
   static Future<List<dynamic>> getMyOrders() async {
     try {
       final r = await http
-          .get(Uri.parse('\$baseUrl/api/orders/my'), headers: _headers)
+          .get(Uri.parse('\$baseUrl/api/orders'), headers: _headers)
           .timeout(const Duration(seconds: 15));
       if (r.statusCode == 200) {
         return jsonDecode(r.body) as List<dynamic>;

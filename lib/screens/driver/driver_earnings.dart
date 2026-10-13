@@ -55,9 +55,9 @@ class _DriverEarningsScreenState extends State<DriverEarningsScreen> {
               const SizedBox(height: 14),
               Row(
                 children: [
-                  _miniCard('أرباح التوصيل', '\${d[3]} ري', Icons.delivery_dining_rounded),
+                  _miniCard('أرباح التوصيل', '${d[3]} ري', Icons.delivery_dining_rounded),
                   const SizedBox(width: 10),
-                  _miniCard('أرباح الخدمات', '\${d[4]} ري', Icons.handyman_rounded),
+                  _miniCard('أرباح الخدمات', '${d[4]} ري', Icons.handyman_rounded),
                 ],
               ),
               const SizedBox(height: 20),
