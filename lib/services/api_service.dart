@@ -190,12 +190,15 @@ class ApiService {
 
   // تحديث حالة طلب
   static Future<List<dynamic>> getMyOrders() async {
+    if (authToken == null || authToken!.isEmpty) return [];
     try {
-      final r = await http
-          .get(Uri.parse('\$baseUrl/api/orders'), headers: _headers)
-          .timeout(const Duration(seconds: 15));
+      final r = await http.get(
+        Uri.parse('$baseUrl/api/orders'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 8));
       if (r.statusCode == 200) {
-        return jsonDecode(r.body) as List<dynamic>;
+        final d = jsonDecode(r.body);
+        return d is List ? d : [];
       }
       return [];
     } catch (e) {

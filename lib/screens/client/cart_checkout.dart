@@ -1122,7 +1122,7 @@ Widget _buildConfirm() {
       );
 
       if (!mounted) return;
-      Navigator.of(context).pop();
+      Navigator.of(context, rootNavigator: true).pop();
 
       if (r.statusCode == 201) {
         provider.clearStore(sid);

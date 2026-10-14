@@ -1,96 +1,120 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import 'chat_screen.dart';
+class OrderTrackingScreen extends StatelessWidget {
+  final Map<String, dynamic> order;
+  const OrderTrackingScreen({super.key, required this.order});
 
-class OrderTrackingScreen extends StatefulWidget {
-  final String orderId;
-  const OrderTrackingScreen({super.key, required this.orderId});
-
-  @override
-  State<OrderTrackingScreen> createState() => _OrderTrackingScreenState();
-}
-
-class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
-  final int _currentStep = 2;
-
-  final _steps = [
-    {
-      'title': 'تم استلام الطلب',
-      'subtitle': 'تم تأكيد طلبك بنجاح',
-      'time': '10:30 ص',
-      'icon': Icons.receipt_long,
-    },
-    {
-      'title': 'قبله المتجر',
-      'subtitle': 'المتجر يحضّر طلبك',
-      'time': '10:35 ص',
-      'icon': Icons.storefront,
-    },
-    {
-      'title': 'في الطريق',
-      'subtitle': 'الكابتن أحمد في طريقه إليك',
-      'time': '10:50 ص',
-      'icon': Icons.delivery_dining,
-    },
-    {
-      'title': 'تم التسليم',
-      'subtitle': 'في انتظار التسليم',
-      'time': '--:--',
-      'icon': Icons.home,
-    },
-  ];
+  int _stepFromStatus(String s) {
+    switch (s) {
+      case 'pending': return 0;
+      case 'accepted': return 1;
+      case 'preparing': return 2;
+      case 'ready': return 2;
+      case 'on_the_way': return 3;
+      case 'delivered': return 4;
+      default: return 0;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final status = (order['status'] ?? 'pending').toString();
+    final verif = (order['verificationStatus'] ?? 'none').toString();
+    final currentStep = _stepFromStatus(status);
+    final driver = order['driverId'];
+    final customer = order['customerId'];
+    final store = order['storeId'];
+    final storeName = store is Map ? (store['name'] ?? '') : '';
+    final pin = (order['pin'] ?? '').toString();
+    final showPin = status == 'on_the_way' || status == 'delivered';
+    final showDriver = driver != null && driver is Map;
+
+    final steps = [
+      {'t': 'تم إنشاء الطلب', 's': 'طلبك في النظام', 'icon': Icons.receipt_long},
+      {'t': 'تم إرسال طلبك للتاجر', 's': 'التاجر سيتواصل معك', 'icon': Icons.storefront},
+      {'t': 'جاري التحضير', 's': 'المتجر يجهّز طلبك', 'icon': Icons.restaurant},
+      {'t': 'في الطريق', 's': 'المندوب في طريقه إليك', 'icon': Icons.delivery_dining},
+      {'t': 'تم التسليم', 's': 'استلمت طلبك بنجاح', 'icon': Icons.check_circle},
+    ];
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2D42),
-        title: Text(
-          'تتبع الطلب #${widget.orderId}',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
         leading: const BackButton(color: Colors.white),
+        title: Text('تتبع الطلب',
+          style: GoogleFonts.cairo(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // خريطة توضيحية
             Container(
               height: 220,
               width: double.infinity,
               color: const Color(0xFF2B2D42).withValues(alpha: 0.05),
-              child: const Stack(
+              child: Stack(
                 alignment: Alignment.center,
                 children: [
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.map, color: Colors.white24, size: 80),
-                      SizedBox(height: 10),
-                      Text(
-                        '📍 خريطة الملاحة',
-                        style: TextStyle(color: Colors.black38, fontSize: 12),
+                      Icon(
+                        status == 'delivered' ? Icons.check_circle : Icons.delivery_dining,
+                        color: status == 'delivered' ? const Color(0xFF25D366) : const Color(0xFF2B2D42),
+                        size: 80,
                       ),
-                      Text(
-                        '⬛⬛⬛⬛ الخط الملاحي نشط ⬛⬛⬛⬛',
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      const SizedBox(height: 10),
+                      Text(_statusLabel(status, verif),
+                        style: GoogleFonts.cairo(color: const Color(0xFF2B2D42), fontSize: 16, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      if (storeName.isNotEmpty)
+                        Text(storeName, style: GoogleFonts.cairo(color: Colors.black54, fontSize: 13)),
                     ],
                   ),
                 ],
               ),
             ),
-
-            // كابتن الطلب
+            if (showDriver)
+              Padding(
+                padding: const EdgeInsets.all(15),
+                child: Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8)],
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 25,
+                        backgroundColor: const Color(0xFF2B2D42),
+                        child: const Icon(Icons.person, color: Colors.white, size: 28),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('المندوب',
+                              style: GoogleFonts.cairo(color: Colors.grey, fontSize: 12)),
+                            const SizedBox(height: 2),
+                            Text((driver['name'] ?? 'مندوب').toString(),
+                              style: GoogleFonts.cairo(color: const Color(0xFF2B2D42), fontSize: 15, fontWeight: FontWeight.bold)),
+                            if (customer is Map && customer['phone'] != null)
+                              Text((driver['phone'] ?? '').toString(),
+                                style: GoogleFonts.cairo(color: Colors.grey, fontSize: 12)),
+                          ],
+                        ),
+                      ),
+                      IconButton(icon: const Icon(Icons.phone, color: Color(0xFF25D366)), onPressed: () {}),
+                      IconButton(icon: const Icon(Icons.chat, color: Color(0xFF2B2D42)), onPressed: () {}),
+                    ],
+                  ),
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.all(15),
               child: Container(
@@ -98,170 +122,90 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 8,
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 25,
-                      backgroundColor: Color(0xFF2B2D42),
-                      child: Icon(Icons.person, color: Colors.white, size: 28),
-                    ),
-                    const SizedBox(width: 12),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'الكابتن أحمد',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 3),
-                          Row(
-                            children: [
-                              Icon(Icons.star, color: Colors.amber, size: 14),
-                              SizedBox(width: 3),
-                              Text('4.9', style: TextStyle(fontSize: 12)),
-                              SizedBox(width: 10),
-                              Text(
-                                'دراجة نارية',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.phone,
-                        color: Color(0xFF25D366),
-                        size: 26,
-                      ),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('📞 اتصال محمي'),
-                            backgroundColor: Color(0xFF25D366),
-                          ),
-                        );
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.chat,
-                        color: Color(0xFFEF233C),
-                        size: 26,
-                      ),
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const ChatScreen()),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // خطوات الطلب
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 8,
-                    ),
-                  ],
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8)],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'حالة الطلب',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2B2D42),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    ..._steps.asMap().entries.map((e) {
-                      final i = e.key;
-                      final step = e.value;
-                      final done = i <= _currentStep;
-                      final active = i == _currentStep;
-                      return _timelineItem(step, done, active, i);
+                    Text('حالة الطلب',
+                      style: GoogleFonts.cairo(color: const Color(0xFF2B2D42), fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 12),
+                    ...List.generate(steps.length, (i) {
+                      final isDone = i <= currentStep;
+                      final isCurrent = i == currentStep;
+                      final color = isDone ? const Color(0xFF25D366) : Colors.grey.shade300;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: isDone ? color : Colors.grey.shade200,
+                                shape: BoxShape.circle,
+                                border: isCurrent ? Border.all(color: color, width: 3) : null,
+                              ),
+                              child: Icon(steps[i]['icon'] as IconData, color: isDone ? Colors.white : Colors.grey, size: 18),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(steps[i]['t'] as String,
+                                    style: GoogleFonts.cairo(
+                                      color: isDone ? const Color(0xFF2B2D42) : Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: isCurrent ? FontWeight.bold : FontWeight.w600)),
+                                  const SizedBox(height: 2),
+                                  Text(steps[i]['s'] as String,
+                                    style: GoogleFonts.cairo(color: Colors.grey, fontSize: 12)),
+                                ],
+                              ),
+                            ),
+                            if (isDone) Icon(Icons.check_circle, color: color, size: 20),
+                          ],
+                        ),
+                      );
                     }),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-
-            // كود OTP
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF25D366).withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(
-                    color: const Color(0xFF25D366).withValues(alpha: 0.3),
+            if (showPin && pin.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF25D366).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: const Color(0xFF25D366).withValues(alpha: 0.3)),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.lock_outline, color: Color(0xFF25D366), size: 20),
+                          const SizedBox(width: 8),
+                          Text('كود التسليم OTP',
+                            style: GoogleFonts.cairo(color: const Color(0xFF2B2D42), fontSize: 14, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(pin,
+                        style: GoogleFonts.cairo(color: const Color(0xFF25D366), fontSize: 36, fontWeight: FontWeight.bold, letterSpacing: 8)),
+                      const SizedBox(height: 8),
+                      Text('شارك هذا الكود مع المندوب عند التسليم',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.cairo(color: Colors.grey, fontSize: 12)),
+                    ],
                   ),
                 ),
-                child: Column(
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.lock, color: Color(0xFF25D366), size: 22),
-                        SizedBox(width: 10),
-                        Text(
-                          'كود التسليم OTP',
-                          style: TextStyle(
-                            color: Color(0xFF25D366),
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-                    const Text(
-                      '4892',
-                      style: TextStyle(
-                        color: Color(0xFF25D366),
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 8,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'شارك هذا الكود مع الكابتن عند التسليم',
-                      style: TextStyle(color: Colors.black54, fontSize: 11),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
               ),
-            ),
             const SizedBox(height: 30),
           ],
         ),
@@ -269,100 +213,18 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 
-  Widget _timelineItem(
-    Map<String, dynamic> step,
-    bool done,
-    bool active,
-    int i,
-  ) {
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // خط زمني
-          Column(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: done ? const Color(0xFF25D366) : Colors.grey.shade300,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  step['icon'] as IconData,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              if (i < _steps.length - 1)
-                Expanded(
-                  child: Container(
-                    width: 3,
-                    color: done && i < _currentStep
-                        ? const Color(0xFF25D366)
-                        : Colors.grey.shade300,
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(width: 15),
-          // تفاصيل
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        step['title'],
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: done ? const Color(0xFF2B2D42) : Colors.grey,
-                        ),
-                      ),
-                      if (active) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            'الآن',
-                            style: TextStyle(
-                              color: Colors.orange,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    step['subtitle'],
-                    style: const TextStyle(fontSize: 12, color: Colors.black54),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    step['time'],
-                    style: const TextStyle(fontSize: 10, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  String _statusLabel(String s, String verif) {
+    if (verif == 'pending') return 'قيد المراجعة';
+    if (verif == 'rejected') return 'مرفوض';
+    switch (s) {
+      case 'pending': return 'بانتظار الموافقة';
+      case 'accepted': return 'تم القبول';
+      case 'preparing': return 'جاري التحضير';
+      case 'ready': return 'جاهز للتوصيل';
+      case 'on_the_way': return 'في الطريق';
+      case 'delivered': return 'تم التسليم';
+      case 'cancelled': return 'ملغي';
+      default: return 'قيد المعالجة';
+    }
   }
 }

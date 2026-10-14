@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../services/api_service.dart';
+import '../order_tracking_screen.dart';
 
 class MyOrdersScreen extends StatefulWidget {
   const MyOrdersScreen({super.key});
@@ -9,21 +10,27 @@ class MyOrdersScreen extends StatefulWidget {
   State<MyOrdersScreen> createState() => _MyOrdersScreenState();
 }
 
-class _MyOrdersScreenState extends State<MyOrdersScreen> {
+class _MyOrdersScreenState extends State<MyOrdersScreen> with SingleTickerProviderStateMixin {
   List<dynamic> _orders = [];
   bool _loading = true;
   Timer? _timer;
+  late TabController _tabs;
+
+  final _tabNames = ['قيد المراجعة', 'جارية', 'مكتملة', 'الكل'];
 
   @override
   void initState() {
     super.initState();
+    _tabs = TabController(length: 4, vsync: this);
+    _tabs.addListener(() => setState(() {}));
     _load();
-    _timer = Timer.periodic(const Duration(seconds: 30), (_) => _load(silent: true));
+    _timer = Timer.periodic(const Duration(seconds: 15), (_) => _load(silent: true));
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    _tabs.dispose();
     super.dispose();
   }
 
@@ -38,9 +45,37 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     }
   }
 
+  bool _isPending(dynamic o) {
+    final m = o is Map ? o as Map<String, dynamic> : <String, dynamic>{};
+    final status = (m['status'] ?? '').toString();
+    final verif = (m['verificationStatus'] ?? '').toString();
+    return status == 'pending' || verif == 'pending';
+  }
+
+  bool _isRunning(dynamic o) {
+    final m = o is Map ? o as Map<String, dynamic> : <String, dynamic>{};
+    final s = (m['status'] ?? '').toString();
+    return ['accepted', 'preparing', 'ready', 'on_the_way'].contains(s);
+  }
+
+  bool _isComplete(dynamic o) {
+    final m = o is Map ? o as Map<String, dynamic> : <String, dynamic>{};
+    final s = (m['status'] ?? '').toString();
+    return s == 'delivered' || s == 'cancelled';
+  }
+
+  List<dynamic> _filtered(int index) {
+    switch (index) {
+      case 0: return _orders.where(_isPending).toList();
+      case 1: return _orders.where(_isRunning).toList();
+      case 2: return _orders.where(_isComplete).toList();
+      default: return _orders;
+    }
+  }
+
   (String, Color, IconData) _statusInfo(String s, String verif) {
-    if (verif == 'pending') return ('قيد المراجعة', Colors.orange, Icons.hourglass_top);
     if (verif == 'rejected') return ('مرفوض', Colors.red, Icons.cancel);
+    if (verif == 'pending') return ('قيد المراجعة', Colors.orange, Icons.hourglass_top);
     switch (s) {
       case 'pending': return ('بانتظار الموافقة', Colors.orange, Icons.hourglass_top);
       case 'accepted': return ('تم القبول', Colors.blue, Icons.check_circle_outline);
@@ -53,6 +88,8 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     }
   }
 
+  bool _canTrack(String s) => ['accepted', 'preparing', 'ready', 'on_the_way', 'delivered'].contains(s);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,30 +100,41 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         title: Text('طلباتي', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.w600)),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: () => _load(),
-          ),
+          IconButton(icon: const Icon(Icons.refresh, color: Colors.white), onPressed: () => _load()),
         ],
+        bottom: TabBar(
+          controller: _tabs,
+          isScrollable: true,
+          indicatorColor: const Color(0xFFFFE233),
+          labelColor: const Color(0xFFFFE233),
+          unselectedLabelColor: Colors.white60,
+          labelStyle: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.bold),
+          tabs: _tabNames.map((t) => Tab(text: t)).toList(),
+        ),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFE233)))
-          : _orders.isEmpty
-              ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Icon(Icons.receipt_long_outlined, size: 80, color: Colors.grey.shade800),
-                  const SizedBox(height: 16),
-                  Text('لا توجد طلبات', style: GoogleFonts.cairo(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  Text('ابدأ التسوق الآن', style: GoogleFonts.cairo(color: Colors.grey, fontSize: 13)),
-                ]))
-              : RefreshIndicator(
+          : TabBarView(
+              controller: _tabs,
+              children: List.generate(4, (i) {
+                final items = _filtered(i);
+                if (items.isEmpty) {
+                  return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Icon(Icons.receipt_long_outlined, size: 80, color: Colors.grey.shade800),
+                    const SizedBox(height: 16),
+                    Text('لا توجد طلبات', style: GoogleFonts.cairo(color: Colors.white70, fontSize: 16)),
+                  ]));
+                }
+                return RefreshIndicator(
                   onRefresh: _load,
                   child: ListView.builder(
                     padding: const EdgeInsets.all(12),
-                    itemCount: _orders.length,
-                    itemBuilder: (_, i) => _card(_orders[i]),
+                    itemCount: items.length,
+                    itemBuilder: (_, idx) => _card(items[idx]),
                   ),
-                ),
+                );
+              }),
+            ),
     );
   }
 
@@ -102,6 +150,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     final dateShort = createdAt.isNotEmpty && createdAt.length >= 10 ? createdAt.substring(0, 10) : '';
     final (label, color, icon) = _statusInfo(status, verif);
     final showRate = status == 'delivered';
+    final showTrack = _canTrack(status);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -148,20 +197,40 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
               Text('$total ر.ي', style: GoogleFonts.cairo(color: const Color(0xFFFFE233), fontSize: 14, fontWeight: FontWeight.bold)),
             ],
           ),
-          if (showRate) ...[
+          if (showTrack || showRate) ...[
             const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFE233),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                ),
-                onPressed: () => _showRatingDialog(m['_id']?.toString() ?? '', storeName),
-                icon: const Icon(Icons.star, color: Colors.black, size: 18),
-                label: Text('قيّم المتجر', style: GoogleFonts.cairo(color: Colors.black, fontWeight: FontWeight.bold)),
-              ),
+            Row(
+              children: [
+                if (showTrack)
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFFFFE233)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                      ),
+                      onPressed: () => Navigator.push(context, MaterialPageRoute(
+                        builder: (_) => OrderTrackingScreen(order: m),
+                      )),
+                      icon: const Icon(Icons.location_on_outlined, color: Color(0xFFFFE233), size: 18),
+                      label: Text('تتبع الطلب', style: GoogleFonts.cairo(color: const Color(0xFFFFE233), fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                if (showTrack && showRate) const SizedBox(width: 8),
+                if (showRate)
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFE233),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                      ),
+                      onPressed: () => _showRatingDialog(m['_id']?.toString() ?? '', storeName),
+                      icon: const Icon(Icons.star, color: Colors.black, size: 18),
+                      label: Text('قيّم', style: GoogleFonts.cairo(color: Colors.black, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+              ],
             ),
           ],
         ],
@@ -202,7 +271,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             TextButton(onPressed: () => Navigator.pop(ctx), child: Text('إلغاء', style: GoogleFonts.cairo(color: Colors.white70))),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFE233)),
-              onPressed: () async {
+              onPressed: () {
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
