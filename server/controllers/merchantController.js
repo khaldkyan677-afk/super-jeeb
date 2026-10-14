@@ -133,3 +133,36 @@ exports.getMyStore = async (req, res) => {
     });
   } catch (e) { res.status(500).json({ message: e.message }); }
 };
+
+exports.updateMyStore = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const Section = require('../models/Section');
+    const store = await Store.findOne({ merchantId: req.user._id });
+    if (!store) return res.status(404).json({ message: 'Store not found' });
+
+    const { name, description, phone, category, location, isActive } = req.body;
+    if (name) store.name = name;
+    if (description != null) store.description = description;
+    if (phone != null) store.phone = phone;
+    if (location != null) store.location = location;
+    if (isActive != null) store.isActive = isActive;
+    if (category) {
+      store.category = category;
+      const map = {
+        supermarket: 'سوبرماركت',
+        restaurant: 'مطاعم',
+        pharmacy: 'صيدليات',
+        grocery: 'بقالات',
+        mall: 'متاجر',
+      };
+      const secName = map[category];
+      if (secName) {
+        const sec = await Section.findOne({ name: secName });
+        if (sec) store.sectionId = sec._id;
+      }
+    }
+    await store.save();
+    res.json({ store });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};

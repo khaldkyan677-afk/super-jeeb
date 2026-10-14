@@ -12,6 +12,8 @@ const storeSchema = new mongoose.Schema({
   closeTime: { type: String, default: '23:00' },
   isFeatured: { type: Boolean, default: false },
   category: { type: String },
+  description: { type: String, default: '' },
+  phone: { type: String, default: '' },
   subCategory: { type: String, default: '' },
   sectionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Section' },
   location: { lat: Number, lng: Number, address: String },

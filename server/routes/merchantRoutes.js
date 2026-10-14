@@ -10,6 +10,7 @@ router.route('/')
   .post(protect, c.createMerchant);
 
 router.route('/me/store').get(protect, authorize('merchant','admin'), c.getMyStore);
+router.route('/me/store').put(protect, authorize('merchant','admin'), c.updateMyStore);
 
 router.route('/me')
   .get(protect, c.getMyMerchant);

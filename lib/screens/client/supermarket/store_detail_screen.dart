@@ -383,7 +383,14 @@ Widget build(BuildContext context) {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Text('${p.price.toStringAsFixed(0)} ر.ي', style: GoogleFonts.cairo(color: _kRed, fontSize: 14, fontWeight: FontWeight.w700)),
+                  Text('${p.price.toStringAsFixed(0)} ر.ي', style: GoogleFonts.cairo(color: _kRed, fontSize: 14, fontWeight: FontWeight.w700)),
+                  if (p.oldPrice is num && p.oldPrice > 0) ...[
+                    const SizedBox(width: 6),
+                    Text('${p.oldPrice.toStringAsFixed(0)}', style: GoogleFonts.cairo(color: Colors.grey, fontSize: 11, decoration: TextDecoration.lineThrough)),
+                  ],
+                  const SizedBox(width: 6),
+                  if (p.stock is num && p.stock <= 0)
+                    Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2), decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(4)), child: Text('نفذ', style: GoogleFonts.cairo(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))),
                     const Spacer(),
                     if (qty == 0)
                       GestureDetector(

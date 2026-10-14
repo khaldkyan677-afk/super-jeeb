@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../services/api_service.dart';
 import 'merchant_theme.dart';
 
 class MerchantProductsScreen extends StatefulWidget {
@@ -9,292 +12,313 @@ class MerchantProductsScreen extends StatefulWidget {
 }
 
 class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
-  final _cats = ['الكل', 'فواكه', 'خضروات', 'عروض'];
-  int _catIdx = 0;
+  List<dynamic> _products = [];
+  bool _loading = true;
 
-  final _products = [
-    _P('طماطم طازجة', '1,200', '1,500', 24, 'خضروات', true),
-    _P('موز', '900', '0', 15, 'فواكه', true),
-    _P('تفاح أحمر', '1,500', '1,800', 0, 'فواكه', false),
-    _P('خيار', '800', '0', 40, 'خضروات', true),
-    _P('برتقال', '1,100', '1,400', 8, 'فواكه', true),
-    _P('جزر', '700', '0', 3, 'خضروات', true),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    try {
+      final r = await http.get(
+        Uri.parse('${ApiService.baseUrl}/api/products/my'),
+        headers: ApiService.get_headers,
+      );
+      if (r.statusCode == 200) {
+        final d = jsonDecode(r.body);
+        setState(() => _products = d is List ? d : []);
+      }
+    } catch (e) { debugPrint('LOAD_ERR: $e'); }
+    setState(() => _loading = false);
+  }
+
+  Future<void> _delete(String id) async {
+    try {
+      await http.delete(
+        Uri.parse('${ApiService.baseUrl}/api/products/$id'),
+        headers: ApiService.get_headers,
+      );
+      _load();
+    } catch (e) { debugPrint('DEL_ERR: $e'); }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MJ.bg,
+      appBar: AppBar(
+        backgroundColor: MJ.bg,
+        elevation: 0,
+        title: Text('المنتجات', style: GoogleFonts.cairo(color: MJ.text, fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        actions: [
+          IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openEditor(null),
         backgroundColor: MJ.primary,
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: Text('إضافة منتج', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.w800)),
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: Text('إضافة منتج', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: Row(
+      body: _loading
+        ? const Center(child: CircularProgressIndicator(color: MJ.primary))
+        : _products.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('المنتجات', style: MJ.h1),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(color: MJ.softPink, borderRadius: BorderRadius.circular(12)),
-                    child: Row(
-                      children: [
-                        Icon(Icons.search_rounded, color: MJ.primary, size: 16),
-                        const SizedBox(width: 4),
-                        Text('بحث', style: GoogleFonts.cairo(color: MJ.primary, fontSize: 12, fontWeight: FontWeight.w700)),
-                      ],
-                    ),
-                  ),
+                  Icon(Icons.inventory_2_outlined, size: 80, color: Colors.grey.shade300),
+                  const SizedBox(height: 16),
+                  Text('لا توجد منتجات', style: GoogleFonts.cairo(color: MJ.textMuted, fontSize: 16)),
+                  const SizedBox(height: 8),
+                  Text('اضغط + لإضافة منتج', style: GoogleFonts.cairo(color: MJ.textMuted, fontSize: 13)),
                 ],
               ),
-            ),
-            SizedBox(
-              height: 38,
+            )
+          : RefreshIndicator(
+              onRefresh: _load,
               child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: _cats.length,
-                itemBuilder: (_, i) {
-                  final sel = _catIdx == i;
-                  return GestureDetector(
-                    onTap: () => setState(() => _catIdx = i),
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 8),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: sel ? MJ.primary : MJ.card,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: MJ.shadowSoft,
-                      ),
-                      child: Text(_cats[i], style: GoogleFonts.cairo(
-                        color: sel ? Colors.white : MJ.text,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      )),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 90),
+                padding: const EdgeInsets.all(15),
                 itemCount: _products.length,
-                separatorBuilder: (_, i) => const SizedBox(height: 10),
-                itemBuilder: (_, i) => _productCard(_products[i]),
+                itemBuilder: (_, i) => _card(_products[i]),
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 
-  Widget _productCard(_P p) {
+  Widget _card(dynamic p) {
+    final m = p is Map ? p as Map<String, dynamic> : <String, dynamic>{};
+    final name = (m['name'] ?? '').toString();
+    final price = m['price'] ?? 0;
+    final oldPrice = m['oldPrice'] ?? 0;
+    final stock = m['stock'] ?? 0;
+    final isAvail = m['isAvailable'] == true;
+    final cat = (m['category'] ?? '').toString();
+    final id = (m['_id'] ?? '').toString();
+
     return Container(
+      margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: MJ.card, borderRadius: BorderRadius.circular(18), boxShadow: MJ.shadowSoft),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 6)],
+      ),
       child: Row(
         children: [
           Container(
-            width: 70, height: 70,
-            decoration: BoxDecoration(color: MJ.softPink, borderRadius: BorderRadius.circular(14)),
-            child: Icon(Icons.eco_rounded, color: MJ.primary, size: 36),
+            width: 55, height: 55,
+            decoration: BoxDecoration(color: MJ.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+            child: Icon(Icons.fastfood, color: MJ.primary, size: 28),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(name, style: GoogleFonts.cairo(color: MJ.text, fontSize: 15, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
                 Row(
                   children: [
-                    Expanded(child: Text(p.name, style: MJ.body.copyWith(fontWeight: FontWeight.w800, fontSize: 13))),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: p.available ? MJ.success.withValues(alpha: 0.15) : MJ.danger.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(p.available ? 'متوفر' : 'نفذ',
-                        style: GoogleFonts.cairo(color: p.available ? MJ.success : MJ.danger, fontSize: 10, fontWeight: FontWeight.w700)),
-                    ),
+                    Text('$price ر.ي', style: GoogleFonts.cairo(color: MJ.primary, fontSize: 13, fontWeight: FontWeight.bold)),
+                    if (oldPrice is num && oldPrice > 0) ...[
+                      const SizedBox(width: 6),
+                      Text('$oldPrice', style: GoogleFonts.cairo(color: MJ.textMuted, fontSize: 11, decoration: TextDecoration.lineThrough)),
+                    ],
                   ],
                 ),
-                const SizedBox(height: 4),
-                Text(p.cat, style: MJ.tiny),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Row(
                   children: [
-                    Text('${p.price} ري', style: MJ.price),
-                    if (p.oldPrice != '0') ...[
+                    Text('مخزون: $stock', style: GoogleFonts.cairo(color: MJ.textMuted, fontSize: 11)),
+                    if (cat.isNotEmpty) ...[
                       const SizedBox(width: 8),
-                      Text('${p.oldPrice} ري', style: GoogleFonts.cairo(fontSize: 11, color: MJ.textMuted, decoration: TextDecoration.lineThrough)),
+                      Text('• $cat', style: GoogleFonts.cairo(color: MJ.textMuted, fontSize: 11)),
                     ],
-                    const Spacer(),
-                    Icon(Icons.inventory_2_rounded, color: MJ.textMuted, size: 14),
-                    const SizedBox(width: 3),
-                    Text('${p.stock}', style: MJ.tiny),
                   ],
                 ),
               ],
             ),
           ),
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert_rounded, color: MJ.textMuted),
-            onSelected: (v) {
-              if (v == 'edit') _openEditor(p);
-              if (v == 'delete') _confirmDelete(p);
-            },
-            itemBuilder: (_) => [
-              _menuItem('edit', Icons.edit_rounded, 'تعديل'),
-              _menuItem('hide', Icons.visibility_off_rounded, 'إخفاء'),
-              _menuItem('price', Icons.attach_money_rounded, 'تغيير السعر'),
-              _menuItem('stock', Icons.inventory_rounded, 'إدارة المخزون'),
-              _menuItem('delete', Icons.delete_rounded, 'حذف'),
+          Column(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
+                onPressed: () => _openEditor(m),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                onPressed: () => _confirmDelete(id, name),
+              ),
             ],
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+            decoration: BoxDecoration(
+              color: isAvail ? Colors.green.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(isAvail ? 'متاح' : 'مخفي',
+              style: GoogleFonts.cairo(color: isAvail ? Colors.green : Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
     );
   }
 
-  PopupMenuItem<String> _menuItem(String v, IconData ic, String label) {
-    return PopupMenuItem(
-      value: v,
-      child: Row(
-        children: [
-          Icon(ic, color: MJ.primary, size: 18),
-          const SizedBox(width: 10),
-          Text(label, style: GoogleFonts.cairo(fontSize: 13)),
-        ],
-      ),
-    );
-  }
-
-  void _confirmDelete(_P p) {
+  void _confirmDelete(String id, String name) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: MJ.card,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('حذف المنتج', style: MJ.h3),
-        content: Text('هل تريد حذف "${p.name}"؟', style: MJ.body),
+      builder: (ctx) => AlertDialog(
+        title: Text('حذف "$name"؟', style: GoogleFonts.cairo()),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text('إلغاء', style: GoogleFonts.cairo(color: MJ.textMuted))),
-          TextButton(onPressed: () { Navigator.pop(context); }, child: Text('حذف', style: GoogleFonts.cairo(color: MJ.danger, fontWeight: FontWeight.w800))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('إلغاء', style: GoogleFonts.cairo())),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () { Navigator.pop(ctx); _delete(id); },
+            child: Text('حذف', style: GoogleFonts.cairo(color: Colors.white)),
+          ),
         ],
       ),
     );
   }
 
-  void _openEditor(_P? p) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => _ProductEditor(product: p),
-    );
+  void _openEditor(Map<String, dynamic>? product) {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (_) => _ProductEditor(product: product, onSaved: _load),
+    ));
   }
 }
 
 class _ProductEditor extends StatefulWidget {
-  final _P? product;
-  const _ProductEditor({this.product});
+  final Map<String, dynamic>? product;
+  final VoidCallback onSaved;
+  const _ProductEditor({this.product, required this.onSaved});
   @override
   State<_ProductEditor> createState() => _ProductEditorState();
 }
 
 class _ProductEditorState extends State<_ProductEditor> {
-  late TextEditingController _name, _desc, _price, _oldPrice, _stock;
-  String _cat = 'فواكه';
-  bool _available = true;
+  late TextEditingController _name, _price, _oldPrice, _stock;
+  bool _isAvailable = true;
+  bool _saving = false;
 
   @override
   void initState() {
     super.initState();
     final p = widget.product;
-    _name = TextEditingController(text: p?.name ?? '');
-    _desc = TextEditingController();
-    _price = TextEditingController(text: p?.price ?? '');
-    _oldPrice = TextEditingController(text: p?.oldPrice == '0' ? '' : p?.oldPrice ?? '');
-    _stock = TextEditingController(text: p?.stock.toString() ?? '');
-    _cat = p?.cat ?? 'فواكه';
-    _available = p?.available ?? true;
+    _name = TextEditingController(text: p?['name']?.toString() ?? '');
+    _price = TextEditingController(text: p?['price']?.toString() ?? '');
+    _oldPrice = TextEditingController(text: (p?['oldPrice'] ?? 0).toString());
+    _stock = TextEditingController(text: (p?['stock'] ?? 0).toString());
+    _isAvailable = p?['isAvailable'] == true;
   }
 
   @override
   void dispose() {
-    _name.dispose(); _desc.dispose(); _price.dispose(); _oldPrice.dispose(); _stock.dispose();
+    _name.dispose(); _price.dispose(); _oldPrice.dispose(); _stock.dispose();
     super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (_name.text.trim().isEmpty || _price.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('املأ الاسم والسعر', style: GoogleFonts.cairo(color: Colors.white)), backgroundColor: Colors.red),
+      );
+      return;
+    }
+    setState(() => _saving = true);
+    try {
+      final body = jsonEncode({
+        'name': _name.text.trim(),
+        'price': double.tryParse(_price.text) ?? 0,
+        'oldPrice': double.tryParse(_oldPrice.text) ?? 0,
+        'stock': int.tryParse(_stock.text) ?? 0,
+        'isAvailable': _isAvailable,
+      });
+      http.Response r;
+      if (widget.product == null) {
+        r = await http.post(
+          Uri.parse('${ApiService.baseUrl}/api/products'),
+          headers: {...ApiService.get_headers, 'Content-Type': 'application/json'},
+          body: body,
+        );
+      } else {
+        r = await http.put(
+          Uri.parse('${ApiService.baseUrl}/api/products/${widget.product!['_id']}'),
+          headers: {...ApiService.get_headers, 'Content-Type': 'application/json'},
+          body: body,
+        );
+      }
+      if (mounted) {
+        if (r.statusCode < 300) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('تم الحفظ بنجاح', style: GoogleFonts.cairo(color: Colors.white)), backgroundColor: Colors.green),
+          );
+          widget.onSaved();
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('فشل: ${r.statusCode}', style: GoogleFonts.cairo(color: Colors.white)), backgroundColor: Colors.red),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('خطأ: $e', style: GoogleFonts.cairo(color: Colors.white)), backgroundColor: Colors.red),
+        );
+      }
+    }
+    if (mounted) setState(() => _saving = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final isNew = widget.product == null;
-    return DraggableScrollableSheet(
-      initialChildSize: 0.9,
-      maxChildSize: 0.95,
-      minChildSize: 0.6,
-      builder: (_, scroll) => Container(
-        decoration: const BoxDecoration(color: MJ.bg, borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
-        child: ListView(
-          controller: scroll,
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+    return Scaffold(
+      backgroundColor: MJ.bg,
+      appBar: AppBar(
+        backgroundColor: MJ.bg,
+        leading: const BackButton(color: Colors.white),
+        title: Text(widget.product == null ? 'إضافة منتج' : 'تعديل منتج',
+          style: GoogleFonts.cairo(color: MJ.text, fontWeight: FontWeight.bold)),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
           children: [
-            Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: MJ.border, borderRadius: BorderRadius.circular(4)))),
+            _field('اسم المنتج', _name, Icons.title),
+            const SizedBox(height: 12),
+            _field('السعر', _price, Icons.attach_money, number: true),
+            const SizedBox(height: 12),
+            _field('السعر القديم (اختياري)', _oldPrice, Icons.money_off, number: true),
+            const SizedBox(height: 12),
+            _field('المخزون', _stock, Icons.inventory, number: true),
             const SizedBox(height: 16),
-            Text(isNew ? 'إضافة منتج جديد' : 'تعديل المنتج', style: MJ.h2),
-            const SizedBox(height: 18),
-
-            _imagePicker(),
-            const SizedBox(height: 16),
-
-            _field('اسم المنتج', _name, Icons.label_rounded),
-            const SizedBox(height: 10),
-            _field('الوصف', _desc, Icons.description_rounded, maxLines: 3),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(child: _field('السعر', _price, Icons.attach_money_rounded)),
-                const SizedBox(width: 10),
-                Expanded(child: _field('السعر بعد الخصم', _oldPrice, Icons.local_offer_rounded)),
-              ],
+            SwitchListTile(
+              title: Text('متاح للبيع', style: GoogleFonts.cairo(color: MJ.text)),
+              value: _isAvailable,
+              activeThumbColor: MJ.primary,
+              onChanged: (v) => setState(() => _isAvailable = v),
             ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(child: _field('المخزون', _stock, Icons.inventory_2_rounded)),
-                const SizedBox(width: 10),
-                Expanded(child: _dropdown()),
-              ],
-            ),
-            const SizedBox(height: 14),
-            _switchAvail(),
             const SizedBox(height: 20),
-
             SizedBox(
+              width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(isNew ? 'تم نشر المنتج' : 'تم حفظ التعديلات', style: GoogleFonts.cairo()), backgroundColor: MJ.success),
-                  );
-                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: MJ.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: Text(isNew ? 'نشر المنتج' : 'حفظ التعديلات', style: GoogleFonts.cairo(fontSize: 15, fontWeight: FontWeight.w800)),
+                onPressed: _saving ? null : _save,
+                child: _saving
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : Text('حفظ', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
               ),
             ),
           ],
@@ -303,76 +327,19 @@ class _ProductEditorState extends State<_ProductEditor> {
     );
   }
 
-  Widget _imagePicker() {
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        height: 140,
-        decoration: BoxDecoration(color: MJ.softPink, borderRadius: BorderRadius.circular(18), border: Border.all(color: MJ.primary.withValues(alpha: 0.2))),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.add_photo_alternate_rounded, color: MJ.primary, size: 40),
-            const SizedBox(height: 8),
-            Text('إضافة صورة المنتج', style: GoogleFonts.cairo(color: MJ.primary, fontSize: 13, fontWeight: FontWeight.w700)),
-          ],
-        ),
+  Widget _field(String hint, TextEditingController c, IconData ic, {bool number = false}) {
+    return TextField(
+      controller: c,
+      keyboardType: number ? TextInputType.number : TextInputType.text,
+      style: GoogleFonts.cairo(color: MJ.text),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: GoogleFonts.cairo(color: MJ.textMuted),
+        prefixIcon: Icon(ic, color: MJ.primary),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
       ),
     );
   }
-
-  Widget _field(String hint, TextEditingController c, IconData ic, {int maxLines = 1}) {
-    return Container(
-      decoration: BoxDecoration(color: MJ.card, borderRadius: BorderRadius.circular(14), boxShadow: MJ.shadowSoft),
-      child: TextField(
-        controller: c,
-        maxLines: maxLines,
-        style: GoogleFonts.cairo(),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: GoogleFonts.cairo(color: MJ.textMuted),
-          prefixIcon: Icon(ic, color: MJ.primary),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        ),
-      ),
-    );
-  }
-
-  Widget _dropdown() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(color: MJ.card, borderRadius: BorderRadius.circular(14), boxShadow: MJ.shadowSoft),
-      child: DropdownButton<String>(
-        value: _cat,
-        isExpanded: true,
-        underline: const SizedBox.shrink(),
-        style: GoogleFonts.cairo(color: MJ.text),
-        items: ['فواكه', 'خضروات', 'عروض'].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-        onChanged: (v) => setState(() => _cat = v!),
-      ),
-    );
-  }
-
-  Widget _switchAvail() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(color: MJ.card, borderRadius: BorderRadius.circular(14), boxShadow: MJ.shadowSoft),
-      child: Row(
-        children: [
-          Icon(_available ? Icons.check_circle_rounded : Icons.cancel_rounded, color: _available ? MJ.success : MJ.danger),
-          const SizedBox(width: 10),
-          Expanded(child: Text('متوفر للبيع', style: MJ.body.copyWith(fontWeight: FontWeight.w700))),
-          Switch(value: _available, activeThumbColor: MJ.primary, onChanged: (v) => setState(() => _available = v)),
-        ],
-      ),
-    );
-  }
-}
-
-class _P {
-  final String name, price, oldPrice, cat;
-  final int stock;
-  final bool available;
-  _P(this.name, this.price, this.oldPrice, this.stock, this.cat, this.available);
 }
