@@ -3,7 +3,7 @@ import 'client_app.dart';
 import 'my_orders_screen.dart';
 import 'package:provider/provider.dart';
 import '../../providers/cart_provider.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../services/api_service.dart';
@@ -811,27 +811,22 @@ Widget _paymentCard(Map<String, dynamic> m, int index) {
   Future<void> _pickReceipt() async {
     setState(() => _uploadingReceipt = true);
     try {
-      final picked = await FilePicker.pickFiles(type: FileType.image);
-      if (picked != null && picked.isNotEmpty) {
-        final f = picked.first;
-        final bytes = await f.readAsBytes();
-        if (bytes != null) {
-          if (bytes.length > 5 * 1024 * 1024) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('حجم الصورة يتجاوز 5 MB')),
-              );
-            }
-            setState(() => _uploadingReceipt = false);
-            return;
-          }
-          setState(() {
-            _receiptBase64 = base64Encode(bytes);
-            _receiptName = f.name;
-          });
-        }
+      final XFile? picked = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 50,
+        maxWidth: 900,
+        maxHeight: 900,
+      );
+      if (picked != null) {
+        final bytes = await picked.readAsBytes();
+        setState(() {
+          _receiptBase64 = base64Encode(bytes);
+          _receiptName = picked.name;
+        });
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('PICK_ERR: $e');
+    }
     if (mounted) setState(() => _uploadingReceipt = false);
   }
 
@@ -1131,7 +1126,18 @@ Widget _buildConfirm() {
 
       if (r.statusCode == 201) {
         provider.clearStore(sid);
-        _showSuccessDialog();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✅ تم إنشاء الطلب بنجاح'),
+              backgroundColor: Color(0xFF25D366),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const MyOrdersScreen()),
+          );
+        }
       } else {
         String msg = 'فشل إنشاء الطلب';
         try {
@@ -1178,12 +1184,13 @@ Widget _buildConfirm() {
                 backgroundColor: const Color(0xFFEF233C),
                 minimumSize: const Size(double.infinity, 45),
               ),
-              onPressed: () {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const MyOrdersScreen()),
-                  (route) => route.isFirst,
-                );
-              },
+                    onPressed: () {
+                      final nav = Navigator.of(context);
+                      nav.pop();
+                      nav.pushReplacement(
+                        MaterialPageRoute(builder: (_) => const MyOrdersScreen()),
+                      );
+                    },
               child: const Text('حسناً', style: TextStyle(color: Colors.white)),
             ),
           ],

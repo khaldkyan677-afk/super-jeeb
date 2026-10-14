@@ -12,11 +12,17 @@ router.route('/')
 
 router.route('/merchant').get(protect, authorize('merchant', 'admin'), require('../controllers/orderController').getMerchantOrders);
 
+router.route('/driver').get(protect, authorize('driver','admin'), require('../controllers/orderController').getDriverOrders);
+
 router.route('/all')
   .get(protect, authorize('admin'), getAllOrders);
 
 router.route('/:id/verify')
   .put(protect, authorize('admin'), verifyOrder);
+
+router.route('/:id/assign-driver').patch(protect, authorize('driver','admin'), require('../controllers/orderController').assignDriver);
+
+router.route('/:id/deliver').post(protect, authorize('driver','admin'), require('../controllers/orderController').deliverOrder);
 
 router.route('/:id/status')
   .patch(protect, authorize('merchant', 'driver', 'admin'), updateOrderStatus);

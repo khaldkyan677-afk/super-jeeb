@@ -242,6 +242,21 @@ class ApiService {
     }
   }
 
+  static Future<Map<String, dynamic>> deliverOrder(String orderId, String pin) async {
+    try {
+      final r = await http.post(
+        Uri.parse('$baseUrl/api/orders/$orderId/deliver'),
+        headers: {'Content-Type': 'application/json', ..._headers},
+        body: jsonEncode({'pin': pin}),
+      );
+      final d = jsonDecode(r.body);
+      return d is Map<String, dynamic> ? d : {'error': 'Invalid'};
+    } catch (e) {
+      debugPrint('deliverOrder: $e');
+      return {'error': e.toString()};
+    }
+  }
+
   // منتجات المتجر
   static Future<List<dynamic>> getMerchantProducts(String storeId) async {
     try {
