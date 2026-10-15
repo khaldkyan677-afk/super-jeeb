@@ -13,6 +13,7 @@ class BecomeMerchantScreen extends StatefulWidget {
 }
 
 class _S extends State<BecomeMerchantScreen> {
+  String lang = 'ar';
   int step = 0;
   bool sectionsLoading = true;
   bool submitting = false;
@@ -164,12 +165,12 @@ class _S extends State<BecomeMerchantScreen> {
       if (r.statusCode == 200 || r.statusCode == 201) {
         _success();
       } else {
-        _snack('فشل الإرسال: \${r.statusCode}');
+    _snack("${t('fail')}: ${r.statusCode}");
       }
     } catch (e) {
       if (!mounted) return;
       setState(() => submitting = false);
-      _snack('خطأ: \${e.toString()}');
+    _snack("${t('err')}: ${e.toString()}");
     }
   }
 
@@ -183,37 +184,111 @@ class _S extends State<BecomeMerchantScreen> {
       title: Row(children: [
         const Icon(Icons.check_circle, color: Color(0xFF25D366), size: 32),
         const SizedBox(width: 10),
-        Text('تم الإرسال!', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold)),
+        Text(t('success_t'), style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold)),
       ]),
-      content: Text('طلبك قيد المراجعة من الإدارة. سيتم إشعارك بعد الموافقة.',
+      content: Text(t('success_b'),
         style: GoogleFonts.cairo(color: Colors.grey, fontSize: 14)),
       actions: [TextButton(
         onPressed: () { Navigator.of(c).pop(); Navigator.of(context).pop(); },
-        child: Text('حسناً', style: GoogleFonts.cairo(color: const Color(0xFF25D366), fontWeight: FontWeight.bold)))],
+        child: Text(t('ok'), style: GoogleFonts.cairo(color: const Color(0xFF25D366), fontWeight: FontWeight.bold)))],
     ));
   }
 
+  static const Map<String, Map<String, String>> _t = {
+    'ar': {
+      'title': 'إعداد متجرك',
+      'back': 'السابق', 'next': 'التالي', 'send': 'إرسال للمراجعة',
+      'step1': 'الهوية', 'step2': 'النشاط', 'step3': 'التواصل', 'step4': 'الإطلاق',
+      'h1': 'هوية المتجر', 's1': 'قم بإعداد اسم متجرك ووصفه',
+      'f_name': 'اسم المتجر *', 'f_desc': 'وصف المتجر (اختياري)',
+      'logo_cover': 'شعار وغلاف المتجر', 'logo': 'الشعار', 'cover': 'الغلاف',
+      'h2': 'نشاط العمل', 's2': 'اختر نوع المتجر',
+      'sub_title': 'التخصص الدقيق *', 'other': 'أخرى', 'other_hint': 'اكتب نوع متجرك',
+      'h3': 'معلومات التواصل', 's3': 'أضف بيانات التواصل الخاصة بمتجرك',
+      'f_phone': 'رقم الهاتف * (مثال: 73xxxxxxx)',
+      'phone_err': 'الرقم يجب أن يبدأ بـ 73/77/78/71/70',
+      'f_gov': 'المحافظة *', 'f_city': 'المدينة / المنطقة',
+      'f_addr': 'العنوان التفصيلي', 'f_map': 'رابط الموقع (خريطة)', 'f_hours': 'ساعات العمل',
+      'h4': 'جاهز للإرسال!', 's4': 'راجع التفاصيل قبل الإرسال للإدارة',
+      'r_name': 'الاسم', 'r_cat': 'القسم', 'r_sub': 'التخصص',
+      'r_phone': 'الهاتف', 'r_addr': 'العنوان', 'r_hours': 'ساعات العمل',
+      'review_note': 'سيتم مراجعة طلبك من الإدارة. لن يُفعّل المتجر إلا بعد الموافقة.',
+      'loading': 'جاري التحميل...',
+      'success_t': 'تم الإرسال!', 'success_b': 'طلبك قيد المراجعة من الإدارة. سيتم إشعارك بعد الموافقة.',
+      'ok': 'حسناً', 'fail': 'فشل الإرسال', 'err': 'خطأ',
+    },
+    'en': {
+      'title': 'Store Setup',
+      'back': 'Back', 'next': 'Next', 'send': 'Submit for Review',
+      'step1': 'Identity', 'step2': 'Activity', 'step3': 'Contact', 'step4': 'Launch',
+      'h1': 'Store Identity', 's1': 'Set up your store name and description',
+      'f_name': 'Store Name *', 'f_desc': 'Store Description (optional)',
+      'logo_cover': 'Logo & Cover', 'logo': 'Logo', 'cover': 'Cover',
+      'h2': 'Business Activity', 's2': 'Choose your store type',
+      'sub_title': 'Subcategory *', 'other': 'Other', 'other_hint': 'Type your store type',
+      'h3': 'Contact Info', 's3': 'Add your store contact information',
+      'f_phone': 'Phone Number * (e.g. 73xxxxxxx)',
+      'phone_err': 'Number must start with 73/77/78/71/70',
+      'f_gov': 'Governorate *', 'f_city': 'City / Area',
+      'f_addr': 'Detailed Address', 'f_map': 'Location Link (Map)', 'f_hours': 'Working Hours',
+      'h4': 'Ready to Submit!', 's4': 'Review details before sending to admin',
+      'r_name': 'Name', 'r_cat': 'Category', 'r_sub': 'Subcategory',
+      'r_phone': 'Phone', 'r_addr': 'Address', 'r_hours': 'Working Hours',
+      'review_note': 'Your request will be reviewed by admin. Store will not be activated until approved.',
+      'loading': 'Loading...',
+      'success_t': 'Submitted!', 'success_b': 'Your request is under review. You will be notified after approval.',
+      'ok': 'OK', 'fail': 'Failed to send', 'err': 'Error',
+    },
+  };
+
+  String t(String k) => _t[lang]?[k] ?? _t['ar']![k] ?? k;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Directionality(
+      textDirection: lang == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+      child: Scaffold(
       backgroundColor: const Color(0xFF0D0D12),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0D0D12), elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context)),
-        title: Text('إعداد متجرك', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.w600)),
+        title: Text(t('title'), style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.w600)),
         centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: GestureDetector(
+              onTap: () => setState(() => lang = lang == 'ar' ? 'en' : 'ar'),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1B26),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFEF7E3C)),
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text(lang == 'ar' ? 'AR' : 'EN',
+                    style: GoogleFonts.cairo(color: const Color(0xFFEF7E3C), fontWeight: FontWeight.bold, fontSize: 12)),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.language, color: Color(0xFFEF7E3C), size: 16),
+                ]),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(children: [
         _stepper(),
         Expanded(child: SingleChildScrollView(padding: const EdgeInsets.all(16), child: _body())),
         _bottomBar(),
       ]),
+      ),
     );
   }
 
   Widget _stepper() {
-    final titles = ['الهوية', 'النشاط', 'التواصل', 'الإطلاق'];
+    final titles = [t('step1'), t('step2'), t('step3'), t('step4')];
     return Container(padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
       child: Row(children: List.generate(4, (i) {
         final active = i <= step;
@@ -242,17 +317,17 @@ class _S extends State<BecomeMerchantScreen> {
   }
 
   Widget _s1() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    _title('هوية المتجر', 'قم بإعداد اسم متجرك ووصفه'),
+    _title(t('h1'), t('s1')),
     const SizedBox(height: 20),
-    _field('اسم المتجر *', nameCtrl),
-    _field('وصف المتجر (اختياري)', descCtrl, max: 3),
+    _field(t('f_name'), nameCtrl),
+    _field(t('f_desc'), descCtrl, max: 3),
     const SizedBox(height: 16),
-    Text('شعار وغلاف المتجر', style: GoogleFonts.cairo(color: Colors.white, fontSize: 13)),
+    Text(t('logo_cover'), style: GoogleFonts.cairo(color: Colors.white, fontSize: 13)),
     const SizedBox(height: 8),
     Row(children: [
-      _imgBox('الشعار', logoBytes, () => _pick(true)),
+      _imgBox(t('logo'), logoBytes, () => _pick(true)),
       const SizedBox(width: 12),
-      _imgBox('الغلاف', coverBytes, () => _pick(false)),
+      _imgBox(t('cover'), coverBytes, () => _pick(false)),
     ]),
   ]);
 
@@ -261,13 +336,13 @@ class _S extends State<BecomeMerchantScreen> {
     final need = selectedSectionName != null && !selectedSectionName!.contains('سوبر');
     if (sectionsLoading) {
       return Column(children: [
-        _title('نشاط العمل', 'جاري التحميل...'),
+        _title(t('h2'), t('loading')),
         const SizedBox(height: 30),
         const Center(child: CircularProgressIndicator(color: Color(0xFFEF7E3C))),
       ]);
     }
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _title('نشاط العمل', 'اختر نوع المتجر'),
+      _title(t('h2'), t('s2')),
       const SizedBox(height: 16),
       GridView.count(
         crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
@@ -307,7 +382,7 @@ class _S extends State<BecomeMerchantScreen> {
         }).toList()),
       if (selectedSectionId != null && need) ...[
         const SizedBox(height: 20),
-        Text('التخصص الدقيق *', key: _subsKey, style: GoogleFonts.cairo(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+        Text(t('sub_title'), key: _subsKey, style: GoogleFonts.cairo(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
         const SizedBox(height: 10),
         GridView.count(
           crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
@@ -338,14 +413,14 @@ class _S extends State<BecomeMerchantScreen> {
                 child: Row(children: [
                   const Icon(Icons.add_circle_outline, color: Colors.white, size: 18),
                   const SizedBox(width: 6),
-                  Expanded(child: Text('أخرى', style: GoogleFonts.cairo(color: Colors.white, fontSize: 11))),
+                  Expanded(child: Text(t('other'), style: GoogleFonts.cairo(color: Colors.white, fontSize: 11))),
                 ]))),
           ]),
         if (isOtherSelected) ...[
           const SizedBox(height: 14),
           TextField(controller: otherSubCtrl, textAlign: TextAlign.right,
             style: GoogleFonts.cairo(color: Colors.white),
-            decoration: InputDecoration(hintText: 'اكتب نوع متجرك', hintStyle: GoogleFonts.cairo(color: Colors.grey, fontSize: 13),
+            decoration: InputDecoration(hintText: t('other_hint'), hintStyle: GoogleFonts.cairo(color: Colors.grey, fontSize: 13),
               filled: true, fillColor: const Color(0xFF1A1B26),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
               contentPadding: const EdgeInsets.all(14)),
@@ -356,12 +431,12 @@ class _S extends State<BecomeMerchantScreen> {
   }
 
   Widget _s3() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    _title('معلومات التواصل', 'أضف بيانات التواصل الخاصة بمتجرك'),
+    _title(t('h3'), t('s3')),
     const SizedBox(height: 20),
-    _field('رقم الهاتف * (مثال: 73xxxxxxx)', phoneCtrl, type: TextInputType.phone),
+    _field(t('f_phone'), phoneCtrl, type: TextInputType.phone),
     if (phoneCtrl.text.isNotEmpty && !_validPhone(phoneCtrl.text))
       Padding(padding: const EdgeInsets.only(bottom: 12),
-        child: Text('الرقم يجب أن يبدأ بـ 73/77/78/71/70', style: GoogleFonts.cairo(color: Colors.redAccent, fontSize: 11))),
+        child: Text(t('phone_err'), style: GoogleFonts.cairo(color: Colors.redAccent, fontSize: 11))),
     Padding(padding: const EdgeInsets.only(bottom: 14),
       child: DropdownButtonFormField<String>(
         initialValue: selectedGov,
@@ -370,18 +445,18 @@ class _S extends State<BecomeMerchantScreen> {
         decoration: InputDecoration(filled: true, fillColor: const Color(0xFF1A1B26),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           contentPadding: const EdgeInsets.all(14),
-          hintText: 'المحافظة *', hintStyle: GoogleFonts.cairo(color: Colors.grey, fontSize: 13)),
+          hintText: t('f_gov'), hintStyle: GoogleFonts.cairo(color: Colors.grey, fontSize: 13)),
         items: govs.map((g) => DropdownMenuItem(value: g, child: Text(g, style: GoogleFonts.cairo(color: Colors.white, fontSize: 13)))).toList(),
         onChanged: (v) => setState(() => selectedGov = v),
       )),
-    _field('المدينة / المنطقة', cityCtrl),
-    _field('العنوان التفصيلي', addrCtrl, max: 2),
-    _field('رابط الموقع (خريطة)', mapCtrl, type: TextInputType.url),
-    _field('ساعات العمل', hoursCtrl),
+    _field(t('f_city'), cityCtrl),
+    _field(t('f_addr'), addrCtrl, max: 2),
+    _field(t('f_map'), mapCtrl, type: TextInputType.url),
+    _field(t('f_hours'), hoursCtrl),
   ]);
 
   Widget _s4() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    _title('جاهز للإرسال!', 'راجع التفاصيل قبل الإرسال للإدارة'),
+    _title(t('h4'), t('s4')),
     const SizedBox(height: 20),
     if (logoBytes != null || coverBytes != null)
       Row(children: [
@@ -392,12 +467,12 @@ class _S extends State<BecomeMerchantScreen> {
           child: Image.memory(coverBytes!, height: 100, fit: BoxFit.cover))),
       ]),
     if (logoBytes != null || coverBytes != null) const SizedBox(height: 16),
-    _row(Icons.storefront, 'الاسم', nameCtrl.text),
-    _row(Icons.category, 'القسم', selectedSectionName ?? '-'),
-    _row(Icons.local_offer, 'التخصص', isOtherSelected ? otherSubCtrl.text : (selectedSub ?? '-')),
-    _row(Icons.phone, 'الهاتف', phoneCtrl.text),
-    _row(Icons.location_on, 'العنوان', [selectedGov ?? '', cityCtrl.text, addrCtrl.text].where((s) => s.isNotEmpty).join(' - ')),
-    _row(Icons.access_time, 'ساعات العمل', hoursCtrl.text.isEmpty ? '-' : hoursCtrl.text),
+    _row(Icons.storefront, t('r_name'), nameCtrl.text),
+    _row(Icons.category, t('r_cat'), selectedSectionName ?? '-'),
+    _row(Icons.local_offer, t('r_sub'), isOtherSelected ? otherSubCtrl.text : (selectedSub ?? '-')),
+    _row(Icons.phone, t('r_phone'), phoneCtrl.text),
+    _row(Icons.location_on, t('r_addr'), [selectedGov ?? '', cityCtrl.text, addrCtrl.text].where((s) => s.isNotEmpty).join(' - ')),
+    _row(Icons.access_time, t('r_hours'), hoursCtrl.text.isEmpty ? '-' : hoursCtrl.text),
     const SizedBox(height: 20),
     Container(padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(color: const Color(0xFF25D366).withValues(alpha: 0.1),
@@ -406,7 +481,7 @@ class _S extends State<BecomeMerchantScreen> {
       child: Row(children: [
         const Icon(Icons.info_outline, color: Color(0xFF25D366)),
         const SizedBox(width: 10),
-        Expanded(child: Text('سيتم مراجعة طلبك من الإدارة. لن يُفعّل المتجر إلا بعد الموافقة.',
+        Expanded(child: Text(t('review_note'),
           style: GoogleFonts.cairo(color: Colors.white, fontSize: 12))),
       ])),
   ]);
@@ -455,7 +530,7 @@ class _S extends State<BecomeMerchantScreen> {
         style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14),
           side: const BorderSide(color: Colors.white24),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-        child: Text('السابق', style: GoogleFonts.cairo(color: Colors.white)))),
+        child: Text(t('back'), style: GoogleFonts.cairo(color: Colors.white)))),
       if (step > 0) const SizedBox(width: 12),
       Expanded(flex: 2, child: ElevatedButton(
         onPressed: (!_canNext() || submitting) ? null : () {
@@ -466,6 +541,6 @@ class _S extends State<BecomeMerchantScreen> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           disabledBackgroundColor: Colors.grey.shade800),
         child: submitting ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) :
-          Text(step == 3 ? 'إرسال للمراجعة' : 'التالي', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)))),
+          Text(step == 3 ? t('send') : t('next'), style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)))),
     ]));
 }
