@@ -109,18 +109,11 @@ class _MerchantManagementScreenState extends State<MerchantManagementScreen> {
   }
 
   Widget _card(Map<String, dynamic> m) {
-    final user = m['userId'] ?? {};
-    final verif = m['verificationStatus'] ?? 'pending';
-    Color color;
-    if (verif == 'verified') {
-      color = Colors.green;
-    } else if (verif == 'rejected') {
-      color = Colors.red;
-    } else {
-      color = Colors.orange;
-    }
-    final nameStr = user['name']?.toString() ?? '';
-    final phoneStr = user['phone']?.toString() ?? '';
+    final user = m['merchantId'] ?? {};
+    final isActive = m['isActive'] == true;
+    Color color = isActive ? Colors.green : Colors.orange;
+    final nameStr = user['name']?.toString() ?? m['name']?.toString() ?? '';
+    final phoneStr = user['phone']?.toString() ?? m['phone']?.toString() ?? '';
 
     return Card(
       color: const Color(0xFF3D0018),
@@ -134,11 +127,11 @@ class _MerchantManagementScreenState extends State<MerchantManagementScreen> {
               children: [
                 const Icon(Icons.store, color: Colors.amber),
                 const SizedBox(width: 8),
-                Expanded(child: Text(m['storeName'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                Expanded(child: Text(m['name'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(12)),
-                  child: Text(verif, style: const TextStyle(color: Colors.white, fontSize: 11)),
+                  child: Text(isActive ? 'مفعّل' : 'قيد المراجعة', style: const TextStyle(color: Colors.white, fontSize: 11)),
                 ),
               ],
             ),
@@ -148,7 +141,7 @@ class _MerchantManagementScreenState extends State<MerchantManagementScreen> {
               Text('صاحب الطلب: $nameStr', style: const TextStyle(color: Colors.white70, fontSize: 13)),
             if (phoneStr.isNotEmpty)
               Text('الهاتف: $phoneStr', style: const TextStyle(color: Colors.white70, fontSize: 13)),
-            if (verif == 'pending') ...[
+            if (!isActive) ...[
               const SizedBox(height: 10),
               Row(
                 children: [

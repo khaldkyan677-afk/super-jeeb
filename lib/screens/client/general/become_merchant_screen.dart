@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../services/api_service.dart';
 
 class BecomeMerchantScreen extends StatefulWidget {
@@ -86,6 +87,7 @@ class _S extends State<BecomeMerchantScreen> {
   void initState() {
     super.initState();
     _loadSections();
+    _loadDraft();
   }
 
   Future<void> _loadSections() async {
@@ -103,6 +105,72 @@ class _S extends State<BecomeMerchantScreen> {
       }
     } catch (_) {}
     if (mounted) setState(() => sectionsLoading = false);
+  }
+
+  static const _draftKey = 'merchant_draft_v1';
+
+  Future<void> _saveDraft() async {
+    try {
+      final sp = await SharedPreferences.getInstance();
+      final d = {
+        'step': step,
+        'name': nameCtrl.text,
+        'desc': descCtrl.text,
+        'phone': phoneCtrl.text,
+        'city': cityCtrl.text,
+        'addr': addrCtrl.text,
+        'map': mapCtrl.text,
+        'hours': hoursCtrl.text,
+        'other': otherSubCtrl.text,
+        'sectionId': selectedSectionId,
+        'sectionName': selectedSectionName,
+        'sub': selectedSub,
+        'gov': selectedGov,
+        'isOther': isOtherSelected,
+        'lang': lang,
+        'logo': logoBytes != null ? base64Encode(logoBytes!) : null,
+        'cover': coverBytes != null ? base64Encode(coverBytes!) : null,
+      };
+      await sp.setString(_draftKey, jsonEncode(d));
+    } catch (_) {}
+  }
+
+  Future<void> _loadDraft() async {
+    try {
+      final sp = await SharedPreferences.getInstance();
+      final raw = sp.getString(_draftKey);
+      if (raw == null) return;
+      final d = jsonDecode(raw) as Map<String, dynamic>;
+      if (!mounted) return;
+      setState(() {
+        step = (d['step'] as int?) ?? 0;
+        nameCtrl.text = (d['name'] as String?) ?? '';
+        descCtrl.text = (d['desc'] as String?) ?? '';
+        phoneCtrl.text = (d['phone'] as String?) ?? '';
+        cityCtrl.text = (d['city'] as String?) ?? '';
+        addrCtrl.text = (d['addr'] as String?) ?? '';
+        mapCtrl.text = (d['map'] as String?) ?? '';
+        hoursCtrl.text = (d['hours'] as String?) ?? '';
+        otherSubCtrl.text = (d['other'] as String?) ?? '';
+        selectedSectionId = d['sectionId'] as String?;
+        selectedSectionName = d['sectionName'] as String?;
+        selectedSub = d['sub'] as String?;
+        selectedGov = d['gov'] as String?;
+        isOtherSelected = (d['isOther'] as bool?) ?? false;
+        lang = (d['lang'] as String?) ?? 'ar';
+        final lb = d['logo'] as String?;
+        final cb = d['cover'] as String?;
+        if (lb != null) logoBytes = base64Decode(lb);
+        if (cb != null) coverBytes = base64Decode(cb);
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _clearDraft() async {
+    try {
+      final sp = await SharedPreferences.getInstance();
+      await sp.remove(_draftKey);
+    } catch (_) {}
   }
 
   Future<void> _pick(bool isLogo) async {
@@ -163,6 +231,7 @@ class _S extends State<BecomeMerchantScreen> {
       if (!mounted) return;
       setState(() => submitting = false);
       if (r.statusCode == 200 || r.statusCode == 201) {
+        await _clearDraft();
         _success();
       } else {
     _snack("${t('fail')}: ${r.statusCode}");
@@ -215,7 +284,7 @@ class _S extends State<BecomeMerchantScreen> {
       'review_note': 'سيتم مراجعة طلبك من الإدارة. لن يُفعّل المتجر إلا بعد الموافقة.',
       'loading': 'جاري التحميل...',
       'success_t': 'تم الإرسال!', 'success_b': 'طلبك قيد المراجعة من الإدارة. سيتم إشعارك بعد الموافقة.',
-      'ok': 'حسناً', 'fail': 'فشل الإرسال', 'err': 'خطأ',
+      'ok': 'حسناً', 'save_draft': 'حفظ كمسودة', 'draft_saved': 'تم حفظ المسودة', 'fail': 'فشل الإرسال', 'err': 'خطأ',
     },
     'en': {
       'title': 'Store Setup',
@@ -237,7 +306,7 @@ class _S extends State<BecomeMerchantScreen> {
       'review_note': 'Your request will be reviewed by admin. Store will not be activated until approved.',
       'loading': 'Loading...',
       'success_t': 'Submitted!', 'success_b': 'Your request is under review. You will be notified after approval.',
-      'ok': 'OK', 'fail': 'Failed to send', 'err': 'Error',
+      'ok': 'OK', 'save_draft': 'Save draft', 'draft_saved': 'Draft saved', 'fail': 'Failed to send', 'err': 'Error',
     },
   };
 
@@ -524,7 +593,13 @@ class _S extends State<BecomeMerchantScreen> {
     ]));
 
   Widget _bottomBar() => Container(padding: const EdgeInsets.all(16),
-    child: Row(children: [
+    child: Column(mainAxisSize: MainAxisSize.min, children: [
+      if (step > 0) Padding(padding: const EdgeInsets.only(bottom: 10), child: TextButton.icon(
+        onPressed: () async { await _saveDraft(); if (mounted) _snack(lang == 'ar' ? 'تم حفظ المسودة' : 'Draft saved'); },
+        icon: const Icon(Icons.save_outlined, color: Color(0xFFEF7E3C), size: 18),
+        label: Text(lang == 'ar' ? 'حفظ كمسودة' : 'Save draft', style: GoogleFonts.cairo(color: const Color(0xFFEF7E3C), fontSize: 13)),
+      )),
+      Row(children: [
       if (step > 0) Expanded(child: OutlinedButton(
         onPressed: () => setState(() => step--),
         style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14),
@@ -534,7 +609,7 @@ class _S extends State<BecomeMerchantScreen> {
       if (step > 0) const SizedBox(width: 12),
       Expanded(flex: 2, child: ElevatedButton(
         onPressed: (!_canNext() || submitting) ? null : () {
-          if (step == 3) { _submit(); } else { setState(() => step++); }
+          if (step == 3) { _submit(); } else { _saveDraft(); setState(() => step++); }
         },
         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF7E3C),
           padding: const EdgeInsets.symmetric(vertical: 14),
@@ -542,5 +617,6 @@ class _S extends State<BecomeMerchantScreen> {
           disabledBackgroundColor: Colors.grey.shade800),
         child: submitting ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) :
           Text(step == 3 ? t('send') : t('next'), style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)))),
+      ]),
     ]));
 }

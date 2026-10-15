@@ -67,46 +67,33 @@ exports.deleteMerchant = async (req, res) => {
 exports.verifyMerchant = async (req, res) => {
   try {
     const { action, reason } = req.body;
-    const update = {};
+    const Store = require('../models/Store');
+    const User = require('../models/User');
+    const store = await Store.findById(req.params.id);
+    if (!store) return res.status(404).json({ error: 'Not found' });
     if (action === 'accept') {
-      update.verificationStatus = 'verified';
-      update.isActive = true;
+      store.isActive = true;
+      await store.save();
+      await User.findByIdAndUpdate(store.merchantId, { role: 'merchant', status: 'approved' });
     } else if (action === 'reject') {
-      update.verificationStatus = 'rejected';
-      update.rejectionReason = reason || '';
-      update.isActive = false;
+      store.isActive = false;
+      await store.save();
     } else {
       return res.status(400).json({ error: 'Invalid action' });
     }
-    const m = await Merchant.findByIdAndUpdate(req.params.id, update, { returnDocument: 'after' });
-    if (!m) return res.status(404).json({ error: 'Not found' });
-    if (action === 'accept') {
-      const User = require('../models/User');
-      await User.findByIdAndUpdate(m.userId, { role: 'merchant', status: 'approved' });
-      const Store = require('../models/Store');
-      const existing = await Store.findOne({ merchantId: m.userId });
-      if (existing) {
-        await Store.updateOne({ _id: existing._id }, { isActive: true });
-      } else {
-        await Store.create({
-          name: m.storeName,
-          merchantId: m.userId,
-          category: m.category || '',
-          location: m.location || {},
-          isActive: true,
-        });
-      }
-    }
-    res.json(m);
+    res.json(store);
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
 
 exports.getAllMerchantsAdmin = async (req, res) => {
   try {
+    const Store = require('../models/Store');
+    const User = require('../models/User');
     const filter = {};
-    if (req.query.verificationStatus) filter.verificationStatus = req.query.verificationStatus;
-    const list = await Merchant.find(filter)
-      .populate('userId', 'name phone')
+    if (req.query.verificationStatus === 'pending') filter.isActive = false;
+    if (req.query.verificationStatus === 'verified') filter.isActive = true;
+    const list = await Store.find(filter)
+      .populate('merchantId', 'name phone email')
       .sort({ createdAt: -1 });
     res.json(list);
   } catch (e) { res.status(500).json({ error: e.message }); }
