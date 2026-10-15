@@ -1,3 +1,4 @@
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -83,9 +84,10 @@ class _MerchantManagementScreenState extends State<MerchantManagementScreen> {
                   ),
           ),
         ],
-      ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _tab(int idx, String label) {
     final sel = _filter == idx;
@@ -108,6 +110,118 @@ class _MerchantManagementScreenState extends State<MerchantManagementScreen> {
     );
   }
 
+  void _showDetails(Map<String, dynamic> m) {
+    final user = m['merchantId'] ?? {};
+    final isActive = m['isActive'] == true;
+    final logo = m['logoUrl']?.toString() ?? '';
+    final cover = m['coverUrl']?.toString() ?? '';
+    final name = m['name']?.toString() ?? '';
+    final desc = m['description']?.toString() ?? '';
+    final cat = m['category']?.toString() ?? '';
+    final sub = m['subCategory']?.toString() ?? '';
+    final phone = m['phone']?.toString() ?? user['phone']?.toString() ?? '';
+    final userPhone = user['phone']?.toString() ?? '';
+    final userName = user['name']?.toString() ?? '';
+    final addr = m['location']?['address']?.toString() ?? '';
+    final mapUrl = m['mapUrl']?.toString() ?? '';
+    final hours = m['workingHours']?.toString() ?? '';
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1A1B26),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                const Icon(Icons.store, color: Color(0xFFEF7E3C), size: 26),
+                const SizedBox(width: 10),
+                Expanded(child: Text('تفاصيل المتجر', style: GoogleFonts.cairo(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold))),
+                IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () => Navigator.pop(context)),
+              ]),
+              const SizedBox(height: 10),
+              if (cover.isNotEmpty) ...[
+                ClipRRect(borderRadius: BorderRadius.circular(12), child: _imgWidget(cover, 140)),
+                const SizedBox(height: 14),
+              ],
+              if (logo.isNotEmpty) ...[
+                Row(children: [
+                  ClipRRect(borderRadius: BorderRadius.circular(50), child: _imgWidget(logo, 70, width: 70)),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(name, style: GoogleFonts.cairo(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold))),
+                ]),
+                const SizedBox(height: 14),
+              ] else ...[
+                Text(name, style: GoogleFonts.cairo(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+              ],
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isActive ? Colors.green.withValues(alpha: 0.2) : Colors.orange.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: isActive ? Colors.green : Colors.orange),
+                ),
+                child: Text(isActive ? 'مفعّل' : 'قيد المراجعة', style: GoogleFonts.cairo(color: isActive ? Colors.green : Colors.orange, fontWeight: FontWeight.bold, fontSize: 12)),
+              ),
+              const SizedBox(height: 16),
+              _detailRow('المالك', userName),
+              _detailRow('هاتف المالك', userPhone),
+              _detailRow('هاتف المتجر', phone),
+              _detailRow('القسم', cat),
+              _detailRow('التخصص', sub),
+              _detailRow('الوصف', desc),
+              _detailRow('العنوان', addr),
+              _detailRow('ساعات العمل', hours),
+              _detailRow('رابط الخريطة', mapUrl),
+              const SizedBox(height: 20),
+              if (!isActive) Row(children: [
+                Expanded(child: ElevatedButton.icon(
+                  onPressed: () { Navigator.pop(context); _verify(m['_id'], 'accept'); },
+                  icon: const Icon(Icons.check_circle, color: Colors.white, size: 18),
+                  label: Text('قبول', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green, padding: const EdgeInsets.symmetric(vertical: 14)),
+                )),
+                const SizedBox(width: 10),
+                Expanded(child: ElevatedButton.icon(
+                  onPressed: () { Navigator.pop(context); _verify(m['_id'], 'reject'); },
+                  icon: const Icon(Icons.cancel, color: Colors.white, size: 18),
+                  label: Text('رفض', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red, padding: const EdgeInsets.symmetric(vertical: 14)),
+                )),
+              ]),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _imgWidget(String url, double h, {double? width}) {
+    if (url.startsWith('data:image')) {
+      try {
+        final parts = url.split(',');
+        return Image.memory(base64Decode(parts[1]), height: h, width: width, fit: BoxFit.cover);
+      } catch (_) { return Container(height: h, width: width, color: Colors.grey); }
+    }
+    return Image.network(url, height: h, width: width, fit: BoxFit.cover, errorBuilder: (_, _, _) => Container(height: h, width: width, color: Colors.grey));
+  }
+
+  Widget _detailRow(String label, String value) {
+    if (value.trim().isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        SizedBox(width: 100, child: Text(label, style: GoogleFonts.cairo(color: Colors.grey, fontSize: 13))),
+        Expanded(child: Text(value, style: GoogleFonts.cairo(color: Colors.white, fontSize: 13))),
+      ]),
+    );
+  }
+
   Widget _card(Map<String, dynamic> m) {
     final user = m['merchantId'] ?? {};
     final isActive = m['isActive'] == true;
@@ -115,7 +229,9 @@ class _MerchantManagementScreenState extends State<MerchantManagementScreen> {
     final nameStr = user['name']?.toString() ?? m['name']?.toString() ?? '';
     final phoneStr = user['phone']?.toString() ?? m['phone']?.toString() ?? '';
 
-    return Card(
+    return GestureDetector(
+      onTap: () => _showDetails(m),
+      child: Card(
       color: const Color(0xFF3D0018),
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -164,6 +280,7 @@ class _MerchantManagementScreenState extends State<MerchantManagementScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 
