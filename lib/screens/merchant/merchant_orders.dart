@@ -49,7 +49,7 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
         shortId: '#${oid.length >= 6 ? oid.substring(0, 6) : oid}',
         customer: client?['name'] ?? 'عميل',
         phone: client?['phone'] ?? '—',
-      itemsCount: items.isEmpty ? 'لا منتجات' : (items.take(2).map((it) => '${it['"'"'name'"'"']} ×${it['"'"'quantity'"'"']}').join('، ') + (items.length > 2 ? ' +${items.length - 2}' : '')),
+      itemsCount: items.isEmpty ? 'لا منتجات' : (items.take(2).map((it) => '${it['name']} ×${it['quantity']}').join('، ') + (items.length > 2 ? ' +${items.length - 2}' : '')),
         total: '${o['total'] ?? 0}',
         statusLabel: statusMap[o['status']] ?? 'جديدة',
         rawStatus: o['status'] ?? 'pending',
