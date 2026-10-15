@@ -100,7 +100,10 @@ exports.getMerchantOrders = async (req, res) => {
     const stores = await Store.find({ merchantId: req.user._id, isActive: true });
     const storeIds = stores.map(s => s._id);
 
-    const filter = { storeId: { $in: storeIds } };
+    const filter = {
+      storeId: { $in: storeIds },
+      status: { $in: ['accepted', 'preparing', 'ready', 'on_the_way', 'delivered'] },
+    };
     if (req.query.status) filter.status = req.query.status;
 
     const orders = await Order.find(filter)

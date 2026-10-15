@@ -53,6 +53,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
       appBar: AppBar(
         backgroundColor: MJ.bg,
         elevation: 0,
+        leading: const BackButton(color: Colors.white),
         title: Text('المنتجات', style: GoogleFonts.cairo(color: MJ.text, fontWeight: FontWeight.bold)),
         centerTitle: true,
         actions: [

@@ -53,7 +53,11 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
         total: '${o['total'] ?? 0}',
         statusLabel: statusMap[o['status']] ?? 'جديدة',
         rawStatus: o['status'] ?? 'pending',
-        payment: 'نقداً',
+      payment: _paymentLabel(
+        (o['paymentMethod'] ?? 'cash').toString(),
+        (o['paymentStatus'] ?? 'unpaid').toString(),
+        (o['verificationStatus'] ?? 'none').toString(),
+      ),
         address: o['address'] ?? 'صنعاء',
         driver: driver?['name'] ?? 'لا يوجد',
         notes: o['notes'] ?? '',
@@ -70,6 +74,13 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MJ.bg,
+      appBar: AppBar(
+        backgroundColor: MJ.bg,
+        elevation: 0,
+        leading: const BackButton(color: Colors.white),
+        title: Text('\u0627\u0644\u0637\u0644\u0628\u0627\u062a', style: GoogleFonts.cairo(color: MJ.text, fontWeight: FontWeight.bold)),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -353,6 +364,16 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen>
     );
   }
 }
+
+
+  String _paymentLabel(String method, String status, String verif) {
+    if (method == 'bank' || method == 'wallet') {
+      if (verif == 'pending') return 'بنكي - تحقق معلق';
+      if (status == 'paid') return 'بنكي - مدفوع ✓';
+      return 'بنكي';
+    }
+    return 'كاش عند التسليم';
+  }
 
 class _Order {
   final String id, shortId, customer, phone, itemsCount, total, statusLabel, rawStatus, payment, address, driver, notes;
