@@ -15,6 +15,8 @@ const storeSchema = new mongoose.Schema({
   description: { type: String, default: '' },
   phone: { type: String, default: '' },
   subCategory: { type: String, default: '' },
+  mapUrl: { type: String, default: '' },
+  workingHours: { type: String, default: '' },
   sectionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Section' },
   location: { lat: Number, lng: Number, address: String },
   isActive: { type: Boolean, default: true },

@@ -25,8 +25,26 @@ exports.getMyMerchant = async (req, res) => {
 
 exports.createMerchant = async (req, res) => {
   try {
-    const m = await Merchant.create({ ...req.body, userId: req.user._id });
-    res.status(201).json(m);
+    const Store = require('../models/Store');
+    const body = req.body || {};
+    const existing = await Store.findOne({ merchantId: req.user._id });
+    if (existing) return res.status(400).json({ error: 'لديك متجر بالفعل' });
+    const store = await Store.create({
+      merchantId: req.user._id,
+      name: body.storeName || body.name || '',
+      description: body.description || '',
+      category: body.category || '',
+      subCategory: body.subCategory || '',
+      sectionId: body.sectionId || null,
+      phone: body.phone || '',
+      logoUrl: body.logoUrl || '',
+      coverUrl: body.coverUrl || '',
+      location: body.location || {},
+      mapUrl: body.mapUrl || '',
+      workingHours: body.workingHours || '',
+      isActive: false,
+    });
+    res.status(201).json({ _id: store._id, store });
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
 
@@ -67,7 +85,9 @@ exports.verifyMerchant = async (req, res) => {
       await User.findByIdAndUpdate(m.userId, { role: 'merchant', status: 'approved' });
       const Store = require('../models/Store');
       const existing = await Store.findOne({ merchantId: m.userId });
-      if (!existing) {
+      if (existing) {
+        await Store.updateOne({ _id: existing._id }, { isActive: true });
+      } else {
         await Store.create({
           name: m.storeName,
           merchantId: m.userId,
