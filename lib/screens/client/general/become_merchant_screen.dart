@@ -1,11 +1,10 @@
-// become_merchant_screen.dart - Full Wizard
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:typed_data';
-import '../../../services/api_service.dart';
 import 'package:http/http.dart' as http;
+import '../../../services/api_service.dart';
 
 class BecomeMerchantScreen extends StatefulWidget {
   const BecomeMerchantScreen({super.key});
@@ -15,53 +14,72 @@ class BecomeMerchantScreen extends StatefulWidget {
 
 class _S extends State<BecomeMerchantScreen> {
   int step = 0;
-  bool loading = false;
+  bool sectionsLoading = true;
   bool submitting = false;
   List<Map<String, dynamic>> sections = [];
 
   final nameCtrl = TextEditingController();
   final descCtrl = TextEditingController();
   final phoneCtrl = TextEditingController();
-  final govCtrl = TextEditingController();
   final cityCtrl = TextEditingController();
   final addrCtrl = TextEditingController();
   final mapCtrl = TextEditingController();
   final hoursCtrl = TextEditingController();
+  final otherSubCtrl = TextEditingController();
 
   String? selectedSectionId;
   String? selectedSectionName;
   String? selectedSub;
+  String? selectedGov;
+  bool isOtherSelected = false;
 
   Uint8List? logoBytes;
   Uint8List? coverBytes;
 
+  static const List<String> govs = [
+    'أمانة العاصمة', 'صنعاء', 'عدن', 'تعز', 'الحديدة', 'حضرموت',
+    'إب', 'لحج', 'أبين', 'شبوة', 'المهرة', 'مأرب', 'الجوف',
+    'صعدة', 'حجة', 'المحويت', 'ريمة', 'الضالع', 'البيضاء', 'ذمار',
+    'عمران', 'سقطرى'
+  ];
+
   static const Map<String, List<Map<String, String>>> subs = {
-    'سوبرماركت': [
-      {'n': 'خضار وفواكه', 'i': '🥬'}, {'n': 'ألبان وأجبان', 'i': '🥛'},
-      {'n': 'معلبات', 'i': '🥫'}, {'n': 'مشروبات', 'i': '🥤'},
-      {'n': 'لحوم ودواجن', 'i': '🍗'}, {'n': 'مخبوزات', 'i': '🥖'},
-    ],
     'مطاعم': [
-      {'n': 'وجبات سريعة', 'i': '🍔'}, {'n': 'مشويات', 'i': '🍖'},
-      {'n': 'حلويات', 'i': '🍰'}, {'n': 'فطور', 'i': '🥞'},
-      {'n': 'عصائر', 'i': '🧃'}, {'n': 'بحري', 'i': '🐟'},
+      {'n': 'مطعم بروست', 'i': '🍗'}, {'n': 'مطعم سمك', 'i': '🐟'},
+      {'n': 'مطعم شعبي', 'i': '🍲'}, {'n': 'كافتيريا', 'i': '🍽️'},
+      {'n': 'كافيه', 'i': '☕'}, {'n': 'مشويات', 'i': '🍖'},
+      {'n': 'وجبات سريعة', 'i': '🍔'}, {'n': 'حلويات', 'i': '🍰'},
+      {'n': 'فطور', 'i': '🥞'}, {'n': 'بيتزا', 'i': '🍕'},
+      {'n': 'شاورما', 'i': '🌯'}, {'n': 'بحري', 'i': '🦐'},
     ],
     'متاجر': [
-      {'n': 'ملابس', 'i': '👕'}, {'n': 'إلكترونيات', 'i': '📱'},
-      {'n': 'ألعاب', 'i': '🎮'}, {'n': 'عطور', 'i': '🌸'},
-      {'n': 'أحذية', 'i': '👟'}, {'n': 'حقائب', 'i': '👜'},
+      {'n': 'إلكترونيات', 'i': '📱'}, {'n': 'ملابس رجالية', 'i': '👔'},
+      {'n': 'ملابس نسائية', 'i': '👗'}, {'n': 'ملابس ولادية', 'i': '👶'},
+      {'n': 'ملابس بناتية', 'i': '👚'}, {'n': 'عطور', 'i': '🌸'},
+      {'n': 'عبايات', 'i': '🧕'}, {'n': 'إكسسوارات', 'i': '💍'},
+      {'n': 'تجميل وعناية', 'i': '💄'}, {'n': 'أحذية', 'i': '👟'},
+      {'n': 'مكسرات', 'i': '🥜'}, {'n': 'أقمشة', 'i': '🧵'},
+    ],
+    'بقالات': [
+      {'n': 'مواد غذائية', 'i': '🍚'}, {'n': 'خضار وفواكه', 'i': '🥬'},
     ],
     'صيدليات': [
       {'n': 'أدوية', 'i': '💊'}, {'n': 'عناية شخصية', 'i': '🧴'},
-      {'n': 'تجميل', 'i': '💄'}, {'n': 'مكملات', 'i': '💪'},
-      {'n': 'أطفال', 'i': '🍼'}, {'n': 'طبية', 'i': '🩺'},
-    ],
-    'بقالات': [
-      {'n': 'مواد غذائية', 'i': '🍚'}, {'n': 'مشروبات', 'i': '🥤'},
-      {'n': 'منظفات', 'i': '🧼'}, {'n': 'سناكس', 'i': '🍿'},
-      {'n': 'بقوليات', 'i': '🫘'}, {'n': 'توابل', 'i': '🧂'},
+      {'n': 'تجميل', 'i': '💄'}, {'n': 'مكملات غذائية', 'i': '💪'},
+      {'n': 'مستلزمات أطفال', 'i': '🍼'}, {'n': 'أجهزة طبية', 'i': '🩺'},
     ],
   };
+
+  String _sectionEmoji(String name) {
+    if (name.contains('سوبر')) return '🛒';
+    if (name.contains('مطاعم') || name.contains('مطعم')) return '🍔';
+    if (name.contains('متاجر') || name.contains('متجر')) return '🛍️';
+    if (name.contains('صيدل')) return '💊';
+    if (name.contains('بقال')) return '🏪';
+    return '🏪';
+  }
+
+  final _subsKey = GlobalKey();
 
   @override
   void initState() {
@@ -71,37 +89,47 @@ class _S extends State<BecomeMerchantScreen> {
 
   Future<void> _loadSections() async {
     try {
-      final r = await http.get(Uri.parse(ApiService.baseUrl + '/api/sections'));
+      final r = await http.get(Uri.parse('\${ApiService.baseUrl}/api/sections'));
       if (r.statusCode == 200) {
-        final data = jsonDecode(r.body);
-        if (data is List) {
-          setState(() => sections = data.map((e) => Map<String, dynamic>.from(e)).toList());
+        final d = jsonDecode(r.body);
+        if (d is List) {
+          setState(() {
+            sections = d.map((e) => Map<String, dynamic>.from(e)).toList();
+            sectionsLoading = false;
+          });
+          return;
         }
       }
-    } catch (e) {
-      debugPrint('loadSections: ' + e.toString());
-    }
+    } catch (_) {}
+    if (mounted) setState(() => sectionsLoading = false);
   }
 
-  Future<void> _pickImage(bool isLogo) async {
+  Future<void> _pick(bool isLogo) async {
     final p = ImagePicker();
     final x = await p.pickImage(source: ImageSource.gallery, imageQuality: 60, maxWidth: 1000);
     if (x == null) return;
     final b = await x.readAsBytes();
-    setState(() {
-      if (isLogo) { logoBytes = b; } else { coverBytes = b; }
-    });
+    if (!mounted) return;
+    setState(() { if (isLogo) { logoBytes = b; } else { coverBytes = b; } });
   }
 
-  String? _toBase64(Uint8List? b) {
-    if (b == null) return null;
-    return 'data:image/jpeg;base64,' + base64Encode(b);
+  String? _b64(Uint8List? b) => b == null ? null : 'data:image/jpeg;base64,\${base64Encode(b)}';
+
+  bool _validPhone(String p) {
+    final t = p.trim();
+    if (t.length < 9) return false;
+    return ['70', '71', '73', '77', '78'].contains(t.substring(0, 2));
   }
 
   bool _canNext() {
-    if (step == 0) return nameCtrl.text.trim().isNotEmpty;
-    if (step == 1) return selectedSectionId != null && selectedSub != null;
-    if (step == 2) return phoneCtrl.text.trim().isNotEmpty;
+    if (step == 0) return nameCtrl.text.trim().length >= 3;
+    if (step == 1) {
+      if (selectedSectionId == null) return false;
+      if (selectedSectionName != null && selectedSectionName!.contains('سوبر')) return true;
+      if (isOtherSelected) return otherSubCtrl.text.trim().isNotEmpty;
+      return selectedSub != null;
+    }
+    if (step == 2) return _validPhone(phoneCtrl.text) && selectedGov != null;
     return true;
   }
 
@@ -112,40 +140,43 @@ class _S extends State<BecomeMerchantScreen> {
         'storeName': nameCtrl.text.trim(),
         'description': descCtrl.text.trim(),
         'category': selectedSectionName ?? '',
-        'subCategory': selectedSub ?? '',
+        'subCategory': isOtherSelected ? otherSubCtrl.text.trim() : (selectedSub ?? ''),
         'sectionId': selectedSectionId,
         'phone': phoneCtrl.text.trim(),
-        'address': [govCtrl.text, cityCtrl.text, addrCtrl.text].where((s) => s.trim().isNotEmpty).join(' - '),
+        'address': [selectedGov ?? '', cityCtrl.text, addrCtrl.text].where((s) => s.isNotEmpty).join(' - '),
         'location': {'lat': 0, 'lng': 0, 'address': addrCtrl.text.trim()},
         'mapUrl': mapCtrl.text.trim(),
         'workingHours': hoursCtrl.text.trim(),
-        'logoUrl': _toBase64(logoBytes),
-        'coverUrl': _toBase64(coverBytes),
-        'image': _toBase64(logoBytes),
+        'logoUrl': _b64(logoBytes),
+        'coverUrl': _b64(coverBytes),
+        'image': _b64(logoBytes),
       };
       final r = await http.post(
-        Uri.parse(ApiService.baseUrl + '/api/merchants'),
-        headers: {'Content-Type': 'application/json', if (ApiService.authToken != null) 'Authorization': 'Bearer ' + ApiService.authToken!},
+        Uri.parse('\${ApiService.baseUrl}/api/merchants'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (ApiService.authToken != null) 'Authorization': 'Bearer \${ApiService.authToken!}',
+        },
         body: jsonEncode(body),
       );
       if (!mounted) return;
       setState(() => submitting = false);
       if (r.statusCode == 200 || r.statusCode == 201) {
-        _showSuccess();
+        _success();
       } else {
-        _snack('فشل الإرسال، حاول مرة أخرى');
+        _snack('فشل الإرسال: \${r.statusCode}');
       }
     } catch (e) {
       if (!mounted) return;
       setState(() => submitting = false);
-      _snack('حدث خطأ: ' + e.toString());
+      _snack('خطأ: \${e.toString()}');
     }
   }
 
   void _snack(String s) => ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(content: Text(s, style: GoogleFonts.cairo(color: Colors.white)), backgroundColor: const Color(0xFF25D366)));
 
-  void _showSuccess() {
+  void _success() {
     showDialog(context: context, barrierDismissible: false, builder: (c) => AlertDialog(
       backgroundColor: const Color(0xFF1A1B26),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -167,8 +198,7 @@ class _S extends State<BecomeMerchantScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D12),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0D0D12),
-        elevation: 0,
+        backgroundColor: const Color(0xFF0D0D12), elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context)),
         title: Text('إعداد متجرك', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.w600)),
@@ -176,7 +206,7 @@ class _S extends State<BecomeMerchantScreen> {
       ),
       body: Column(children: [
         _stepper(),
-        Expanded(child: SingleChildScrollView(padding: const EdgeInsets.all(16), child: _stepBody())),
+        Expanded(child: SingleChildScrollView(padding: const EdgeInsets.all(16), child: _body())),
         _bottomBar(),
       ]),
     );
@@ -184,8 +214,7 @@ class _S extends State<BecomeMerchantScreen> {
 
   Widget _stepper() {
     final titles = ['الهوية', 'النشاط', 'التواصل', 'الإطلاق'];
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+    return Container(padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
       child: Row(children: List.generate(4, (i) {
         final active = i <= step;
         return Expanded(child: Column(children: [
@@ -205,111 +234,187 @@ class _S extends State<BecomeMerchantScreen> {
     );
   }
 
-  Widget _stepBody() {
-    if (step == 0) return _step1();
-    if (step == 1) return _step2();
-    if (step == 2) return _step3();
-    return _step4();
+  Widget _body() {
+    if (step == 0) return _s1();
+    if (step == 1) return _s2();
+    if (step == 2) return _s3();
+    return _s4();
   }
 
-  Widget _step1() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  Widget _s1() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     _title('هوية المتجر', 'قم بإعداد اسم متجرك ووصفه'),
     const SizedBox(height: 20),
     _field('اسم المتجر *', nameCtrl),
     _field('وصف المتجر (اختياري)', descCtrl, max: 3),
     const SizedBox(height: 16),
-    Text('شعار المتجر', style: GoogleFonts.cairo(color: Colors.white, fontSize: 13)),
+    Text('شعار وغلاف المتجر', style: GoogleFonts.cairo(color: Colors.white, fontSize: 13)),
     const SizedBox(height: 8),
     Row(children: [
-      _imgBox('الشعار', logoBytes, () => _pickImage(true)),
+      _imgBox('الشعار', logoBytes, () => _pick(true)),
       const SizedBox(width: 12),
-      _imgBox('الغلاف', coverBytes, () => _pickImage(false)),
+      _imgBox('الغلاف', coverBytes, () => _pick(false)),
     ]),
   ]);
 
-  Widget _step2() {
-    final subList = selectedSectionName != null ? (subs[selectedSectionName!] ?? []) : <Map<String, String>>[];
+  Widget _s2() {
+    final sl = selectedSectionName != null ? (subs[selectedSectionName!] ?? []) : <Map<String, String>>[];
+    final need = selectedSectionName != null && !selectedSectionName!.contains('سوبر');
+    if (sectionsLoading) {
+      return Column(children: [
+        _title('نشاط العمل', 'جاري التحميل...'),
+        const SizedBox(height: 30),
+        const Center(child: CircularProgressIndicator(color: Color(0xFFEF7E3C))),
+      ]);
+    }
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _title('نشاط العمل', 'ما نوع المنتجات التي يبيعها متجرك؟'),
+      _title('نشاط العمل', 'اختر نوع المتجر'),
       const SizedBox(height: 16),
-      if (sections.isEmpty)
-        const Center(child: CircularProgressIndicator(color: Color(0xFFEF7E3C)))
-      else
-        Wrap(spacing: 10, runSpacing: 10, children: sections.map((s) {
+      GridView.count(
+        crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
+        crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: 2.4,
+        children: sections.map((s) {
           final id = s['_id']?.toString() ?? '';
           final nm = s['name']?.toString() ?? '';
           final sel = selectedSectionId == id;
           return GestureDetector(
-            onTap: () => setState(() { selectedSectionId = id; selectedSectionName = nm; selectedSub = null; }),
-            child: Container(width: 100, padding: const EdgeInsets.all(12),
+            onTap: () {
+              setState(() {
+                selectedSectionId = id; selectedSectionName = nm;
+                selectedSub = null; isOtherSelected = false; otherSubCtrl.clear();
+              });
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final ctx = _subsKey.currentContext;
+                if (ctx != null) Scrollable.ensureVisible(ctx, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+              });
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: sel ? const Color(0xFFEF7E3C).withOpacity(0.15) : const Color(0xFF1A1B26),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: sel ? const Color(0xFFEF7E3C) : Colors.transparent, width: 2)),
-              child: Column(children: [
-                Text(s['iconName']?.toString() ?? '🏪', style: const TextStyle(fontSize: 28)),
-                const SizedBox(height: 8),
-                Text(nm, textAlign: TextAlign.center, style: GoogleFonts.cairo(color: Colors.white, fontSize: 12)),
-              ])));
+                color: sel ? const Color(0xFFEF7E3C).withValues(alpha: 0.2) : const Color(0xFF1A1B26),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: sel ? const Color(0xFFEF7E3C) : Colors.white12, width: 2),
+                boxShadow: sel ? [BoxShadow(color: const Color(0xFFEF7E3C).withValues(alpha: 0.4), blurRadius: 12, offset: const Offset(0, -4))] : [],
+              ),
+              child: Row(children: [
+                Text(_sectionEmoji(nm), style: const TextStyle(fontSize: 26)),
+                const SizedBox(width: 10),
+                Expanded(child: Text(nm, style: GoogleFonts.cairo(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700), overflow: TextOverflow.ellipsis)),
+                if (sel) const Icon(Icons.check_circle, color: Color(0xFFEF7E3C), size: 20),
+              ]),
+            ),
+          );
         }).toList()),
-      if (selectedSectionId != null && subList.isNotEmpty) ...[
-        const SizedBox(height: 24),
-        Text('التخصص الدقيق *', style: GoogleFonts.cairo(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 12),
-        Wrap(spacing: 8, runSpacing: 8, children: subList.map((s) {
-          final sel = selectedSub == s['n'];
-          return GestureDetector(
-            onTap: () => setState(() => selectedSub = s['n']),
-            child: Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: sel ? const Color(0xFFEF7E3C) : const Color(0xFF1A1B26),
-                borderRadius: BorderRadius.circular(20)),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text(s['i']!, style: const TextStyle(fontSize: 16)),
-                const SizedBox(width: 6),
-                Text(s['n']!, style: GoogleFonts.cairo(color: Colors.white, fontSize: 12)),
-              ])));
-        }).toList()),
+      if (selectedSectionId != null && need) ...[
+        const SizedBox(height: 20),
+        Text('التخصص الدقيق *', key: _subsKey, style: GoogleFonts.cairo(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 10),
+        GridView.count(
+          crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 2.8,
+          children: [
+            ...sl.map((s) {
+              final sel = selectedSub == s['n'] && !isOtherSelected;
+              return GestureDetector(
+                onTap: () => setState(() { selectedSub = s['n']; isOtherSelected = false; }),
+                child: Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: sel ? const Color(0xFFEF7E3C) : const Color(0xFF1A1B26),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: sel ? const Color(0xFFEF7E3C) : Colors.white12)),
+                  child: Row(children: [
+                    Text(s['i']!, style: const TextStyle(fontSize: 16)),
+                    const SizedBox(width: 6),
+                    Expanded(child: Text(s['n']!, style: GoogleFonts.cairo(color: Colors.white, fontSize: 11), overflow: TextOverflow.ellipsis)),
+                  ])));
+            }),
+            GestureDetector(
+              onTap: () => setState(() { isOtherSelected = true; selectedSub = '__other__'; }),
+              child: Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isOtherSelected ? const Color(0xFFEF7E3C) : const Color(0xFF1A1B26),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: isOtherSelected ? const Color(0xFFEF7E3C) : Colors.white12)),
+                child: Row(children: [
+                  const Icon(Icons.add_circle_outline, color: Colors.white, size: 18),
+                  const SizedBox(width: 6),
+                  Expanded(child: Text('أخرى', style: GoogleFonts.cairo(color: Colors.white, fontSize: 11))),
+                ]))),
+          ]),
+        if (isOtherSelected) ...[
+          const SizedBox(height: 14),
+          TextField(controller: otherSubCtrl, textAlign: TextAlign.right,
+            style: GoogleFonts.cairo(color: Colors.white),
+            decoration: InputDecoration(hintText: 'اكتب نوع متجرك', hintStyle: GoogleFonts.cairo(color: Colors.grey, fontSize: 13),
+              filled: true, fillColor: const Color(0xFF1A1B26),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+              contentPadding: const EdgeInsets.all(14)),
+            onChanged: (_) => setState(() {})),
+        ],
       ],
     ]);
   }
 
-  Widget _step3() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    _title('معلومات التواصل', 'أضف معلومات التواصل الخاصة بمتجرك'),
+  Widget _s3() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    _title('معلومات التواصل', 'أضف بيانات التواصل الخاصة بمتجرك'),
     const SizedBox(height: 20),
-    _field('رقم الهاتف *', phoneCtrl, type: TextInputType.phone),
-    _field('المحافظة', govCtrl),
+    _field('رقم الهاتف * (مثال: 73xxxxxxx)', phoneCtrl, type: TextInputType.phone),
+    if (phoneCtrl.text.isNotEmpty && !_validPhone(phoneCtrl.text))
+      Padding(padding: const EdgeInsets.only(bottom: 12),
+        child: Text('الرقم يجب أن يبدأ بـ 73/77/78/71/70', style: GoogleFonts.cairo(color: Colors.redAccent, fontSize: 11))),
+    Padding(padding: const EdgeInsets.only(bottom: 14),
+      child: DropdownButtonFormField<String>(
+        initialValue: selectedGov,
+        dropdownColor: const Color(0xFF1A1B26),
+        style: GoogleFonts.cairo(color: Colors.white),
+        decoration: InputDecoration(filled: true, fillColor: const Color(0xFF1A1B26),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+          contentPadding: const EdgeInsets.all(14),
+          hintText: 'المحافظة *', hintStyle: GoogleFonts.cairo(color: Colors.grey, fontSize: 13)),
+        items: govs.map((g) => DropdownMenuItem(value: g, child: Text(g, style: GoogleFonts.cairo(color: Colors.white, fontSize: 13)))).toList(),
+        onChanged: (v) => setState(() => selectedGov = v),
+      )),
     _field('المدينة / المنطقة', cityCtrl),
     _field('العنوان التفصيلي', addrCtrl, max: 2),
-    _field('رابط الموقع على الخريطة', mapCtrl, type: TextInputType.url),
+    _field('رابط الموقع (خريطة)', mapCtrl, type: TextInputType.url),
     _field('ساعات العمل', hoursCtrl),
   ]);
 
-  Widget _step4() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    _title('جاهز للإطلاق!', 'راجع تفاصيل متجرك قبل الإرسال'),
+  Widget _s4() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    _title('جاهز للإرسال!', 'راجع التفاصيل قبل الإرسال للإدارة'),
     const SizedBox(height: 20),
-    _reviewRow(Icons.storefront, 'اسم المتجر', nameCtrl.text),
-    _reviewRow(Icons.category, 'القسم', selectedSectionName ?? '-'),
-    _reviewRow(Icons.local_offer, 'التخصص', selectedSub ?? '-'),
-    _reviewRow(Icons.phone, 'الهاتف', phoneCtrl.text),
-    _reviewRow(Icons.location_on, 'العنوان', [govCtrl.text, cityCtrl.text, addrCtrl.text].where((s) => s.isNotEmpty).join(' - ')),
-    _reviewRow(Icons.access_time, 'ساعات العمل', hoursCtrl.text.isEmpty ? '-' : hoursCtrl.text),
-    const SizedBox(height: 24),
+    if (logoBytes != null || coverBytes != null)
+      Row(children: [
+        if (logoBytes != null) Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(12),
+          child: Image.memory(logoBytes!, height: 100, fit: BoxFit.cover))),
+        if (logoBytes != null && coverBytes != null) const SizedBox(width: 10),
+        if (coverBytes != null) Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(12),
+          child: Image.memory(coverBytes!, height: 100, fit: BoxFit.cover))),
+      ]),
+    if (logoBytes != null || coverBytes != null) const SizedBox(height: 16),
+    _row(Icons.storefront, 'الاسم', nameCtrl.text),
+    _row(Icons.category, 'القسم', selectedSectionName ?? '-'),
+    _row(Icons.local_offer, 'التخصص', isOtherSelected ? otherSubCtrl.text : (selectedSub ?? '-')),
+    _row(Icons.phone, 'الهاتف', phoneCtrl.text),
+    _row(Icons.location_on, 'العنوان', [selectedGov ?? '', cityCtrl.text, addrCtrl.text].where((s) => s.isNotEmpty).join(' - ')),
+    _row(Icons.access_time, 'ساعات العمل', hoursCtrl.text.isEmpty ? '-' : hoursCtrl.text),
+    const SizedBox(height: 20),
     Container(padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: const Color(0xFF25D366).withOpacity(0.1), borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF25D366).withOpacity(0.3))),
+      decoration: BoxDecoration(color: const Color(0xFF25D366).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF25D366).withValues(alpha: 0.3))),
       child: Row(children: [
         const Icon(Icons.info_outline, color: Color(0xFF25D366)),
         const SizedBox(width: 10),
-        Expanded(child: Text('سيتم مراجعة طلبك من الإدارة وسيُفعّل متجرك بعد الموافقة.',
+        Expanded(child: Text('سيتم مراجعة طلبك من الإدارة. لن يُفعّل المتجر إلا بعد الموافقة.',
           style: GoogleFonts.cairo(color: Colors.white, fontSize: 12))),
       ])),
   ]);
 
   Widget _title(String t, String s) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(t, style: GoogleFonts.cairo(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+    Text(t, style: GoogleFonts.cairo(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
     const SizedBox(height: 4),
-    Text(s, style: GoogleFonts.cairo(color: Colors.grey, fontSize: 13)),
+    Text(s, style: GoogleFonts.cairo(color: Colors.grey, fontSize: 12)),
   ]);
 
   Widget _field(String h, TextEditingController c, {TextInputType? type, int max = 1}) => Padding(
@@ -322,24 +427,23 @@ class _S extends State<BecomeMerchantScreen> {
         contentPadding: const EdgeInsets.all(14)),
       onChanged: (_) => setState(() {})));
 
-  Widget _imgBox(String label, Uint8List? b, VoidCallback onTap) => Expanded(
+  Widget _imgBox(String l, Uint8List? b, VoidCallback onTap) => Expanded(
     child: GestureDetector(onTap: onTap, child: Container(height: 120,
       decoration: BoxDecoration(color: const Color(0xFF1A1B26), borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white24, style: BorderStyle.solid)),
-      child: b != null ? ClipRRect(borderRadius: BorderRadius.circular(12),
-        child: Image.memory(b, fit: BoxFit.cover)) :
+        border: Border.all(color: Colors.white24)),
+      child: b != null ? ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.memory(b, fit: BoxFit.cover)) :
         Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           const Icon(Icons.add_photo_alternate_outlined, color: Colors.grey, size: 32),
           const SizedBox(height: 6),
-          Text(label, style: GoogleFonts.cairo(color: Colors.grey, fontSize: 12)),
+          Text(l, style: GoogleFonts.cairo(color: Colors.grey, fontSize: 12)),
         ]))));
 
-  Widget _reviewRow(IconData i, String l, String v) => Padding(
+  Widget _row(IconData i, String l, String v) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
     child: Row(children: [
       Icon(i, color: const Color(0xFFEF7E3C), size: 20),
       const SizedBox(width: 10),
-      Text(l + ': ', style: GoogleFonts.cairo(color: Colors.grey, fontSize: 13)),
+      Text('\$l: ', style: GoogleFonts.cairo(color: Colors.grey, fontSize: 13)),
       Expanded(child: Text(v.isEmpty ? '-' : v, textAlign: TextAlign.right,
         style: GoogleFonts.cairo(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600))),
     ]));
@@ -349,7 +453,8 @@ class _S extends State<BecomeMerchantScreen> {
       if (step > 0) Expanded(child: OutlinedButton(
         onPressed: () => setState(() => step--),
         style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14),
-          side: const BorderSide(color: Colors.white24), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+          side: const BorderSide(color: Colors.white24),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
         child: Text('السابق', style: GoogleFonts.cairo(color: Colors.white)))),
       if (step > 0) const SizedBox(width: 12),
       Expanded(flex: 2, child: ElevatedButton(
