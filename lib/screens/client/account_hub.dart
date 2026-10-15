@@ -259,7 +259,7 @@ class _AccountHubScreenState extends State<AccountHubScreen> {
             child: _upgradeCard(
               context,
               icon: Icons.storefront,
-              title: 'كن تاجر',
+              title: 'افتح متجرك',
               subtitle: 'ابدأ ببيع منتجاتك',
               color: const Color(0xFF25D366),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BecomeMerchantScreen())),
