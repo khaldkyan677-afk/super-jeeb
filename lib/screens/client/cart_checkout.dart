@@ -1111,7 +1111,8 @@ Widget _buildConfirm() {
         'deliveryFee': provider.deliveryFeeFor(sid),
         'address': _addresses[_selectedAddressIndex]['address'] ?? '',
         'notes': '',
-        'paymentMethodId': selectedMethod['_id'],
+          'paymentMethodId': selectedMethod['_id'],
+          'paymentMethod': (selectedMethod['type'] ?? 'cash').toString(),
         'receiptImage': _receiptBase64,
       };
 
