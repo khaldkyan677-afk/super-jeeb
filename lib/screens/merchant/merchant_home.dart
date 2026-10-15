@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'merchant_theme.dart';
+import 'merchant_orders.dart';
+import 'merchant_products.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../services/api_service.dart';
@@ -14,6 +16,7 @@ class MerchantHomeScreen extends StatefulWidget {
 class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
   final bool _open = true;
   String _storeName = 'المتجر';
+  List<dynamic> _realOrders = [];
   int _newOrders = 0, _preparing = 0, _delivered = 0;
   double _revenue = 0;
 
@@ -39,6 +42,10 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
         });
       }
     } catch (e) { debugPrint('LOAD_ERR: \$e'); }
+    try {
+      final list = await ApiService.getMerchantOrders();
+      if (mounted) setState(() => _realOrders = list.take(3).toList());
+    } catch (e) { debugPrint('ORD_ERR: $e'); }
   }
 
   @override
@@ -55,14 +62,36 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
               const SizedBox(height: 18),
               _pulseCard(),
               const SizedBox(height: 20),
-              _sectionTitle('طلبات تحتاج انتباهك', 'عرض الكل'),
-              const SizedBox(height: 10),
-              _orderCard('#5487', 'أحمد محمد', '5 منتجات', '8,500 ري', 'جديد', Colors.red, 'منذ 12 دقيقة'),
-              const SizedBox(height: 10),
-              _orderCard('#5486', 'سارة علي', '3 منتجات', '5,200 ري', 'قيد التجهيز', MJ.warning, 'منذ 28 دقيقة'),
-              const SizedBox(height: 10),
-              _orderCard('#5485', 'محمد عبدالله', '2 منتج', '3,700 ري', 'جاهز للمندوب', MJ.success, 'منذ ساعة'),
-              const SizedBox(height: 20),
+          _sectionTitle('طلبات تحتاج انتباهك', 'عرض الكل'),
+          const SizedBox(height: 10),
+          if (_realOrders.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(color: MJ.card, borderRadius: BorderRadius.circular(14), boxShadow: MJ.shadowSoft),
+              child: Center(child: Text('لا توجد طلبات حالياً', style: GoogleFonts.cairo(color: Colors.grey))),
+            ),
+          if (_realOrders.isNotEmpty)
+            ..._realOrders.map((o) {
+              final m = o is Map ? o as Map<String, dynamic> : <String, dynamic>{};
+              final cust = m['customerId'];
+              final name = (cust is Map ? cust['name'] : null)?.toString() ?? 'عميل';
+              final id = (m['_id'] ?? '').toString();
+              final shortId = id.length >= 6 ? id.substring(id.length - 6) : id;
+              final items = (m['items'] as List?) ?? [];
+              final total = m['total'] ?? 0;
+              final status = (m['status'] ?? 'pending').toString();
+              Color color; String label;
+              switch (status) {
+                case 'accepted': color = MJ.success; label = 'تم القبول'; break;
+                case 'preparing': color = Colors.purple; label = 'جاري التحضير'; break;
+                case 'ready': color = Colors.teal; label = 'جاهز'; break;
+                case 'on_the_way': color = Colors.indigo; label = 'في الطريق'; break;
+                case 'delivered': color = MJ.success; label = 'تم التسليم'; break;
+                default: color = MJ.warning; label = 'قيد المراجعة';
+              }
+              return _orderCard('#' + shortId, name, '${items.length} منتج', '$total ر.ي', label, color, 'الآن');
+            }),
+          const SizedBox(height: 20),
               _storePreview(),
               const SizedBox(height: 20),
               _sectionTitle('أحدث المنتجات', 'عرض الكل'),
@@ -327,26 +356,35 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
   Widget _quickActions() {
     return Row(
       children: [
-        _action(Icons.add_box_rounded, 'إضافة منتج'),
+        _action(Icons.add_box_rounded, 'إضافة منتج', () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const MerchantProductsScreen()));
+        }),
         const SizedBox(width: 10),
-        _action(Icons.manage_accounts_rounded, 'إدارة الطلبات'),
+        _action(Icons.manage_accounts_rounded, 'إدارة الطلبات', () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const MerchantOrdersScreen()));
+        }),
         const SizedBox(width: 10),
-        _action(Icons.local_offer_rounded, 'إضافة عرض'),
+        _action(Icons.local_offer_rounded, 'إضافة خصم', () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const MerchantProductsScreen()));
+        }),
       ],
     );
   }
 
-  Widget _action(IconData ic, String label) {
+  Widget _action(IconData ic, String label, VoidCallback onTap) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(color: MJ.card, borderRadius: BorderRadius.circular(16), boxShadow: MJ.shadowSoft),
-        child: Column(
-          children: [
-            Icon(ic, color: MJ.primary, size: 24),
-            const SizedBox(height: 6),
-            Text(label, style: GoogleFonts.cairo(fontSize: 10, fontWeight: FontWeight.w700)),
-          ],
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(color: MJ.card, borderRadius: BorderRadius.circular(16), boxShadow: MJ.shadowSoft),
+          child: Column(
+            children: [
+              Icon(ic, color: MJ.primary, size: 24),
+              const SizedBox(height: 6),
+              Text(label, style: GoogleFonts.cairo(fontSize: 10, fontWeight: FontWeight.w700)),
+            ],
+          ),
         ),
       ),
     );

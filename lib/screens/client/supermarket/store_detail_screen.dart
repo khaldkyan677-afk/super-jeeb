@@ -78,6 +78,24 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
   double get _cartTotal => _cartP.subtotal;
 
   void _addToCart(Product p) {
+    if (p.stock <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('نفذ المخزون', style: GoogleFonts.cairo(color: Colors.white)), backgroundColor: Colors.red),
+      );
+      return;
+    }
+    final currentQty = _cartP.items
+      .where((x) => x.productId == p.id)
+      .fold<int>(0, (s, x) => s + x.qty);
+    if (currentQty >= p.stock) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('الكمية المتوفرة فقط: ${p.stock}', style: GoogleFonts.cairo(color: Colors.white)),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
     final sid = widget.store['_id']?.toString() ?? '';
     if (_cartP.storeId != sid) {
       _cartP.setStore(
@@ -94,7 +112,7 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+          SnackBar(content: Text('خطأ: $e', style: GoogleFonts.cairo(color: Colors.white)), backgroundColor: Colors.red),
         );
       }
     }
