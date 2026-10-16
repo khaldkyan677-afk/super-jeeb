@@ -13,6 +13,8 @@ const storeSchema = new mongoose.Schema({
   isFeatured: { type: Boolean, default: false },
   category: { type: String },
   description: { type: String, default: '' },
+  governorate: { type: String, default: '' },
+  city: { type: String, default: '' },
   phone: { type: String, default: '' },
   subCategory: { type: String, default: '' },
   mapUrl: { type: String, default: '' },

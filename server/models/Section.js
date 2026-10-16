@@ -5,5 +5,6 @@ const sectionSchema = new mongoose.Schema({
   imageUrl: { type: String },
   order: { type: Number, default: 0 },
   isActive: { type: Boolean, default: true }
+  parentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Section', default: null },
 });
 module.exports = mongoose.model('Section', sectionSchema);

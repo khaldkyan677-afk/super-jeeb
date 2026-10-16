@@ -26,24 +26,51 @@ exports.getMyMerchant = async (req, res) => {
 exports.createMerchant = async (req, res) => {
   try {
     const Store = require('../models/Store');
+  const Section = require('../models/Section');
     const body = req.body || {};
     const existing = await Store.findOne({ merchantId: req.user._id });
     if (existing) return res.status(400).json({ error: 'لديك متجر بالفعل' });
-    const store = await Store.create({
-      merchantId: req.user._id,
-      name: body.storeName || body.name || '',
-      description: body.description || '',
-      category: body.category || '',
-      subCategory: body.subCategory || '',
-      sectionId: body.sectionId || null,
-      phone: body.phone || '',
-      logoUrl: body.logoUrl || '',
-      coverUrl: body.coverUrl || '',
-      location: body.location || {},
-      mapUrl: body.mapUrl || '',
-      workingHours: body.workingHours || '',
-      isActive: false,
-    });
+  let category = body.category || '';
+  let sectionId = body.sectionId || null;
+  const catMap = {
+    '\u0633\u0648\u0628\u0631\u0645\u0627\u0631\u0643\u062a': 'supermarket',
+    '\u0645\u0637\u0627\u0639\u0645': 'restaurant',
+    '\u0645\u0637\u0639\u0645': 'restaurant',
+    '\u0635\u064a\u062f\u0644\u064a\u0627\u062a': 'pharmacy',
+    '\u0635\u064a\u062f\u0644\u064a\u0629': 'pharmacy',
+    '\u0628\u0642\u0627\u0644\u0627\u062a': 'grocery',
+    '\u0628\u0642\u0627\u0644\u0629': 'grocery',
+    '\u0645\u062a\u0627\u062c\u0631': 'mall',
+    '\u0645\u062a\u062c\u0631': 'mall',
+  };
+  const catName = catMap[body.category] ? body.category : null;
+  if (catMap[body.category]) category = catMap[body.category];
+  if (!sectionId && catName) {
+    const sec = await Section.findOne({ name: catName });
+    if (sec) sectionId = sec._id;
+  }
+  if (!sectionId && category) {
+    const nameMap = { supermarket: '\u0633\u0648\u0628\u0631\u0645\u0627\u0631\u0643\u062a', restaurant: '\u0645\u0637\u0627\u0639\u0645', pharmacy: '\u0635\u064a\u062f\u0644\u064a\u0627\u062a', grocery: '\u0628\u0642\u0627\u0644\u0627\u062a', mall: '\u0645\u062a\u0627\u062c\u0631' };
+    const sec = await Section.findOne({ name: nameMap[category] });
+    if (sec) sectionId = sec._id;
+  }
+  const store = await Store.create({
+    merchantId: req.user._id,
+    name: body.storeName || body.name || '',
+    description: body.description || '',
+    category: category,
+    subCategory: body.subCategory || '',
+    sectionId: sectionId,
+    phone: body.phone || '',
+    logoUrl: body.logoUrl || '',
+    coverUrl: body.coverUrl || '',
+    governorate: body.governorate || '',
+    city: body.city || '',
+    location: body.location || {},
+    mapUrl: body.mapUrl || '',
+    workingHours: body.workingHours || '',
+    isActive: false,
+  });
     res.status(201).json({ _id: store._id, store });
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
