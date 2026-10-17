@@ -24,7 +24,7 @@ class ApiService {
   static void setDeviceId(String id) => _deviceId = id;
   static String? get deviceId => _deviceId;
 
-  static Map<String, String> get get_headers => _headers;
+  static Map<String, String> get getHeaders => _headers;
   static Map<String, String> get _headers {
     final h = <String, String>{};
     if (_authToken != null) h['Authorization'] = 'Bearer $_authToken';
@@ -372,13 +372,14 @@ class ApiService {
   static Future<Map<String, dynamic>> updateTripStage({
     required String orderId,
     required String stage,
+    String? pin,
   }) async {
     try {
       final r = await http
           .patch(
             Uri.parse('$baseUrl/api/orders/$orderId/stage'),
             headers: _headers,
-            body: jsonEncode({'stage': stage}),
+            body: jsonEncode({'stage': stage, if (pin != null) 'pin': pin}),
           )
           .timeout(const Duration(seconds: 15));
       return jsonDecode(r.body);

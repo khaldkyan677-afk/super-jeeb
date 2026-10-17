@@ -26,7 +26,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     try {
       final r = await http.get(
         Uri.parse('${ApiService.baseUrl}/api/products/my'),
-        headers: ApiService.get_headers,
+        headers: ApiService.getHeaders,
       );
       if (r.statusCode == 200) {
         final d = jsonDecode(r.body);
@@ -40,7 +40,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     try {
       await http.delete(
         Uri.parse('${ApiService.baseUrl}/api/products/$id'),
-        headers: ApiService.get_headers,
+        headers: ApiService.getHeaders,
       );
       _load();
     } catch (e) { debugPrint('DEL_ERR: $e'); }
@@ -246,13 +246,13 @@ class _ProductEditorState extends State<_ProductEditor> {
       if (widget.product == null) {
         r = await http.post(
           Uri.parse('${ApiService.baseUrl}/api/products'),
-          headers: {...ApiService.get_headers, 'Content-Type': 'application/json'},
+          headers: {...ApiService.getHeaders, 'Content-Type': 'application/json'},
           body: body,
         );
       } else {
         r = await http.put(
           Uri.parse('${ApiService.baseUrl}/api/products/${widget.product!['_id']}'),
-          headers: {...ApiService.get_headers, 'Content-Type': 'application/json'},
+          headers: {...ApiService.getHeaders, 'Content-Type': 'application/json'},
           body: body,
         );
       }

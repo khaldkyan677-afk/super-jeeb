@@ -15,7 +15,7 @@ class _StoresScreenState extends State<StoresScreen> {
   bool _loading = true;
 
   Map<String, String> get _jsonH {
-    final h = Map<String, String>.from(ApiService.get_headers);
+    final h = Map<String, String>.from(ApiService.getHeaders);
     h['Content-Type'] = 'application/json';
     return h;
   }
@@ -36,7 +36,7 @@ class _StoresScreenState extends State<StoresScreen> {
     try {
       final r = await http.get(
         Uri.parse('${ApiService.baseUrl}/api/stores/all'),
-        headers: ApiService.get_headers,
+        headers: ApiService.getHeaders,
       );
       if (r.statusCode == 200) {
         setState(() => _stores = jsonDecode(r.body));
@@ -48,7 +48,7 @@ class _StoresScreenState extends State<StoresScreen> {
     try {
       final r = await http.get(
         Uri.parse('${ApiService.baseUrl}/api/sections/all'),
-        headers: ApiService.get_headers,
+        headers: ApiService.getHeaders,
       );
       if (r.statusCode == 200) {
         setState(() => _sections = jsonDecode(r.body));
@@ -251,7 +251,7 @@ class _StoresScreenState extends State<StoresScreen> {
               try {
                 await http.delete(
                   Uri.parse('${ApiService.baseUrl}/api/stores/${s['_id']}'),
-                  headers: ApiService.get_headers,
+                  headers: ApiService.getHeaders,
                 );
                 if (ctx.mounted) Navigator.pop(ctx);
                 _loadStores();

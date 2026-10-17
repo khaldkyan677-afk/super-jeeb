@@ -105,6 +105,7 @@ exports.verifyMerchant = async (req, res) => {
     if (!store) return res.status(404).json({ error: 'Not found' });
     if (action === 'accept') {
       store.isActive = true;
+      store.documentsVerified = true;
       await store.save();
       await User.findByIdAndUpdate(store.merchantId, { role: 'merchant', status: 'approved' });
     } else if (action === 'reject') {

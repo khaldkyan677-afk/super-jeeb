@@ -25,7 +25,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
   Future<void> _loadMethods() async {
     try {
       final url = Uri.parse('${ApiService.baseUrl}/api/payments/methods');
-      final r = await http.get(url, headers: ApiService.get_headers);
+      final r = await http.get(url, headers: ApiService.getHeaders);
       if (r.statusCode == 200) {
         final data = jsonDecode(r.body);
         final list = (data is Map && data['data'] is List)
@@ -1118,7 +1118,7 @@ Widget _buildConfirm() {
 
       final r = await http.post(
         Uri.parse('${ApiService.baseUrl}/api/orders'),
-        headers: {...ApiService.get_headers, 'Content-Type': 'application/json'},
+        headers: {...ApiService.getHeaders, 'Content-Type': 'application/json'},
         body: jsonEncode(body),
       );
 

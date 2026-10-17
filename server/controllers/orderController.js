@@ -1,3 +1,19 @@
+
+function generateSecurePin() {
+  let pin;
+  let isWeak = true;
+  const weakPatterns = ['1234','2345','3456','4567','5678','6789','9876','8765','7654','6543','5432','4321','0000','1111','2222','3333','4444','5555','6666','7777','8888','9999'];
+  
+  while (isWeak) {
+    pin = Math.floor(1000 + Math.random() * 9000).toString();
+    // نتحقق: ليس في القائمة الضعيفة، وليس به نمط مكرر مثل 1212
+    if (!weakPatterns.includes(pin) && !(pin[0] === pin[2] && pin[1] === pin[3])) {
+      isWeak = false;
+    }
+  }
+  return pin;
+}
+
 const Order = require('../models/Order');
 
 exports.createOrder = async (req, res) => {
@@ -8,6 +24,8 @@ exports.createOrder = async (req, res) => {
       paymentMethodId, paymentMethod, receiptImage,
     } = req.body;
     const order = await Order.create({
+      deliveryPin: generateSecurePin(),
+
       customerId: req.user._id,
       merchantId,
       storeId,
@@ -158,4 +176,36 @@ exports.deliverOrder = async (req, res) => {
     await order.save();
     res.json(order);
   } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.updateOrderStage = async (req, res) => {
+  try {
+    const { stage, pin } = req.body;
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    if (stage === 'delivered') {
+      if (!pin) return res.status(400).json({ message: 'كود التسليم مطلوب' });
+      
+      // حماية من التخمين: إذا تجاوز 3 محاولات
+      if (order.pinAttempts >= 3) {
+        return res.status(403).json({ message: 'تم قفل الطلب بسبب كثرة المحاولات الخاطئة. تواصل مع الإدارة.' });
+      }
+
+      const expectedPin = order.deliveryPin || order.pin;
+      if (expectedPin && expectedPin !== pin) {
+        order.pinAttempts = (order.pinAttempts || 0) + 1;
+        await order.save();
+        return res.status(400).json({ message: `كود التسليم غير صحيح. المحاولات المتبقية: ${3 - order.pinAttempts}` });
+      }
+      order.status = 'delivered';
+      order.deliveredAt = new Date();
+    } else {
+      order.status = stage;
+    }
+    await order.save();
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };

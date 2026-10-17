@@ -30,7 +30,7 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
     try {
       final r = await http.get(
         Uri.parse('${ApiService.baseUrl}/api/merchants/me/store'),
-        headers: ApiService.get_headers);
+        headers: ApiService.getHeaders);
       if (r.statusCode == 200) {
         final d = jsonDecode(r.body);
         setState(() {

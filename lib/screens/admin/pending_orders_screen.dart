@@ -14,7 +14,7 @@ class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
   bool _loading = true;
 
   Map<String, String> get _jsonH {
-    final h = Map<String, String>.from(ApiService.get_headers);
+    final h = Map<String, String>.from(ApiService.getHeaders);
     h['Content-Type'] = 'application/json';
     return h;
   }
@@ -30,7 +30,7 @@ class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
     try {
       final r = await http.get(
         Uri.parse('${ApiService.baseUrl}/api/orders/all?verificationStatus=pending'),
-        headers: ApiService.get_headers,
+        headers: ApiService.getHeaders,
       );
       if (r.statusCode == 200) {
         setState(() => _orders = jsonDecode(r.body));

@@ -43,3 +43,83 @@ exports.unlockAdmin = async (req, res) => {
     res.json(a);
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
+
+
+exports.getAdminMerchants = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const stores = await Store.find({ merchantId: { $exists: true, $ne: null } }).sort({ createdAt: -1 });
+    res.json({ merchants: stores, applications: [] });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.toggleMerchantStatus = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const store = await Store.findById(req.params.id);
+    if (!store) return res.status(404).json({ message: 'Store not found' });
+    store.isActive = !store.isActive;
+    await store.save();
+    res.json({ message: 'Status toggled', store });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.deleteMerchant = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    await Store.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Store deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+exports.verifyMerchant = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const { action } = req.body;
+    const store = await Store.findById(req.params.id);
+    if (!store) return res.status(404).json({ message: 'Store not found' });
+
+    if (action === 'accept') {
+      store.isVerified = true;
+      store.isActive = true;
+      store.documentsVerified = true;
+    } else if (action === 'reject') {
+      store.isVerified = false;
+      store.isActive = false;
+      store.documentsVerified = false; // تمييز المرفوض عن المعلق
+      store.rejectionReason = req.body.reason || 'بدون سبب محدد';
+    }
+    await store.save();
+    res.json({ message: 'Status updated', store });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.sendAlert = async (req, res) => {
+  try {
+    const { message } = req.body;
+    console.log(`[ALERT] To Merchant ${req.params.id}: ${message}`);
+    res.json({ success: true, message: 'Alert sent' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.updateCommission = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const { commission } = req.body;
+    const store = await Store.findByIdAndUpdate(req.params.id, { commission }, { new: true });
+    res.json({ success: true, store });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

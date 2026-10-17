@@ -32,7 +32,7 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
   Future<void> _loadMethods() async {
     try {
       final url = Uri.parse('${ApiService.baseUrl}/api/payments/methods');
-      final r = await http.get(url, headers: ApiService.get_headers);
+      final r = await http.get(url, headers: ApiService.getHeaders);
       if (r.statusCode == 200) {
         final data = jsonDecode(r.body);
         final list = (data is Map && data['data'] is List)

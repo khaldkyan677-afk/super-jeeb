@@ -1,18 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const c = require('../controllers/adminController');
-const { protect, authorize } = require('../middleware/auth');
+const adminController = require('../controllers/adminController');
+const { protect } = require('../middleware/auth');
 
-router.route('/')
-  .get(protect, authorize('admin'), c.getAllAdmins)
-  .post(protect, authorize('admin'), c.createAdmin);
-
-router.route('/:id')
-  .get(protect, authorize('admin'), c.getAdminById)
-  .put(protect, authorize('admin'), c.updateAdmin)
-  .delete(protect, authorize('admin'), c.deleteAdmin);
-
-router.route('/:id/unlock')
-  .patch(protect, authorize('admin'), c.unlockAdmin);
+router.get('/merchants', protect, adminController.getAdminMerchants);
+router.put('/merchants/:id/toggle', protect, adminController.toggleMerchantStatus);
+router.put('/merchants/:id/verify', protect, adminController.verifyMerchant);
+router.delete('/merchants/:id', protect, adminController.deleteMerchant);
+router.put('/merchants/:id/alert', protect, adminController.sendAlert);
+router.put('/merchants/:id/commission', protect, adminController.updateCommission);
 
 module.exports = router;

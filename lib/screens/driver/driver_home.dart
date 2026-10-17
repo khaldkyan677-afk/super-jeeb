@@ -18,7 +18,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   Future<void> _updateStage(String stage, String label) async {
     // TODO: نستخدم الطلب الحالي
     final res = await ApiService.updateTripStage(orderId: 'CURRENT', stage: stage);
-    if (!mounted) return;
+    if (!mounted) { return; }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(res.containsKey('error') ? 'خطأ: ${res['error']}' : '✓ $label'),
@@ -30,7 +30,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
   Future<void> _acceptFromList() async {
     final list = await ApiService.getAvailableOrders();
-    if (!mounted) return;
+    if (!mounted) { return; }
     if (list.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('لا توجد طلبات متاحة'), backgroundColor: DJ.warning),
@@ -40,7 +40,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     final first = list.first as Map<String, dynamic>;
     final oid = first['_id'].toString();
     final res = await ApiService.acceptOrder(oid);
-    if (!mounted) return;
+    if (!mounted) { return; }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(res.containsKey('error') ? 'فشل: ${res['error']}' : '✓ تم قبول الطلب'),

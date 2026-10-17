@@ -45,7 +45,7 @@ class _MerchantStoreScreenState extends State<MerchantStoreScreen> {
     try {
       final r = await http.get(
         Uri.parse('${ApiService.baseUrl}/api/merchants/me/store'),
-        headers: ApiService.get_headers,
+        headers: ApiService.getHeaders,
       );
       if (r.statusCode == 200) {
         final d = jsonDecode(r.body);
@@ -76,7 +76,7 @@ class _MerchantStoreScreenState extends State<MerchantStoreScreen> {
     try {
       final r = await http.put(
         Uri.parse('${ApiService.baseUrl}/api/merchants/me/store'),
-        headers: {...ApiService.get_headers, 'Content-Type': 'application/json'},
+        headers: {...ApiService.getHeaders, 'Content-Type': 'application/json'},
         body: jsonEncode({
           'name': _name.text.trim(),
           'description': _desc.text.trim(),

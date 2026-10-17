@@ -6,6 +6,10 @@ const userSchema = new mongoose.Schema({
   phone: { type: String, unique: true, sparse: true },
   bio: { type: String, default: '' },
   password: { type: String, required: true },
+  bankName: { type: String },
+  bankAccountNumber: { type: String },
+  bankAccountName: { type: String },
+  maxDebtLimit: { type: Number, default: 10000 },
   role: { 
     type: String, 
     enum: ['client', 'merchant', 'driver', 'admin'], 

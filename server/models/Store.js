@@ -22,6 +22,7 @@ const storeSchema = new mongoose.Schema({
   sectionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Section' },
   location: { lat: Number, lng: Number, address: String },
   isActive: { type: Boolean, default: true },
+  isVerified: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   documents: {
     nationalId: { type: String, default: '' },
@@ -30,7 +31,8 @@ const storeSchema = new mongoose.Schema({
     storeFrontImage: { type: String, default: '' },
     storeInsideImage: { type: String, default: '' },
   },
-  documentsVerified: { type: Boolean, default: false },
+  documentsVerified: { type: Boolean },
+  rejectionReason: { type: String, default: null },
   commission: { type: Number, default: 5 },
   agreedToTerms: { type: Boolean, default: false },
   agreedToCommission: { type: Boolean, default: false },
