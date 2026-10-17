@@ -22,6 +22,17 @@ const storeSchema = new mongoose.Schema({
   sectionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Section' },
   location: { lat: Number, lng: Number, address: String },
   isActive: { type: Boolean, default: true },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  documents: {
+    nationalId: { type: String, default: '' },
+    commercialRegistry: { type: String, default: '' },
+    businessLicense: { type: String, default: '' },
+    storeFrontImage: { type: String, default: '' },
+    storeInsideImage: { type: String, default: '' },
+  },
+  documentsVerified: { type: Boolean, default: false },
+  commission: { type: Number, default: 5 },
+  agreedToTerms: { type: Boolean, default: false },
+  agreedToCommission: { type: Boolean, default: false },
 });
 module.exports = mongoose.model('Store', storeSchema);

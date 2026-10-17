@@ -37,6 +37,14 @@ class _S extends State<BecomeMerchantScreen> {
 
   Uint8List? logoBytes;
   Uint8List? coverBytes;
+  Uint8List? nationalIdBytes;
+  Uint8List? commercialRegistryBytes;
+  Uint8List? businessLicenseBytes;
+  Uint8List? storeFrontImageBytes;
+  Uint8List? storeInsideImageBytes;
+  bool agreedToDocuments = false;
+  bool agreedToTerms = false;
+  bool agreedToCommission = false;
 
   static const List<String> govs = [
     'أمانة العاصمة', 'صنعاء', 'عدن', 'تعز', 'الحديدة', 'حضرموت',
@@ -92,7 +100,7 @@ class _S extends State<BecomeMerchantScreen> {
 
   Future<void> _loadSections() async {
     try {
-      final r = await http.get(Uri.parse('\${ApiService.baseUrl}/api/sections'));
+      final r = await http.get(Uri.parse('${ApiService.baseUrl}/api/sections'));
       if (r.statusCode == 200) {
         final d = jsonDecode(r.body);
         if (d is List) {
@@ -199,6 +207,8 @@ class _S extends State<BecomeMerchantScreen> {
       return selectedSub != null;
     }
     if (step == 2) return _validPhone(phoneCtrl.text) && selectedGov != null;
+    if (step == 3) return nationalIdBytes != null && storeFrontImageBytes != null && agreedToDocuments;
+    if (step == 4) return agreedToTerms && agreedToCommission;
     return true;
   }
 
@@ -219,12 +229,23 @@ class _S extends State<BecomeMerchantScreen> {
         'logoUrl': _b64(logoBytes),
         'coverUrl': _b64(coverBytes),
         'image': _b64(logoBytes),
+      'governorate': selectedGov ?? '',
+      'city': cityCtrl.text.trim(),
+      'documents': {
+        'nationalId': _b64(nationalIdBytes) ?? '',
+        'commercialRegistry': _b64(commercialRegistryBytes) ?? '',
+        'businessLicense': _b64(businessLicenseBytes) ?? '',
+        'storeFrontImage': _b64(storeFrontImageBytes) ?? '',
+        'storeInsideImage': _b64(storeInsideImageBytes) ?? '',
+      },
+      'agreedToTerms': agreedToTerms,
+      'agreedToCommission': agreedToCommission,
       };
       final r = await http.post(
-        Uri.parse('\${ApiService.baseUrl}/api/merchants'),
+        Uri.parse('${ApiService.baseUrl}/api/merchants'),
         headers: {
           'Content-Type': 'application/json',
-          if (ApiService.authToken != null) 'Authorization': 'Bearer \${ApiService.authToken!}',
+          if (ApiService.authToken != null) 'Authorization': 'Bearer ${ApiService.authToken!}',
         },
         body: jsonEncode(body),
       );
@@ -279,6 +300,14 @@ class _S extends State<BecomeMerchantScreen> {
       'f_gov': 'المحافظة *', 'f_city': 'المدينة / المنطقة',
       'f_addr': 'العنوان التفصيلي', 'f_map': 'رابط الموقع (خريطة)', 'f_hours': 'ساعات العمل',
       'h4': 'جاهز للإرسال!', 's4': 'راجع التفاصيل قبل الإرسال للإدارة',
+    'h_docs': 'الوثائق والتصاريح',
+    's_docs': 'لأمان الجميع، نحتاج التحقق من هويتك',
+    'docs_note': '⚠ الوثائق للتحقق فقط',
+    'commission_title': 'اتفاقية العمولة',
+    'commission_label': 'نسبة عمولة المنصة',
+    'commission_example': 'مثال: طلب 10,000 ريال → عمولة 500 ريال، صافي 9,500 ريال',
+    'agree_terms': 'أوافق على الشروط والخصوصية',
+    'agree_commission': 'أوافق على نسبة العمولة',
       'r_name': 'الاسم', 'r_cat': 'القسم', 'r_sub': 'التخصص',
       'r_phone': 'الهاتف', 'r_addr': 'العنوان', 'r_hours': 'ساعات العمل',
       'review_note': 'سيتم مراجعة طلبك من الإدارة. لن يُفعّل المتجر إلا بعد الموافقة.',
@@ -301,6 +330,14 @@ class _S extends State<BecomeMerchantScreen> {
       'f_gov': 'Governorate *', 'f_city': 'City / Area',
       'f_addr': 'Detailed Address', 'f_map': 'Location Link (Map)', 'f_hours': 'Working Hours',
       'h4': 'Ready to Submit!', 's4': 'Review details before sending to admin',
+    'h_docs': 'Documents & Permits',
+    's_docs': 'For everyone safety, we need to verify your identity',
+    'docs_note': '⚠ Documents are for verification only',
+    'commission_title': 'Commission Agreement',
+    'commission_label': 'Platform commission rate',
+    'commission_example': 'Example: 10,000 YER order → 500 YER (5%) commission, net 9,500 YER',
+    'agree_terms': 'I agree to the Terms of Service and Privacy Policy',
+    'agree_commission': 'I agree to the commission rate',
       'r_name': 'Name', 'r_cat': 'Category', 'r_sub': 'Subcategory',
       'r_phone': 'Phone', 'r_addr': 'Address', 'r_hours': 'Working Hours',
       'review_note': 'Your request will be reviewed by admin. Store will not be activated until approved.',
@@ -356,10 +393,67 @@ class _S extends State<BecomeMerchantScreen> {
     );
   }
 
+  Widget _s5() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    _title(t('h4'), t('s4')),
+    const SizedBox(height: 20),
+    if (logoBytes != null || coverBytes != null)
+      Row(children: [
+        if (logoBytes != null) Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(12),
+          child: Image.memory(logoBytes!, height: 100, fit: BoxFit.cover))),
+        if (logoBytes != null && coverBytes != null) const SizedBox(width: 10),
+        if (coverBytes != null) Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(12),
+          child: Image.memory(coverBytes!, height: 100, fit: BoxFit.cover))),
+      ]),
+    if (logoBytes != null || coverBytes != null) const SizedBox(height: 16),
+    _row(Icons.storefront, t('r_name'), nameCtrl.text),
+    _row(Icons.category, t('r_cat'), selectedSectionName ?? '-'),
+    _row(Icons.local_offer, t('r_sub'), isOtherSelected ? otherSubCtrl.text : (selectedSub ?? '-')),
+    _row(Icons.phone, t('r_phone'), phoneCtrl.text),
+    _row(Icons.location_on, t('r_addr'), [selectedGov ?? '', cityCtrl.text, addrCtrl.text].where((s) => s.isNotEmpty).join(' - ')),
+    _row(Icons.access_time, t('r_hours'), hoursCtrl.text.isEmpty ? '-' : hoursCtrl.text),
+    const SizedBox(height: 20),
+    Container(padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: const Color(0xFF25D366).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF25D366).withValues(alpha: 0.3))),
+      child: Row(children: [
+        const Icon(Icons.info_outline, color: Color(0xFF25D366)),
+        const SizedBox(width: 10),
+        Expanded(child: Text(t('review_note'),
+          style: GoogleFonts.cairo(color: Colors.white, fontSize: 12))),
+      ])),
+    const SizedBox(height: 20),
+    _title(t('commission_title'), ''),
+    const SizedBox(height: 8),
+    Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1B26),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE50914).withValues(alpha: 0.4)),
+      ),
+      child: Column(children: [
+        Row(children: [
+          const Icon(Icons.percent, color: Color(0xFFE50914), size: 20),
+          const SizedBox(width: 8),
+          Expanded(child: Text(t('commission_label'), style: GoogleFonts.cairo(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold))),
+          Text('5%', style: GoogleFonts.cairo(color: const Color(0xFFE50914), fontSize: 20, fontWeight: FontWeight.bold)),
+        ]),
+        const SizedBox(height: 10),
+        Text(t('commission_example'), style: GoogleFonts.cairo(color: Colors.white70, fontSize: 12)),
+      ]),
+    ),
+    const SizedBox(height: 16),
+    _check(t('agree_terms'), agreedToTerms, (v) => setState(() => agreedToTerms = v)),
+    const SizedBox(height: 10),
+    _check(t('agree_commission'), agreedToCommission, (v) => setState(() => agreedToCommission = v)),
+    const SizedBox(height: 20),
+  ]);
+
   Widget _stepper() {
-    final titles = [t('step1'), t('step2'), t('step3'), t('step4')];
+    final titles = [t('step1'), t('step2'), t('step3'), t('h_docs'), t('step4')];
     return Container(padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-      child: Row(children: List.generate(4, (i) {
+      child: Row(children: List.generate(5, (i) {
         final active = i <= step;
         return Expanded(child: Column(children: [
           Row(children: [
@@ -367,9 +461,9 @@ class _S extends State<BecomeMerchantScreen> {
             Container(width: 30, height: 30,
               decoration: BoxDecoration(shape: BoxShape.circle,
                 color: active ? const Color(0xFFEF7E3C) : const Color(0xFF1A1B26)),
-              child: Icon(i < step ? Icons.check : [Icons.storefront, Icons.category, Icons.phone, Icons.rocket_launch][i],
+              child: Icon(i < step ? Icons.check : [Icons.storefront, Icons.category, Icons.phone, Icons.description, Icons.rocket_launch][i],
                 color: Colors.white, size: 16)),
-            if (i < 3) Expanded(child: Container(height: 3, color: i < step ? const Color(0xFFEF7E3C) : Colors.white24)),
+            if (i < 4) Expanded(child: Container(height: 3, color: i < step ? const Color(0xFFEF7E3C) : Colors.white24)),
           ]),
           const SizedBox(height: 6),
           Text(titles[i], style: GoogleFonts.cairo(color: active ? Colors.white : Colors.grey, fontSize: 11)),
@@ -382,7 +476,8 @@ class _S extends State<BecomeMerchantScreen> {
     if (step == 0) return _s1();
     if (step == 1) return _s2();
     if (step == 2) return _s3();
-    return _s4();
+    if (step == 3) return _s4();
+    return _s5();
   }
 
   Widget _s1() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -524,35 +619,71 @@ class _S extends State<BecomeMerchantScreen> {
     _field(t('f_hours'), hoursCtrl),
   ]);
 
-  Widget _s4() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    _title(t('h4'), t('s4')),
-    const SizedBox(height: 20),
-    if (logoBytes != null || coverBytes != null)
-      Row(children: [
-        if (logoBytes != null) Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(12),
-          child: Image.memory(logoBytes!, height: 100, fit: BoxFit.cover))),
-        if (logoBytes != null && coverBytes != null) const SizedBox(width: 10),
-        if (coverBytes != null) Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(12),
-          child: Image.memory(coverBytes!, height: 100, fit: BoxFit.cover))),
-      ]),
-    if (logoBytes != null || coverBytes != null) const SizedBox(height: 16),
-    _row(Icons.storefront, t('r_name'), nameCtrl.text),
-    _row(Icons.category, t('r_cat'), selectedSectionName ?? '-'),
-    _row(Icons.local_offer, t('r_sub'), isOtherSelected ? otherSubCtrl.text : (selectedSub ?? '-')),
-    _row(Icons.phone, t('r_phone'), phoneCtrl.text),
-    _row(Icons.location_on, t('r_addr'), [selectedGov ?? '', cityCtrl.text, addrCtrl.text].where((s) => s.isNotEmpty).join(' - ')),
-    _row(Icons.access_time, t('r_hours'), hoursCtrl.text.isEmpty ? '-' : hoursCtrl.text),
-    const SizedBox(height: 20),
-    Container(padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: const Color(0xFF25D366).withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF25D366).withValues(alpha: 0.3))),
+  Widget _docBox(String label, Uint8List? bytes, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1B26),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: bytes != null ? const Color(0xFF16A34A) : Colors.white12),
+        ),
+        child: Row(children: [
+          Icon(bytes != null ? Icons.check_circle : Icons.upload_file, color: bytes != null ? const Color(0xFF16A34A) : Colors.white54, size: 24),
+          const SizedBox(width: 10),
+          Expanded(child: Text(label, style: GoogleFonts.cairo(color: Colors.white, fontSize: 13))),
+          if (bytes != null)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.memory(bytes, width: 50, height: 50, fit: BoxFit.cover),
+            ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _check(String label, bool val, Function(bool) onChanged) {
+    return GestureDetector(
+      onTap: () => onChanged(!val),
       child: Row(children: [
-        const Icon(Icons.info_outline, color: Color(0xFF25D366)),
-        const SizedBox(width: 10),
-        Expanded(child: Text(t('review_note'),
-          style: GoogleFonts.cairo(color: Colors.white, fontSize: 12))),
-      ])),
+        Icon(val ? Icons.check_box : Icons.check_box_outline_blank, color: const Color(0xFFE50914), size: 22),
+        const SizedBox(width: 8),
+        Expanded(child: Text(label, style: GoogleFonts.cairo(color: Colors.white, fontSize: 13))),
+      ]),
+    );
+  }
+
+  Future<void> _pickDoc(String which) async {
+    final XFile? picked = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 60, maxWidth: 1200, maxHeight: 1200);
+    if (picked == null) return;
+    final bytes = await picked.readAsBytes();
+    setState(() {
+      if (which == 'id') nationalIdBytes = bytes;
+      else if (which == 'cr') commercialRegistryBytes = bytes;
+      else if (which == 'bl') businessLicenseBytes = bytes;
+      else if (which == 'front') storeFrontImageBytes = bytes;
+      else if (which == 'inside') storeInsideImageBytes = bytes;
+    });
+  }
+
+  Widget _s4() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    _title(t('h_docs'), t('s_docs')),
+    const SizedBox(height: 8),
+    Text(t('docs_note'), style: GoogleFonts.cairo(color: Colors.amber, fontSize: 12)),
+    const SizedBox(height: 16),
+    _docBox('\u0627\u0644\u0628\u0637\u0627\u0642\u0629 \u0627\u0644\u0634\u062e\u0635\u064a\u0629 *', nationalIdBytes, () => _pickDoc('id')),
+    const SizedBox(height: 12),
+    _docBox('\u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a', commercialRegistryBytes, () => _pickDoc('cr')),
+    const SizedBox(height: 12),
+    _docBox('\u0631\u062e\u0635\u0629 \u0628\u0644\u062f\u064a', businessLicenseBytes, () => _pickDoc('bl')),
+    const SizedBox(height: 12),
+    _docBox('\u0635\u0648\u0631\u0629 \u0648\u0627\u062c\u0647\u0629 \u0627\u0644\u0645\u062a\u062c\u0631 *', storeFrontImageBytes, () => _pickDoc('front')),
+    const SizedBox(height: 12),
+    _docBox('\u0635\u0648\u0631\u0629 \u062f\u0627\u062e\u0644 \u0627\u0644\u0645\u062a\u062c\u0631', storeInsideImageBytes, () => _pickDoc('inside')),
+    const SizedBox(height: 16),
+    _check('\u0623\u062a\u0639\u0647\u062f \u0628\u0623\u0646 \u0627\u0644\u0648\u062b\u0627\u0626\u0642 \u0635\u062d\u064a\u062d\u0629', agreedToDocuments, (v) => setState(() => agreedToDocuments = v)),
+    const SizedBox(height: 20),
   ]);
 
   Widget _title(String t, String s) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -609,14 +740,14 @@ class _S extends State<BecomeMerchantScreen> {
       if (step > 0) const SizedBox(width: 12),
       Expanded(flex: 2, child: ElevatedButton(
         onPressed: (!_canNext() || submitting) ? null : () {
-          if (step == 3) { _submit(); } else { _saveDraft(); setState(() => step++); }
+          if (step == 4) { _submit(); } else { _saveDraft(); setState(() => step++); }
         },
         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF7E3C),
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           disabledBackgroundColor: Colors.grey.shade800),
         child: submitting ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) :
-          Text(step == 3 ? t('send') : t('next'), style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)))),
+          Text(step == 4 ? t('send') : t('next'), style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)))),
       ]),
     ]));
 }

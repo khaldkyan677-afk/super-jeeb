@@ -8,7 +8,11 @@ class ApiService {
   static final ApiService instance = ApiService._();
 
   static String get baseUrl {
-    if (kIsWeb) return Uri.base.origin;
+    if (kIsWeb) {
+      final u = Uri.base;
+      final port = u.hasPort ? ':${u.port}' : '';
+      return '${u.scheme}://${u.host}$port';
+    }
     return '';
   }
 

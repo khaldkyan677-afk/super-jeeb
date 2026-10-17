@@ -70,6 +70,11 @@ exports.createMerchant = async (req, res) => {
     mapUrl: body.mapUrl || '',
     workingHours: body.workingHours || '',
     isActive: false,
+    documents: body.documents || {},
+    documentsVerified: false,
+    commission: body.commission || 5,
+    agreedToTerms: body.agreedToTerms || false,
+    agreedToCommission: body.agreedToCommission || false,
   });
     res.status(201).json({ _id: store._id, store });
   } catch (e) { res.status(500).json({ error: e.message }); }
