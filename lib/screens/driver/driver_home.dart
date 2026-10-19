@@ -16,13 +16,43 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
 
   Future<void> _updateStage(String stage, String label) async {
-    // TODO: نستخدم الطلب الحالي
-    final res = await ApiService.updateTripStage(orderId: 'CURRENT', stage: stage);
-    if (!mounted) { return; }
+    String? pin;
+    if (stage == 'delivered') {
+      final pinCtrl = TextEditingController();
+      pin = await showDialog<String>(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: const Color(0xFF1E000C),
+          title: const Text('كود التسليم', style: TextStyle(color: Colors.white)),
+          content: TextField(
+            controller: pinCtrl,
+            keyboardType: TextInputType.number,
+            style: const TextStyle(color: Colors.white),
+            decoration: const InputDecoration(
+              hintText: 'أدخل الكود المكون من 4 أرقام من الزبون',
+              hintStyle: TextStyle(color: Colors.white54),
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء', style: TextStyle(color: Colors.grey))),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+              onPressed: () => Navigator.pop(ctx, pinCtrl.text),
+              child: const Text('تأكيد', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      );
+      if (pin == null || pin.isEmpty) return;
+    }
+
+    final res = await ApiService.updateTripStage(orderId: 'CURRENT', stage: stage, pin: pin);
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(res.containsKey('error') ? 'خطأ: ${res['error']}' : '✓ $label'),
-        backgroundColor: res.containsKey('error') ? DJ.danger : DJ.success,
+        backgroundColor: res.containsKey('error') ? Colors.red : Colors.green,
       ),
     );
   }
