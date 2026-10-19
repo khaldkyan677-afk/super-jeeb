@@ -60,6 +60,8 @@ app.use('/api/invoices', require('./routes/invoiceRoutes'));
 app.use('/api/receipts', require('./routes/receiptRoutes'));
 app.use('/api/refunds', require('./routes/refundRoutes'));
 app.use('/api/admins', require('./routes/adminRoutes'));
+app.use('/api/services', require('./routes/serviceRoutes'));
+app.use('/api/trips', require('./routes/tripRoutes'));
 app.use('/api/chat', require('./routes/chatRoutes'));
 app.use('/api/taxi', require('./routes/taxiRoutes'));
 

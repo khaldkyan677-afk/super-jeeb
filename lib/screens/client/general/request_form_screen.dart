@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import '../../../services/api_service.dart';
 import 'dart:convert';
-import 'track_order_screen.dart';
 
 const _kRed = Color(0xFFEF233C);
 const _kBg = Color(0xFF0D0D12);
@@ -215,7 +214,53 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
     );
   }
 
-  void _showConfirmDialog() {
+  
+  Future<void> _submitRequest() async {
+    setState(() => _loadingMethods = true);
+
+    // تحديد نوع الخدمة حسب اختيار المستخدم
+    String apiType = 'taxi';
+    if (widget.serviceType == 'طرود') apiType = 'parcel';
+    if (widget.serviceType == 'اشتري لي') apiType = 'buy_for_me';
+    if (widget.serviceType == 'Super Express') apiType = 'super_express';
+
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiService.baseUrl}/api/services'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${ApiService.authToken}',
+        },
+        body: jsonEncode({
+          'serviceType': apiType,
+          'pickupLocation': {'address': _c1.text},
+          'dropoffLocation': {'address': _c2.text},
+          'details': '${_c3.text} ${_c4.text} - Option: $_option',
+          'price': 500, // سعر افتراضي مؤقتاً (سيتم تطوير حساب المسافة لاحقاً)
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        if (mounted) _showSuccessDialog();
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('حدث خطأ أثناء إرسال الطلب'), backgroundColor: Colors.red),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('خطأ في الاتصال: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loadingMethods = false);
+    }
+  }
+
+  void _showSuccessDialog() {
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
@@ -232,9 +277,9 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
                 child: const Icon(Icons.check_circle, color: _kRed, size: 44),
               ),
               const SizedBox(height: 14),
-              Text('تأكيد الطلب', style: GoogleFonts.cairo(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700)),
+              Text('تم بنجاح', style: GoogleFonts.cairo(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
-              Text('سيتم إرسال طلب ${widget.serviceType} الآن', style: GoogleFonts.cairo(color: Colors.grey, fontSize: 13), textAlign: TextAlign.center),
+              Text('تم إرسال طلب ${widget.serviceType} بنجاح', style: GoogleFonts.cairo(color: Colors.grey, fontSize: 13), textAlign: TextAlign.center),
               const SizedBox(height: 20),
               Row(
                 children: [
@@ -244,32 +289,19 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(color: _kBg, borderRadius: BorderRadius.circular(12)),
-                        child: Center(child: Text('إلغاء', style: GoogleFonts.cairo(color: Colors.grey, fontWeight: FontWeight.w600))),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => TrackOrderScreen(serviceType: widget.serviceType)));
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(color: _kRed, borderRadius: BorderRadius.circular(12)),
-                        child: Center(child: Text('تأكيد', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.w700))),
+                        child: Center(child: Text('إغلاق', style: GoogleFonts.cairo(color: Colors.grey, fontWeight: FontWeight.w600))),
                       ),
                     ),
                   ),
                 ],
-              ),
+              )
             ],
           ),
         ),
       ),
     );
   }
+
 
   Widget _buildPaymentDetails() {
     if (_selectedMethodId == null) return const SizedBox.shrink();
@@ -461,7 +493,7 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
 
   Widget _buildButton() {
     return GestureDetector(
-      onTap: () => _showConfirmDialog(),
+      onTap: () => _submitRequest(),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(

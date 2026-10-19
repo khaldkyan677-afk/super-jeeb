@@ -30,3 +30,4 @@ build/
 # Misc
 .DS_Store
 DB_Store
+.aider*

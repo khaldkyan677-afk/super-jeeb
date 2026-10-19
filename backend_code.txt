@@ -1,0 +1,3892 @@
+
+
+--- FILE: server/simulate_cycle.js ---
+
+const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+const User = require('./models/User');
+const Store = require('./models/Store');
+const Order = require('./models/Order');
+const Product = require('./models/Product');
+
+async function runCycle() {
+  console.log('🚀 بدء محاكاة دورة حياة التطبيق الكاملة...\n');
+  await mongoose.connect(process.env.MONGO_URI);
+
+  // 1. تجهيز الأدمن
+  const admin = await User.findOne({ role: 'admin' });
+  if (!admin) throw new Error('لا يوجد أدمن في DB');
+  const adminToken = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET);
+  const adminHeaders = { 'Authorization': `Bearer ${adminToken}`, 'Content-Type': 'application/json' };
+
+  // 2. إنشاء عميل (Client)
+  let client = await User.findOne({ phone: '999999991' });
+  if (!client) client = await User.create({ name: 'عميل تجريبي', phone: '999999991', role: 'client' });
+  const clientToken = jwt.sign({ id: client._id, role: 'client' }, process.env.JWT_SECRET);
+  const clientHeaders = { 'Authorization': `Bearer ${clientToken}`, 'Content-Type': 'application/json' };
+  console.log('1️⃣ تم إنشاء عميل تجريبي:', client.name);
+
+  // 3. تقديم طلب متجر (من العميل)
+  let store = await Store.findOne({ merchantId: client._id });
+  if (!store) {
+    store = await Store.create({ name: 'متجر المحاكاة', merchantId: client._id, phone: '999999991', isVerified: false, commission: 5 });
+  }
+  console.log('2️⃣ العميل قدم طلب فتح متجر (معلق):', store.name);
+
+  // 4. الأدمن يقبل المتجر
+  store.isVerified = true;
+  store.isActive = true;
+  store.documentsVerified = true;
+  await store.save();
+  console.log('3️⃣ الأدمن قام بتوثيق المتجر (أصبح نشطاً)');
+
+  // 5. التاجر يضيف منتج
+  let product = await Product.findOne({ storeId: store._id });
+  if (!product) {
+    product = await Product.create({ name: 'منتج تجريبي', price: 100, storeId: store._id, category: 'general' });
+  }
+  console.log('4️⃣ التاجر أضاف منتجاً:', product.name, '| السعر:', product.price);
+
+  // 6. إنشاء مندوب
+  let driver = await User.findOne({ phone: '999999992' });
+  if (!driver) driver = await User.create({ name: 'مندوب تجريبي', phone: '999999992', role: 'driver' });
+  const driverToken = jwt.sign({ id: driver._id, role: 'driver' }, process.env.JWT_SECRET);
+  const driverHeaders = { 'Authorization': `Bearer ${driverToken}`, 'Content-Type': 'application/json' };
+  console.log('5️⃣ تم إنشاء مندوب تجريبي:', driver.name);
+
+  // 7. العميل يطلب المنتج
+  let order = await Order.findOne({ userId: client._id });
+  if (!order) {
+    order = await Order.create({
+      userId: client._id,
+      storeId: store._id,
+      products: [{ productId: product._id, quantity: 1, price: product.price }],
+      total: product.price,
+      status: 'pending',
+      paymentMethod: 'cash'
+    });
+  }
+  console.log('6️⃣ العميل أنشأ طلباً (قيد الانتظار) | الإجمالي:', order.total);
+
+  // 8. المندوب يقبل الطلب
+  order.driverId = driver._id;
+  order.status = 'accepted';
+  await order.save();
+  console.log('7️⃣ المندوب قبل الطلب وذهب للمتجر');
+
+  // 9. المندوب يستلم ويوصل الطلب
+  order.status = 'delivered';
+  await order.save();
+  console.log('8️⃣ المندوب سلم الطلب للعميل (مكتمل)');
+
+  // 10. حساب العمولة والمديونية
+  const commissionAmount = (order.total * (store.commission || 5)) / 100;
+  const merchantNet = order.total - commissionAmount;
+  console.log('9️⃣ العمولة المحسوبة للتطبيق:', commissionAmount, '| صافي حق التاجر:', merchantNet);
+  
+  // هل يوجد حقل للمديونية في المتجر؟
+  if (store.schema.path('walletBalance')) {
+    store.walletBalance = (store.walletBalance || 0) + merchantNet;
+    await store.save();
+    console.log('🔟 تمت إضافة المبلغ لمحفظة التاجر');
+  } else {
+    console.log('⚠️ تنبيه: لا يوجد حقل Wallet/Balance في نموذج المتجر لحفظ المديونية!');
+  }
+
+  // تنظيف البيانات التجريبية (إزالة الطلب والمنتج والمتجر والمندوب والعميل)
+  await Order.findByIdAndDelete(order._id);
+  await Product.findByIdAndDelete(product._id);
+  await Store.findByIdAndDelete(store._id);
+  await User.findByIdAndDelete(driver._id);
+  await User.findByIdAndDelete(client._id);
+  
+  console.log('\n🏁 انتهت المحاكاة وتم تنظيف البيانات.');
+  await mongoose.disconnect();
+}
+
+runCycle().catch(err => console.error('❌ فشل في المحاكاة:', err));
+
+
+--- FILE: server/finance_simulation.js ---
+
+const mongoose = require('mongoose');
+require('dotenv').config();
+const User = require('./models/User');
+const Store = require('./models/Store');
+const Product = require('./models/Product');
+const Order = require('./models/Order');
+const Wallet = require('./models/Wallet');
+
+async function runFinanceSimulation() {
+  console.log('🎬 بدء محاكاة الدفع كاش، كود التسليم، والمديونية...\n');
+  await mongoose.connect(process.env.MONGO_URI);
+
+  const id = Date.now().toString().slice(-4);
+  const pass = '123456';
+
+  // 1. تجهيز المستخدمين (نضع حد أقصى للمديونية 1000 ريال مثلاً)
+  const merchant = await User.create({ name: 'التاجر', phone: `771${id}`, role: 'merchant', email: `m${id}@t.com`, password: pass });
+  const customer = await User.create({ name: 'الزبون', phone: `772${id}`, role: 'client', email: `c${id}@t.com`, password: pass });
+  const driver = await User.create({ name: 'المندوب', phone: `773${id}`, role: 'driver', email: `d${id}@t.com`, password: pass, maxDebtLimit: 1000 }); // حد المديونية 1000
+
+  const store = await Store.create({ name: 'متجر كاش', merchantId: merchant._id, category: 'مطاعم', isVerified: true, isActive: true, commission: 5 });
+  const product = await Product.create({ name: 'وجبة كاش', price: 1000, storeId: store._id, isAvailable: true });
+  
+  const deliveryFee = 500;
+  const deliveryPin = '1234'; // كود التسليم الذي سيطلبه المندوب من الزبون
+
+  // 2. الزبون يطلب (الدفع كاش)
+  let order = await Order.create({
+    customerId: customer._id, merchantId: merchant._id, storeId: store._id,
+    items: [{ name: product.name, price: product.price, quantity: 1 }],
+    total: product.price + deliveryFee,
+    status: 'ready',
+    paymentMethod: 'cash', // الدفع كاش
+    deliveryPin: deliveryPin,
+    isCashCollected: false
+  });
+  console.log(`🛒 1. الزبون طلب وجبة كاش. الإجمالي المطلوب للمندوب: 1500 ريال.`);
+
+  // 3. المندوب يقبل الطلب
+  order.driverId = driver._id;
+  order.status = 'delivering';
+  await order.save();
+  console.log(`🏍️ 2. المندوب قبل الطلب وفي الطريق للزبون.`);
+
+  // 4. المندوب يصل ويطلب الإغلاق (محاولة خاطئة)
+  console.log(`🔒 3. المندوب وصل وطلب إغلاق الطلب (بدون كود)...`);
+  if (order.deliveryPin !== 'wrong') {
+    console.log(`❌ رفض الإغلاق: يجب إدخال كود التسليم الصحيح من الزبون!`);
+  }
+
+  // 5. إدخال الكود الصحيح (الكاش تم تحصيله)
+  console.log(`🔑 4. المندوب أدخل الكود الصحيح (1234) واستلم الكاش.`);
+  order.status = 'delivered';
+  order.isCashCollected = true;
+  await order.save();
+
+  // 6. الحسابات المالية في حالة الكاش
+  const appCommStore = (product.price * 5) / 100; // 50
+  const appCommDelivery = (deliveryFee * 15) / 100; // 75
+  const totalAppRevenue = appCommStore + appCommDelivery; // 125
+  
+  const merchantShare = product.price - appCommStore; // 950
+  const driverShare = deliveryFee - appCommDelivery; // 425
+
+  // المندوب معه 1500 كاش. من حقه 425. إذن هو مدين للتطبيق بـ (1500 - 425) = 1075
+  const driverDebt = order.total - driverShare; // 1075
+
+  console.log(`\n💰 5. التقرير المالي للدفع كاش:`);
+  console.log(`   - التطبيق أرباحه: ${totalAppRevenue} ريال.`);
+  console.log(`   - التاجر مستحقاته: ${merchantShare} ريال.`);
+  console.log(`   - المندوب مستحقاته: ${driverShare} ريال.`);
+  console.log(`   - المندوب يحمل كاش: ${order.total} ريال.`);
+  
+  // تحديث المحافظ
+  await Wallet.create({ userId: merchant._id, balance: merchantShare }); // التاجر دائن
+  await Wallet.create({ userId: driver._id, balance: -driverDebt }); // المندوب مدين (سالب)
+  console.log(`\n💳 6. تم تحديث المحافظ: التاجر (+${merchantShare}) | المندوب (${-driverDebt})`);
+
+  // 7. محاكاة محاولة المندوب استلام طلب جديد (الحد الأقصى للمديونية)
+  console.log(`\n⚠️ 7. المندوب حاول استلام طلب جديد...`);
+  const driverWallet = await Wallet.findOne({ userId: driver._id });
+  const currentDebt = Math.abs(driverWallet.balance); // 1075
+  
+  if (currentDebt >= driver.maxDebtLimit) {
+    console.log(`❌ مرفوض! لقد وصلت للحد الأقصى للمديونية (${driver.maxDebtLimit}). يجب التسديد أولاً.`);
+  } else {
+    console.log(`✅ يمكنه استلام طلب جديد.`);
+  }
+
+  // تنظيف
+  await Order.findByIdAndDelete(order._id);
+  await Product.findByIdAndDelete(product._id);
+  await Store.findByIdAndDelete(store._id);
+  await Wallet.deleteMany({ userId: { $in: [merchant._id, driver._id] } });
+  await User.deleteMany({ _id: { $in: [merchant._id, customer._id, driver._id] } });
+
+  console.log('\n🏁 انتهت محاكاة الكاش والمديونية.');
+  await mongoose.disconnect();
+}
+
+runFinanceSimulation().catch(err => console.error('❌ خطأ:', err.message));
+
+
+--- FILE: server/master_simulation.js ---
+
+const mongoose = require('mongoose');
+require('dotenv').config();
+const User = require('./models/User');
+const Store = require('./models/Store');
+const Product = require('./models/Product');
+const Order = require('./models/Order');
+
+async function masterSimulation() {
+  console.log('🎬 بدء المحاكاة الشاملة (بدون حذف البيانات)...\n');
+  await mongoose.connect(process.env.MONGO_URI);
+
+  const id = Date.now().toString().slice(-4);
+  const pass = '123456';
+
+  const merchantUser = await User.create({ name: 'التاجر_علي', phone: `771${id}`, role: 'client', email: `m${id}@t.com`, password: pass });
+  const buyerUser = await User.create({ name: 'الزبون_سالم', phone: `772${id}`, role: 'client', email: `b${id}@t.com`, password: pass });
+  const driverUser = await User.create({ name: 'المندوب_أحمد', phone: `773${id}`, role: 'driver', email: `d${id}@t.com`, password: pass });
+  console.log(`👥 1. تم تسجيل 4 مستخدمين.`);
+
+  let store = await Store.create({ name: 'مطعم السعادة', merchantId: merchantUser._id, category: 'مطاعم', phone: `771${id}`, isVerified: false, commission: 5 });
+  console.log(`🏪 2. التاجر (علي) قدم طلب متجر (معلق).`);
+  
+  store.isVerified = true; store.isActive = true; store.documentsVerified = true;
+  await store.save();
+  await User.findByIdAndUpdate(merchantUser._id, { role: 'merchant' });
+  console.log(`✅ 3. الأدمن وثق المتجر.`);
+
+  const product = await Product.create({ name: 'برجر دبل', price: 1000, storeId: store._id, category: 'مطاعم', isAvailable: true });
+  console.log(`🍔 4. التاجر أضاف منتج (برجر دبل) بسعر 1000.`);
+
+  const deliveryFee = 500;
+  let order = await Order.create({
+    customerId: buyerUser._id, merchantId: merchantUser._id, storeId: store._id, 
+    items: [{ name: product.name, price: product.price, quantity: 1 }],
+    total: product.price + deliveryFee,
+    status: 'pending', paymentMethod: 'wallet', paymentStatus: 'unpaid', verificationStatus: 'pending',
+    receiptImage: 'receipt.jpg', address: 'شارع حدة، صنعاء'
+  });
+  console.log(`🛒 5. الزبون طلب البرجر. الإجمالي: ${order.total}.`);
+
+  order.paymentStatus = 'paid';
+  order.verificationStatus = 'verified';
+  await order.save();
+  console.log(`💳 6. الأدمن راجع السند وقبل الدفع.`);
+
+  order.status = 'accepted'; await order.save();
+  order.status = 'preparing'; await order.save();
+  order.status = 'ready'; await order.save();
+  console.log(`📦 7. التاجر قبل وجهز الطلب.`);
+
+  const radarOrders = await Order.find({ status: 'ready' });
+  console.log(`📡 8. تطبيق المندوب يرصد ${radarOrders.length} طلب في الرادار.`);
+  
+  order.driverId = driverUser._id;
+  order.status = 'delivering';
+  await order.save();
+  console.log(`🏍️ 9. المندوب قبل الطلب، وفي الطريق.`);
+
+  order.status = 'delivered';
+  await order.save();
+  console.log(`🏁 10. المندوب سلّم الطلب. تم إغلاق الطلب.\n`);
+
+  const appCommissionStore = (product.price * (store.commission || 5)) / 100;
+  const appCommissionDelivery = (deliveryFee * 15) / 100;
+  const totalAppRevenue = appCommissionStore + appCommissionDelivery;
+  const merchantEarnings = product.price - appCommissionStore;
+  const driverEarnings = deliveryFee - appCommissionDelivery;
+
+  console.log('💰 === التقرير المالي ===');
+  console.log(`💵 إجمالي الزبون: ${order.total}`);
+  console.log(`🏪 مستحقات التاجر: ${merchantEarnings}`);
+  console.log(`🏍️ مستحقات المندوب: ${driverEarnings}`);
+  console.log(`🛡️ ربح التطبيق: ${totalAppRevenue}.`);
+
+  order.commission = totalAppRevenue;
+  order.merchantShare = merchantEarnings;
+  order.driverShare = driverEarnings;
+  await order.save();
+
+  console.log('\n✅ تم حفظ جميع البيانات في قاعدة البيانات بنجاح.');
+  await mongoose.disconnect();
+}
+
+masterSimulation().catch(err => console.error('❌ خطأ:', err.message));
+
+
+--- FILE: server/server.js ---
+
+const express = require('express');
+const { errorLogger } = require('./middleware/logging');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const connectDB = require('./config/db');
+
+dotenv.config();
+connectDB();
+
+const path = require('path');
+const app = express();
+app.set('trust proxy', 1);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Disable all caching for development
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
+
+app.use(express.json({ limit: '10mb', type: ["application/json", "text/plain"] }));
+app.use(cors());
+app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
+
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
+app.use('/api', limiter);
+
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
+app.use('/api/driver', require('./routes/driverRoutes'));
+app.use('/api/logs', require('./routes/logRoutes'));
+app.use('/api/withdrawals', require('./routes/withdrawalRoutes'));
+app.use('/api/otp', require('./routes/otpRoutes'));
+app.use('/api/payments', require('./routes/paymentRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/favorites', require('./routes/favoriteRoutes'));
+app.use('/api/ratings', require('./routes/ratingRoutes'));
+app.use('/api/reports', require('./routes/reportRoutes'));
+app.use('/api/admin-auth', require('./routes/adminAuthRoutes'));
+app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/sections', require('./routes/sectionRoutes'));
+app.use('/api/stores', require('./routes/storeRoutes'));
+app.use('/api/products', require('./routes/productRoutes'));
+app.use('/api/ads', require('./routes/adsRoutes'));
+app.use('/api/wallet', require('./routes/walletRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/merchants', require('./routes/merchantRoutes'));
+app.use('/api/settings', require('./routes/settingRoutes'));
+app.use('/api/cities', require('./routes/cityRoutes'));
+app.use('/api/districts', require('./routes/districtRoutes'));
+app.use('/api/addresses', require('./routes/addressRoutes'));
+app.use('/api/coupons', require('./routes/couponRoutes'));
+app.use('/api/exchange-rates', require('./routes/exchangeRateRoutes'));
+app.use('/api/official-accounts', require('./routes/officialAccountRoutes'));
+app.use('/api/invoices', require('./routes/invoiceRoutes'));
+app.use('/api/receipts', require('./routes/receiptRoutes'));
+app.use('/api/refunds', require('./routes/refundRoutes'));
+app.use('/api/admins', require('./routes/adminRoutes'));
+app.use('/api/chat', require('./routes/chatRoutes'));
+app.use('/api/taxi', require('./routes/taxiRoutes'));
+
+app.get('/api/health', (req, res) => { res.status(200).json({ status: 'OK', message: 'Super-Jeeb Server is running' }); });
+
+app.use((err, req, res, next) => { console.error(err.stack); res.status(500).json({ message: 'Something went wrong!' }); });
+
+const PORT = process.env.PORT || 5000;
+app.use(errorLogger);
+
+
+// === Static files (Flutter web) ===
+const buildPath = path.join(require('os').homedir(), 'super-jeeb/build/web');
+
+// MIME types for Flutter assets
+app.use((req, res, next) => {
+  if (req.url.endsWith('.wasm')) res.setHeader('Content-Type', 'application/wasm');
+  if (req.url.endsWith('.mjs')) res.setHeader('Content-Type', 'text/javascript');
+  next();
+});
+
+app.use(express.static(buildPath));
+app.use('/v2', express.static(buildPath));
+app.use('/v2', (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  if (req.method !== 'GET') return next();
+  res.sendFile(path.join(buildPath, 'index.html'));
+});
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  if (req.method !== 'GET') return next();
+  res.sendFile(path.join(buildPath, 'index.html'));
+});
+
+app.listen(PORT, () => { console.log(`Server running on port ${PORT}`); });
+
+
+--- FILE: server/seed_payment_methods.js ---
+
+const mongoose = require('mongoose');
+require('dotenv').config();
+
+(async () => {
+  await mongoose.connect(process.env.MONGO_URI);
+  const PM = require('./models/PaymentMethod');
+
+  const methods = [
+    { name: 'كاش', code: 'cash', type: 'cash', icon: 'payments', order: 1, isActive: true, isDefault: true },
+    { name: 'جوالي', code: 'jawali', type: 'wallet', icon: 'phone_android', order: 2, isActive: true },
+    { name: 'ون كاش', code: 'one_cash', type: 'wallet', icon: 'wallet', order: 3, isActive: true },
+    { name: 'بن دول باي', code: 'bin_dollar', type: 'wallet', icon: 'credit_card', order: 4, isActive: true },
+    { name: 'فلوسك', code: 'floosak', type: 'wallet', icon: 'account_balance_wallet', order: 5, isActive: true },
+  ];
+
+  for (const m of methods) {
+    const exists = await PM.findOne({ code: m.code });
+    if (!exists) {
+      await PM.create(m);
+      console.log('✓ Created:', m.name);
+    } else {
+      console.log('✓ Exists:', m.name);
+    }
+  }
+
+  const count = await PM.countDocuments();
+  console.log('\nTotal payment methods:', count);
+  process.exit(0);
+})();
+
+
+--- FILE: server/routes/cityRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const c = require('../controllers/cityController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.route('/')
+  .get(c.getAllCities)
+  .post(protect, authorize('admin'), c.createCity);
+
+router.route('/:id')
+  .get(c.getCityById)
+  .put(protect, authorize('admin'), c.updateCity)
+  .delete(protect, authorize('admin'), c.deleteCity);
+
+module.exports = router;
+
+
+--- FILE: server/routes/adminRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const adminController = require('../controllers/adminController');
+const { protect } = require('../middleware/auth');
+
+router.get('/merchants', protect, adminController.getAdminMerchants);
+router.put('/merchants/:id/toggle', protect, adminController.toggleMerchantStatus);
+router.put('/merchants/:id/verify', protect, adminController.verifyMerchant);
+router.delete('/merchants/:id', protect, adminController.deleteMerchant);
+router.put('/merchants/:id/alert', protect, adminController.sendAlert);
+router.put('/merchants/:id/commission', protect, adminController.updateCommission);
+
+module.exports = router;
+
+
+--- FILE: server/routes/walletRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const { getMyWallet, requestTopup, getTransactions } = require('../controllers/walletController');
+const { protect } = require('../middleware/auth');
+router.get('/', protect, getMyWallet);
+router.post('/topup', protect, requestTopup);
+router.get('/transactions', protect, getTransactions);
+module.exports = router;
+
+
+--- FILE: server/routes/notificationRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const { getMyNotifications, markAsRead, sendNotification } = require('../controllers/notificationController');
+const { protect, authorize } = require('../middleware/auth');
+router.get('/', protect, getMyNotifications);
+router.patch('/:id/read', protect, markAsRead);
+router.post('/', protect, authorize('admin'), sendNotification);
+module.exports = router;
+
+
+--- FILE: server/routes/invoiceRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const c = require('../controllers/invoiceController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.route('/')
+  .get(protect, authorize('admin'), c.getAllInvoices)
+  .post(protect, authorize('admin'), c.createInvoice);
+
+router.route('/my')
+  .get(protect, c.getMyInvoices);
+
+router.route('/:id')
+  .get(protect, c.getInvoiceById)
+  .delete(protect, authorize('admin'), c.deleteInvoice);
+
+module.exports = router;
+
+
+--- FILE: server/routes/couponRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const c = require('../controllers/couponController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.route('/')
+  .get(c.getAllCoupons)
+  .post(protect, authorize('admin'), c.createCoupon);
+
+router.route('/validate/:code')
+  .get(protect, c.validateCoupon);
+
+router.route('/code/:code')
+  .get(c.getCouponByCode);
+
+router.route('/:id')
+  .put(protect, authorize('admin'), c.updateCoupon)
+  .delete(protect, authorize('admin'), c.deleteCoupon);
+
+module.exports = router;
+
+
+--- FILE: server/routes/officialAccountRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const c = require('../controllers/officialAccountController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.route('/')
+  .get(c.getAllAccounts)
+  .post(protect, authorize('admin'), c.createAccount);
+
+router.route('/:id')
+  .get(c.getAccountById)
+  .put(protect, authorize('admin'), c.updateAccount)
+  .delete(protect, authorize('admin'), c.deleteAccount);
+
+module.exports = router;
+
+
+--- FILE: server/routes/districtRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const c = require('../controllers/districtController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.route('/')
+  .get(c.getAllDistricts)
+  .post(protect, authorize('admin'), c.createDistrict);
+
+router.route('/city/:cityId')
+  .get(c.getDistrictsByCity);
+
+router.route('/:id')
+  .get(c.getDistrictById)
+  .put(protect, authorize('admin'), c.updateDistrict)
+  .delete(protect, authorize('admin'), c.deleteDistrict);
+
+module.exports = router;
+
+
+--- FILE: server/routes/adminAuthRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const { adminLogin } = require('../controllers/adminAuthController');
+router.post('/login', adminLogin);
+module.exports = router;
+
+
+--- FILE: server/routes/taxiRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const { requestTrip, getMyTrips, acceptTrip, verifyPin } = require('../controllers/taxiController');
+const { protect, authorize } = require('../middleware/auth');
+router.post('/request', protect, requestTrip);
+router.get('/my', protect, getMyTrips);
+router.patch('/:id/accept', protect, authorize('driver'), acceptTrip);
+router.post('/:id/verify-pin', protect, verifyPin);
+module.exports = router;
+
+
+--- FILE: server/routes/withdrawalRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const {
+  listPayoutAccounts, addPayoutAccount, updatePayoutAccount, deletePayoutAccount,
+  requestWithdrawal, myWithdrawals,
+  listAllWithdrawals, processWithdrawal,
+  listAllPayoutAccounts, verifyPayoutAccount
+} = require('../controllers/withdrawalController');
+const { protect, authorize } = require('../middleware/auth');
+
+// حسابات الاستلام (مستخدم)
+router.get('/accounts', protect, listPayoutAccounts);
+router.post('/accounts', protect, addPayoutAccount);
+router.patch('/accounts/:id', protect, updatePayoutAccount);
+router.delete('/accounts/:id', protect, deletePayoutAccount);
+
+// طلبات السحب (مستخدم)
+router.post('/request', protect, requestWithdrawal);
+router.get('/my', protect, myWithdrawals);
+
+// أدمن
+router.get('/admin/all', protect, authorize('admin'), listAllWithdrawals);
+router.patch('/admin/:id/process', protect, authorize('admin'), processWithdrawal);
+router.get('/admin/accounts', protect, authorize('admin'), listAllPayoutAccounts);
+router.patch('/admin/accounts/:id/verify', protect, authorize('admin'), verifyPayoutAccount);
+
+module.exports = router;
+
+
+--- FILE: server/routes/exchangeRateRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const c = require('../controllers/exchangeRateController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.route('/')
+  .get(c.getAllRates)
+  .post(protect, authorize('admin'), c.createRate);
+
+router.route('/:id')
+  .get(c.getRateById)
+  .put(protect, authorize('admin'), c.updateRate)
+  .delete(protect, authorize('admin'), c.deleteRate);
+
+module.exports = router;
+
+
+--- FILE: server/routes/chatRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const { getChat, sendMessage } = require('../controllers/chatController');
+const { protect } = require('../middleware/auth');
+router.get('/:orderId', protect, getChat);
+router.post('/', protect, sendMessage);
+module.exports = router;
+
+
+--- FILE: server/routes/logRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const {
+  listAuditLogs, listLoginLogs, listErrorLogs,
+  listNotificationLogs, logsStats
+} = require('../controllers/logController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.get('/audit', protect, authorize('admin'), listAuditLogs);
+router.get('/logins', protect, authorize('admin'), listLoginLogs);
+router.get('/errors', protect, authorize('admin'), listErrorLogs);
+router.get('/notifications', protect, listNotificationLogs);
+router.get('/stats', protect, authorize('admin'), logsStats);
+
+module.exports = router;
+
+
+--- FILE: server/routes/receiptRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const c = require('../controllers/receiptController');
+const { protect, authorize } = require('../middleware/auth');
+router.route('/').get(protect, authorize('admin'), c.getAllReceipts).post(protect, authorize('admin'), c.createReceipt);
+router.route('/my').get(protect, c.getMyReceipts);
+router.route('/:id').get(protect, c.getReceiptById).delete(protect, authorize('admin'), c.deleteReceipt);
+module.exports = router;
+
+
+--- FILE: server/routes/storeRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const {
+  getStores, getStoresBySection, createStore,
+  getAllStoresAdmin, updateStore, deleteStore
+} = require('../controllers/storeController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.route('/')
+  .get(getStores)
+  .post(protect, authorize('admin', 'merchant'), createStore);
+
+router.route('/all')
+  .get(protect, authorize('admin'), getAllStoresAdmin);
+
+router.route('/section/:sectionId')
+  .get(getStoresBySection);
+
+router.route('/:id')
+  .put(protect, authorize('admin', 'merchant'), updateStore)
+  .delete(protect, authorize('admin'), deleteStore);
+
+module.exports = router;
+
+
+--- FILE: server/routes/paymentRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const {
+  listPaymentMethods, addPaymentMethod, updatePaymentMethod, deletePaymentMethod,
+  createPayment, confirmPayment, listTransactions, getTransaction,
+  refundPayment, paymentStats
+} = require('../controllers/paymentController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.get('/methods', listPaymentMethods);
+router.post('/methods', protect, authorize('admin'), addPaymentMethod);
+router.patch('/methods/:id', protect, authorize('admin'), updatePaymentMethod);
+router.delete('/methods/:id', protect, authorize('admin'), deletePaymentMethod);
+
+router.post('/create', protect, createPayment);
+router.post('/confirm', confirmPayment);
+
+router.get('/transactions', protect, listTransactions);
+router.get('/transactions/:id', protect, getTransaction);
+
+router.post('/refund', protect, authorize('admin'), refundPayment);
+router.get('/stats', protect, authorize('admin'), paymentStats);
+
+module.exports = router;
+
+
+--- FILE: server/routes/authRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const { register, login, getMe, firebaseLogin, updateProfile } = require('../controllers/authController');
+const { protect } = require('../middleware/auth');
+
+router.post('/register', register);
+router.post('/login', login);
+router.post('/firebase-login', firebaseLogin);
+router.get('/me', protect, getMe);
+router.put('/me', protect, updateProfile);
+
+module.exports = router;
+
+
+--- FILE: server/routes/uploadRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const c = require('../controllers/uploadController');
+const { protect } = require('../middleware/auth');
+
+router.post('/', protect, c.uploadSingle, c.handleUpload);
+
+module.exports = router;
+
+
+--- FILE: server/routes/favoriteRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const { toggle, getMyFavorites } = require('../controllers/favoriteController');
+const { protect } = require('../middleware/auth');
+
+router.get('/', protect, getMyFavorites);
+router.post('/:storeId', protect, toggle);
+
+module.exports = router;
+
+
+--- FILE: server/routes/addressRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const c = require('../controllers/addressController');
+const { protect } = require('../middleware/auth');
+
+router.route('/')
+  .get(protect, c.getMyAddresses)
+  .post(protect, c.createAddress);
+
+router.route('/:id')
+  .get(protect, c.getAddressById)
+  .put(protect, c.updateAddress)
+  .delete(protect, c.deleteAddress);
+
+module.exports = router;
+
+
+--- FILE: server/routes/userRoutes.js ---
+
+
+const express = require('express');
+const router = express.Router();
+const { listUsers, approveUser, rejectUser, changeUserRole } = require('../controllers/miscController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.get('/', protect, authorize('admin'), listUsers);
+router.patch('/:id/approve', protect, authorize('admin'), approveUser);
+router.patch('/:id/reject', protect, authorize('admin'), rejectUser);
+router.patch('/:id/role', protect, authorize('admin'), changeUserRole);
+
+module.exports = router;
+
+
+--- FILE: server/routes/orderRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const {
+  createOrder, getMyOrders, updateOrderStatus,
+  getAllOrders, verifyOrder
+} = require('../controllers/orderController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.route('/')
+  .post(protect, createOrder)
+  .get(protect, getMyOrders);
+
+router.route('/merchant').get(protect, authorize('merchant', 'admin'), require('../controllers/orderController').getMerchantOrders);
+
+router.route('/driver').get(protect, authorize('driver','admin'), require('../controllers/orderController').getDriverOrders);
+
+router.route('/all')
+  .get(protect, authorize('admin'), getAllOrders);
+
+router.route('/:id/verify')
+  .put(protect, authorize('admin'), verifyOrder);
+
+router.route('/:id/assign-driver').patch(protect, authorize('driver','admin'), require('../controllers/orderController').assignDriver);
+
+router.route('/:id/deliver').post(protect, authorize('driver','admin'), require('../controllers/orderController').deliverOrder);
+
+router.route('/:id/status')
+  .patch(protect, authorize('merchant', 'driver', 'admin'), updateOrderStatus);
+
+router.route('/:id/stage').patch(protect, authorize('driver', 'admin', 'merchant'), require('../controllers/orderController').updateOrderStage);
+
+module.exports = router;
+
+
+--- FILE: server/routes/ratingRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const { createRating } = require('../controllers/ratingController');
+
+router.post('/', createRating);
+module.exports = router;
+
+
+--- FILE: server/routes/productRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const {
+  getProductsByStore, getProductById,
+  createProduct, updateProduct, deleteProduct, getMyProducts,
+} = require('../controllers/productController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.route('/')
+  .post(protect, authorize('merchant', 'admin'), createProduct);
+
+router.route('/my')
+  .get(protect, authorize('merchant', 'admin'), getMyProducts);
+
+router.route('/store/:storeId').get(getProductsByStore);
+router.route('/:id')
+  .get(getProductById)
+  .put(protect, authorize('merchant', 'admin'), updateProduct)
+  .delete(protect, authorize('merchant', 'admin'), deleteProduct);
+
+module.exports = router;
+
+
+--- FILE: server/routes/otpRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const { sendOtp, verifyOtp, cleanupOtps } = require('../controllers/otpController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.post('/send', sendOtp);
+router.post('/verify', verifyOtp);
+router.delete('/cleanup', protect, authorize('admin'), cleanupOtps);
+
+module.exports = router;
+
+
+--- FILE: server/routes/settingRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const c = require('../controllers/settingController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.route('/')
+  .get(c.getAllSettings)
+  .post(protect, authorize('admin'), c.createSetting);
+
+router.route('/group/:group')
+  .get(c.getSettingsByGroup);
+
+router.route('/:key')
+  .get(c.getSettingByKey)
+  .put(protect, authorize('admin'), c.updateSetting)
+  .delete(protect, authorize('admin'), c.deleteSetting);
+
+module.exports = router;
+
+
+--- FILE: server/routes/sectionRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const {
+  getSections, getAllSections, createSection,
+  updateSection, deleteSection
+} = require('../controllers/sectionController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.route('/')
+  .get(getSections)
+  .post(protect, authorize('admin'), createSection);
+
+router.route('/all')
+  .get(protect, authorize('admin'), getAllSections);
+
+router.route('/:id')
+  .put(protect, authorize('admin'), updateSection)
+  .delete(protect, authorize('admin'), deleteSection);
+
+module.exports = router;
+
+
+--- FILE: server/routes/driverRoutes.js ---
+
+
+const express = require('express');
+const router = express.Router();
+const { driverEarnings } = require('../controllers/miscController');
+const { protect } = require('../middleware/auth');
+
+router.get('/earnings', protect, driverEarnings);
+
+module.exports = router;
+
+
+--- FILE: server/routes/adsRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const { getAds, createAd, updateAd, deleteAd } = require('../controllers/adController');
+const { protect, authorize } = require('../middleware/auth');
+router.route('/').get(getAds).post(protect, authorize('admin'), createAd);
+router.route('/:id').put(protect, authorize('admin'), updateAd).delete(protect, authorize('admin'), deleteAd);
+module.exports = router;
+
+
+--- FILE: server/routes/adRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const { getAds, createAd, updateAd, deleteAd } = require('../controllers/adController');
+const { protect, authorize } = require('../middleware/auth');
+router.route('/').get(getAds).post(protect, authorize('admin'), createAd);
+router.route('/:id').put(protect, authorize('admin'), updateAd).delete(protect, authorize('admin'), deleteAd);
+module.exports = router;
+
+
+--- FILE: server/routes/refundRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const c = require('../controllers/refundController');
+const { protect, authorize } = require('../middleware/auth');
+router.route('/').get(protect, authorize('admin'), c.getAllRefunds).post(protect, c.createRefund);
+router.route('/my').get(protect, c.getMyRefunds);
+router.route('/:id').patch(protect, authorize('admin'), c.updateRefundStatus).delete(protect, authorize('admin'), c.deleteRefund);
+module.exports = router;
+
+
+--- FILE: server/routes/merchantRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const c = require('../controllers/merchantController');
+const { protect, authorize } = require('../middleware/auth');
+
+router.route('/all').get(protect, authorize('admin'), c.getAllMerchantsAdmin);
+
+router.route('/')
+  .get(c.getAllMerchants)
+  .post(protect, c.createMerchant);
+
+router.route('/me/store').get(protect, authorize('merchant','admin'), c.getMyStore);
+router.route('/me/store').put(protect, authorize('merchant','admin'), c.updateMyStore);
+
+router.route('/me')
+  .get(protect, c.getMyMerchant);
+
+router.route('/:id')
+  .get(c.getMerchantById)
+  .put(protect, authorize('admin'), c.updateMerchant)
+  .delete(protect, authorize('admin'), c.deleteMerchant);
+
+router.route('/:id/verify')
+  .patch(protect, authorize('admin'), c.verifyMerchant);
+
+module.exports = router;
+
+
+--- FILE: server/routes/reportRoutes.js ---
+
+const express = require('express');
+const router = express.Router();
+const { createReport, getMyReports } = require('../controllers/reportController');
+const { protect } = require('../middleware/auth');
+router.post('/', createReport);
+router.get('/my', protect, getMyReports);
+module.exports = router;
+
+
+--- FILE: server/config/db.js ---
+
+const mongoose = require('mongoose');
+
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
+
+
+--- FILE: server/models/Favorite.js ---
+
+const mongoose = require('mongoose');
+const favoriteSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  storeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Store', required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+favoriteSchema.index({ userId: 1, storeId: 1 }, { unique: true });
+module.exports = mongoose.model('Favorite', favoriteSchema);
+
+
+--- FILE: server/models/Receipt.js ---
+
+const mongoose = require('mongoose');
+const s = new mongoose.Schema({
+  receiptNumber: { type: String, required: true, unique: true },
+  transactionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Transaction', required: true },
+  orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  amount: { type: Number, required: true },
+  currency: { type: String, default: 'YER' },
+  method: { type: String },
+  details: { type: Object },
+  issuedAt: { type: Date, default: Date.now }
+}, { timestamps: true });
+module.exports = mongoose.model('Receipt', s);
+
+
+--- FILE: server/models/PayoutAccount.js ---
+
+const mongoose = require('mongoose');
+const s = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  type: { type: String, enum: ['wallet', 'bank', 'cash'], required: true },
+  accountName: { type: String, required: true },
+  accountNumber: { type: String, required: true },
+  walletProvider: { type: String },
+  bankName: { type: String },
+  iban: { type: String },
+  isDefault: { type: Boolean, default: false },
+  isVerified: { type: Boolean, default: false },
+  isActive: { type: Boolean, default: true }
+}, { timestamps: true });
+s.index({ userId: 1 });
+module.exports = mongoose.model('PayoutAccount', s);
+
+
+--- FILE: server/models/LoginLog.js ---
+
+const mongoose = require('mongoose');
+const s = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  phone: { type: String },
+  email: { type: String },
+  method: { type: String, enum: ['otp', 'password', 'google', 'firebase'], default: 'otp' },
+  success: { type: Boolean, default: true },
+  failureReason: { type: String },
+  ip: { type: String },
+  userAgent: { type: String }
+}, { timestamps: true });
+s.index({ createdAt: -1 });
+s.index({ userId: 1 });
+module.exports = mongoose.model('LoginLog', s);
+
+
+--- FILE: server/models/Admin.js ---
+
+const mongoose = require('mongoose');
+const adminSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  permissions: [{ type: String }],
+  lastLogin: { type: Date },
+  createdAt: { type: Date, default: Date.now }
+});
+module.exports = mongoose.model('Admin', adminSchema);
+
+
+--- FILE: server/models/Invoice.js ---
+
+const mongoose = require('mongoose');
+const invoiceSchema = new mongoose.Schema({
+  orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
+  breakdown: { subtotal: Number, delivery: Number, discount: Number, total: Number },
+  paymentMethod: { type: String, enum: ['cash', 'card', 'wallet'], default: 'cash' },
+  status: { type: String, enum: ['unpaid', 'paid', 'refunded'], default: 'unpaid' },
+  issuedAt: { type: Date, default: Date.now },
+  paidAt: { type: Date }
+});
+module.exports = mongoose.model('Invoice', invoiceSchema);
+
+
+--- FILE: server/models/NotificationLog.js ---
+
+const mongoose = require('mongoose');
+const s = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  type: { type: String, required: true },
+  title: { type: String, required: true },
+  body: { type: String },
+  channel: { type: String, enum: ['push', 'email', 'sms', 'in_app'], default: 'push' },
+  status: { type: String, enum: ['pending', 'sent', 'failed', 'read'], default: 'pending' },
+  error: { type: String },
+  relatedTo: { type: String },
+  relatedId: { type: mongoose.Schema.Types.ObjectId },
+  sentAt: { type: Date }
+}, { timestamps: true });
+s.index({ userId: 1, createdAt: -1 });
+s.index({ status: 1 });
+module.exports = mongoose.model('NotificationLog', s);
+
+
+--- FILE: server/models/Refund.js ---
+
+const mongoose = require('mongoose');
+const s = new mongoose.Schema({
+  refundId: { type: String, required: true, unique: true },
+  transactionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Transaction', required: true },
+  orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  amount: { type: Number, required: true },
+  currency: { type: String, default: 'YER' },
+  reason: { type: String, required: true },
+  status: { type: String, enum: ['pending', 'approved', 'rejected', 'processed'], default: 'pending' },
+  requestedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  processedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  adminNote: { type: String },
+  refundedAt: { type: Date }
+}, { timestamps: true });
+s.index({ userId: 1 });
+s.index({ status: 1 });
+module.exports = mongoose.model('Refund', s);
+
+
+--- FILE: server/models/Chat.js ---
+
+const mongoose = require('mongoose');
+const chatSchema = new mongoose.Schema({
+  orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
+  messages: [{
+    senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    text: String,
+    sentAt: { type: Date, default: Date.now }
+  }],
+  deletedAt: { type: Date },
+  createdAt: { type: Date, default: Date.now }
+});
+module.exports = mongoose.model('Chat', chatSchema);
+
+
+--- FILE: server/models/Store.js ---
+
+const mongoose = require('mongoose');
+const storeSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  merchantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Merchant' },
+  logoUrl: { type: String },
+  coverUrl: { type: String },
+  rating: { type: Number, default: 5 },
+  deliveryTime: { type: String, default: '25 دقيقة' },
+  deliveryFee: { type: Number, default: 0 },
+  minimumOrder: { type: Number, default: 0 },
+  openTime: { type: String, default: '08:00' },
+  closeTime: { type: String, default: '23:00' },
+  isFeatured: { type: Boolean, default: false },
+  category: { type: String },
+  description: { type: String, default: '' },
+  governorate: { type: String, default: '' },
+  city: { type: String, default: '' },
+  phone: { type: String, default: '' },
+  subCategory: { type: String, default: '' },
+  mapUrl: { type: String, default: '' },
+  workingHours: { type: String, default: '' },
+  sectionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Section' },
+  location: { lat: Number, lng: Number, address: String },
+  isActive: { type: Boolean, default: true },
+  isVerified: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now },
+  documents: {
+    nationalId: { type: String, default: '' },
+    commercialRegistry: { type: String, default: '' },
+    businessLicense: { type: String, default: '' },
+    storeFrontImage: { type: String, default: '' },
+    storeInsideImage: { type: String, default: '' },
+  },
+  documentsVerified: { type: Boolean },
+  rejectionReason: { type: String, default: null },
+  commission: { type: Number, default: 5 },
+  agreedToTerms: { type: Boolean, default: false },
+  agreedToCommission: { type: Boolean, default: false },
+});
+module.exports = mongoose.model('Store', storeSchema);
+
+
+--- FILE: server/models/Notification.js ---
+
+const mongoose = require('mongoose');
+const notificationSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  title: { type: String, required: true },
+  body: { type: String, required: true },
+  type: { type: String },
+  isRead: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now }
+});
+module.exports = mongoose.model('Notification', notificationSchema);
+
+
+--- FILE: server/models/PaymentMethod.js ---
+
+const mongoose = require('mongoose');
+
+const s = new mongoose.Schema({
+  name: { type: String, required: true },
+  code: { type: String, required: true, unique: true },
+  type: { type: String, enum: ['cash', 'wallet', 'card', 'bank'], default: 'wallet' },
+  icon: { type: String, default: '' },
+  provider: { type: String, default: '' },
+  accountName: { type: String, default: '' },
+  accountNumber: { type: String, default: '' },
+  iban: { type: String, default: '' },
+  instructions: { type: String, default: '' },
+  config: { type: Object, default: {} },
+  minAmount: { type: Number, default: 0 },
+  maxAmount: { type: Number, default: 0 },
+  isActive: { type: Boolean, default: true },
+  isDefault: { type: Boolean, default: false },
+  order: { type: Number, default: 0 },
+}, { timestamps: true });
+
+module.exports = mongoose.model('PaymentMethod', s);
+
+
+--- FILE: server/models/Transaction.js ---
+
+const mongoose = require('mongoose');
+const transSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  amount: { type: Number, required: true },
+  type: { type: String, enum: ['commission', 'settlement', 'debt', 'payout'], required: true },
+  description: { type: String },
+  status: { type: String, enum: ['pending', 'completed', 'rejected'], default: 'completed' }
+}, { timestamps: true });
+module.exports = mongoose.model('Transaction', transSchema);
+
+
+--- FILE: server/models/Ad.js ---
+
+const mongoose = require('mongoose');
+const adSchema = new mongoose.Schema({
+  title: { type: String },
+  subtitle: { type: String },
+  imageUrl: { type: String, required: true },
+  link: { type: String },
+  order: { type: Number, default: 0 },
+  isActive: { type: Boolean, default: true },
+  expiresAt: { type: Date }
+});
+module.exports = mongoose.model('Ad', adSchema);
+
+
+--- FILE: server/models/Merchant.js ---
+
+const mongoose = require('mongoose');
+const merchantSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  storeName: { type: String, required: true },
+  category: { type: String },
+  image: { type: String },
+  location: { lat: Number, lng: Number, address: String },
+  isActive: { type: Boolean, default: true },
+  verificationStatus: { type: String, enum: ['pending', 'verified', 'rejected'], default: 'pending' },
+  rejectionReason: { type: String, default: '' },
+  commission: { type: Number, default: 0 },
+  createdAt: { type: Date, default: Date.now }
+});
+module.exports = mongoose.model('Merchant', merchantSchema);
+
+
+--- FILE: server/models/Rating.js ---
+
+const mongoose = require('mongoose');
+const ratingSchema = new mongoose.Schema({
+  orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
+  fromUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  toUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  storeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Store' },
+  stars: { type: Number, min: 1, max: 5, required: true },
+  feedback: { type: String },
+  imageUrl: { type: String },
+  createdAt: { type: Date, default: Date.now }
+});
+ratingSchema.index({ fromUserId: 1, storeId: 1 }, { unique: true, sparse: true });
+module.exports = mongoose.model('Rating', ratingSchema);
+
+
+--- FILE: server/models/OtpCode.js ---
+
+const mongoose = require('mongoose');
+const s = new mongoose.Schema({
+  phone: { type: String, required: true, index: true },
+  code: { type: String, required: true },
+  purpose: { type: String, enum: ['login', 'register', 'payment', 'withdrawal', 'verify'], required: true },
+  attempts: { type: Number, default: 0 },
+  maxAttempts: { type: Number, default: 5 },
+  expiresAt: { type: Date, required: true },
+  isUsed: { type: Boolean, default: false },
+  ip: { type: String }
+}, { timestamps: true });
+s.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+module.exports = mongoose.model('OtpCode', s);
+
+
+--- FILE: server/models/City.js ---
+
+const mongoose = require('mongoose');
+const citySchema = new mongoose.Schema({
+  name: { type: String, required: true, unique: true },
+  currency: { type: String, required: true },
+  lat: { type: Number },
+  lng: { type: Number },
+  isActive: { type: Boolean, default: true }
+});
+module.exports = mongoose.model('City', citySchema);
+
+
+--- FILE: server/models/Address.js ---
+
+const mongoose = require('mongoose');
+
+const addressSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  label: { type: String, default: 'المنزل' },
+  city: { type: String },
+  district: { type: String },
+  street: { type: String },
+  building: { type: String },
+  floor: { type: String },
+  details: { type: String },
+  lat: { type: Number },
+  lng: { type: Number },
+  isDefault: { type: Boolean, default: false },
+}, { timestamps: true });
+
+module.exports = mongoose.model('Address', addressSchema);
+
+
+--- FILE: server/models/Report.js ---
+
+const mongoose = require('mongoose');
+const reportSchema = new mongoose.Schema({
+  fromUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  againstUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  storeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Store' },
+  orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
+  reasonType: { type: String, required: true },
+  reason: { type: String },
+  imageUrl: { type: String },
+  status: { type: String, enum: ['pending', 'reviewed', 'resolved', 'ignored'], default: 'pending' },
+  createdAt: { type: Date, default: Date.now }
+});
+module.exports = mongoose.model('Report', reportSchema);
+
+
+--- FILE: server/models/Section.js ---
+
+const mongoose = require('mongoose');
+const sectionSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  iconName: { type: String },
+  imageUrl: { type: String },
+  order: { type: Number, default: 0 },
+  isActive: { type: Boolean, default: true },
+  parentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Section', default: null },
+});
+module.exports = mongoose.model('Section', sectionSchema);
+
+
+--- FILE: server/models/User.js ---
+
+const mongoose = require('mongoose');
+
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  phone: { type: String, unique: true, sparse: true },
+  bio: { type: String, default: '' },
+  password: { type: String, required: true },
+  bankName: { type: String },
+  bankAccountNumber: { type: String },
+  bankAccountName: { type: String },
+  maxDebtLimit: { type: Number, default: 10000 },
+  role: { 
+    type: String, 
+    enum: ['client', 'merchant', 'driver', 'admin'], 
+    default: 'client' 
+  },
+  wallet: { type: Number, default: 0 },
+  defaultPaymentMethod: { type: String, default: 'cash' },
+  defaultPayoutAccountId: { type: mongoose.Schema.Types.ObjectId, ref: 'PayoutAccount' },
+  phoneVerified: { type: Boolean, default: false },
+  emailVerified: { type: Boolean, default: false },
+  totalSpent: { type: Number, default: 0 },
+  totalEarned: { type: Number, default: 0 },
+  referralCode: { type: String, unique: true, sparse: true },
+  referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  loyaltyPoints: { type: Number, default: 0 },
+  loyaltyTier: { type: String, enum: ['bronze', 'silver', 'gold'], default: 'bronze' },
+  status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+    isActive: { type: Boolean, default: true },
+  createdAt: { type: Date, default: Date.now }
+});
+
+module.exports = mongoose.model('User', userSchema);
+
+
+--- FILE: server/models/ErrorLog.js ---
+
+const mongoose = require('mongoose');
+const s = new mongoose.Schema({
+  level: { type: String, enum: ['error', 'warning', 'info'], default: 'error' },
+  message: { type: String, required: true },
+  stack: { type: String },
+  endpoint: { type: String },
+  method: { type: String },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  ip: { type: String },
+  meta: { type: Object }
+}, { timestamps: true });
+s.index({ createdAt: -1 });
+s.index({ level: 1 });
+module.exports = mongoose.model('ErrorLog', s);
+
+
+--- FILE: server/models/Driver.js ---
+
+const mongoose = require('mongoose');
+const driverSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  vehicle: { type: String, required: true },
+  license: { type: String },
+  lat: { type: Number },
+  lng: { type: Number },
+  isAvailable: { type: Boolean, default: false },
+  rating: { type: Number, default: 5 },
+  earnings: { type: Number, default: 0 },
+  createdAt: { type: Date, default: Date.now }
+});
+module.exports = mongoose.model('Driver', driverSchema);
+
+
+--- FILE: server/models/Trip.js ---
+
+const mongoose = require('mongoose');
+
+const tripSchema = new mongoose.Schema({
+  customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  driverId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  from: { type: String, required: true },
+  to: { type: String, required: true },
+  distance: { type: Number },
+  fare: { type: Number, required: true },
+  status: { 
+    type: String, 
+    enum: ['requested', 'accepted', 'ongoing', 'completed', 'cancelled'], 
+    default: 'requested' 
+  },
+  pin: { type: String },
+  startedAt: { type: Date },
+  endedAt: { type: Date },
+  createdAt: { type: Date, default: Date.now }
+});
+
+module.exports = mongoose.model('Trip', tripSchema);
+
+
+--- FILE: server/models/AuditLog.js ---
+
+const mongoose = require('mongoose');
+const s = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  userRole: { type: String },
+  action: { type: String, required: true },
+  entity: { type: String },
+  entityId: { type: mongoose.Schema.Types.ObjectId },
+  before: { type: Object },
+  after: { type: Object },
+  ip: { type: String },
+  userAgent: { type: String },
+  description: { type: String }
+}, { timestamps: true });
+s.index({ createdAt: -1 });
+s.index({ userId: 1 });
+module.exports = mongoose.model('AuditLog', s);
+
+
+--- FILE: server/models/OfficialAccount.js ---
+
+const mongoose = require('mongoose');
+const officialAccountSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  number: { type: String, required: true },
+  type: { type: String },
+  isActive: { type: Boolean, default: true },
+  addedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+});
+module.exports = mongoose.model('OfficialAccount', officialAccountSchema);
+
+
+--- FILE: server/models/Coupon.js ---
+
+const mongoose = require('mongoose');
+const couponSchema = new mongoose.Schema({
+  code: { type: String, required: true, unique: true },
+  discount: { type: Number, required: true },
+  type: { type: String, enum: ['percentage', 'fixed'], default: 'percentage' },
+  expiresAt: { type: Date },
+  usageLimit: { type: Number, default: 1 },
+  usedCount: { type: Number, default: 0 }
+});
+module.exports = mongoose.model('Coupon', couponSchema);
+
+
+--- FILE: server/models/Setting.js ---
+
+const mongoose = require('mongoose');
+const settingSchema = new mongoose.Schema({
+  key: { type: String, required: true, unique: true },
+  value: { type: mongoose.Schema.Types.Mixed, required: true },
+  group: { type: String, default: 'general' },
+  isSecret: { type: Boolean, default: false },
+  description: { type: String, default: '' },
+  updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  updatedAt: { type: Date, default: Date.now }
+});
+module.exports = mongoose.model('Setting', settingSchema);
+
+
+--- FILE: server/models/District.js ---
+
+const mongoose = require('mongoose');
+const districtSchema = new mongoose.Schema({
+  cityId: { type: mongoose.Schema.Types.ObjectId, ref: 'City', required: true },
+  name: { type: String, required: true },
+  currency: { type: String },
+  lat: { type: Number },
+  lng: { type: Number }
+});
+module.exports = mongoose.model('District', districtSchema);
+
+
+--- FILE: server/models/Order.js ---
+
+const mongoose = require('mongoose');
+
+function generateSecurePin() {
+  let pin;
+  let isWeak = true;
+  const weak = ['1234','2345','3456','4567','5678','6789','9876','8765','7654','6543','5432','4321','0000','1111','2222','3333','4444','5555','6666','7777','8888','9999'];
+  while (isWeak) {
+    pin = Math.floor(1000 + Math.random() * 9000).toString();
+    if (!weak.includes(pin) && !(pin[0] === pin[2] && pin[1] === pin[3])) isWeak = false;
+  }
+  return pin;
+}
+
+const orderSchema = new mongoose.Schema({
+  customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  merchantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  storeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Store' },
+  driverId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  items: [{ name: String, price: Number, quantity: Number }],
+  total: { type: Number, required: true },
+  status: { type: String, default: 'pending' },
+  paymentStatus: { type: String, default: 'unpaid' },
+  paymentMethod: { type: String, default: 'cash' },
+  verificationStatus: { type: String, default: 'none' },
+  receiptImage: { type: String },
+  address: { type: String },
+  commission: { type: Number, default: 0 },
+  merchantShare: { type: Number, default: 0 },
+  driverShare: { type: Number, default: 0 },
+  deliveryPin: { type: String },
+  pinAttempts: { type: Number, default: 0 }
+});
+
+// التوليد التلقائي عند الحفظ
+orderSchema.pre("save", function() {
+  if (this.isNew && !this.deliveryPin) {
+    this.deliveryPin = generateSecurePin();
+  }
+
+});
+
+module.exports = mongoose.model('Order', orderSchema);
+
+
+--- FILE: server/models/ExchangeRate.js ---
+
+const mongoose = require('mongoose');
+const exchangeRateSchema = new mongoose.Schema({
+  from: { type: String, required: true },
+  to: { type: String, required: true },
+  rate: { type: Number, required: true },
+  updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  updatedAt: { type: Date, default: Date.now }
+});
+module.exports = mongoose.model('ExchangeRate', exchangeRateSchema);
+
+
+--- FILE: server/models/Withdrawal.js ---
+
+const mongoose = require('mongoose');
+const s = new mongoose.Schema({
+  withdrawalId: { type: String, required: true, unique: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  amount: { type: Number, required: true },
+  currency: { type: String, default: 'YER' },
+  payoutAccountId: { type: mongoose.Schema.Types.ObjectId, ref: 'PayoutAccount', required: true },
+  status: { type: String, enum: ['pending', 'approved', 'rejected', 'paid'], default: 'pending' },
+  adminNote: { type: String },
+  processedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  transactionRef: { type: String },
+  requestedAt: { type: Date, default: Date.now },
+  processedAt: { type: Date },
+  paidAt: { type: Date }
+}, { timestamps: true });
+s.index({ userId: 1, createdAt: -1 });
+s.index({ status: 1 });
+module.exports = mongoose.model('Withdrawal', s);
+
+
+--- FILE: server/models/Product.js ---
+
+const mongoose = require('mongoose');
+const productSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  oldPrice: { type: Number, default: 0 },
+  imageUrl: { type: String, default: '' },
+  storeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Store', required: true },
+  category: { type: String, default: '' },
+  description: { type: String, default: '' },
+  stock: { type: Number, default: 0 },
+  isAvailable: { type: Boolean, default: true },
+}, { timestamps: true });
+module.exports = mongoose.model('Product', productSchema);
+
+
+--- FILE: server/models/Wallet.js ---
+
+const mongoose = require('mongoose');
+const walletSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+  balance: { type: Number, default: 0 }, // الرصيد (يمكن أن يكون سالباً للمديونية)
+  currency: { type: String, default: 'YER' }
+}, { timestamps: true });
+module.exports = mongoose.model('Wallet', walletSchema);
+
+
+--- FILE: server/controllers/walletController.js ---
+
+const Wallet = require('../models/Wallet');
+exports.getMyWallet = async (req, res) => { try { let wallet = await Wallet.findOne({ userId: req.user._id }); if (!wallet) wallet = await Wallet.create({ userId: req.user._id }); res.json(wallet); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.requestTopup = async (req, res) => { try { const { amount } = req.body; const wallet = await Wallet.findOneAndUpdate({ userId: req.user._id }, { $inc: { balance: amount } }, { returnDocument: 'after', upsert: true }); res.json(wallet); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.getTransactions = async (req, res) => { try { const wallet = await Wallet.findOne({ userId: req.user._id }); res.json(wallet ? wallet.transactions : []); } catch (e) { res.status(500).json({ message: e.message }); } };
+
+
+--- FILE: server/controllers/productController.js ---
+
+const Product = require('../models/Product');
+
+exports.getProductsByStore = async (req, res) => {
+  try {
+    const { storeId } = req.params;
+    const products = await Product.find({ storeId, isAvailable: true });
+    res.json(products);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+};
+
+exports.getProductById = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    res.json(product);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+};
+
+exports.createProduct = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const store = await Store.findOne({ merchantId: req.user._id });
+    if (!store) return res.status(403).json({ message: 'No store for merchant' });
+    const p = await Product.create({ ...req.body, storeId: store._id });
+    res.status(201).json(p);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.updateProduct = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const store = await Store.findOne({ merchantId: req.user._id });
+    if (!store) return res.status(403).json({ message: 'No store' });
+    const p = await Product.findOne({ _id: req.params.id, storeId: store._id });
+    if (!p) return res.status(404).json({ message: 'Not found' });
+    Object.assign(p, req.body);
+    await p.save();
+    res.json(p);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.deleteProduct = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const store = await Store.findOne({ merchantId: req.user._id });
+    if (!store) return res.status(403).json({ message: 'No store' });
+    const p = await Product.findOneAndDelete({ _id: req.params.id, storeId: store._id });
+    if (!p) return res.status(404).json({ message: 'Not found' });
+    res.json({ message: 'Deleted' });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.getMyProducts = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const store = await Store.findOne({ merchantId: req.user._id });
+    if (!store) return res.json([]);
+    const products = await Product.find({ storeId: store._id }).sort({ createdAt: -1 });
+    res.json(products);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+
+--- FILE: server/controllers/withdrawalController.js ---
+
+const PayoutAccount = require('../models/PayoutAccount');
+const Withdrawal = require('../models/Withdrawal');
+const Wallet = require('../models/Wallet');
+const AuditLog = require('../models/AuditLog');
+
+function genWid() { return 'WD' + Date.now() + Math.floor(1000 + Math.random() * 9000); }
+
+// ═══════════════ حسابات الاستلام ═══════════════
+
+exports.listPayoutAccounts = async (req, res) => {
+  try {
+    const accounts = await PayoutAccount.find({ userId: req.user._id }).sort({ isDefault: -1, createdAt: -1 });
+    res.json(accounts);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.addPayoutAccount = async (req, res) => {
+  try {
+    const { type, accountName, accountNumber, walletProvider, bankName, iban, isDefault } = req.body;
+    if (!type || !accountName || !accountNumber) {
+      return res.status(400).json({ message: 'البيانات ناقصة' });
+    }
+    // إذا isDefault، نلغي default من البقية
+    if (isDefault) {
+      await PayoutAccount.updateMany({ userId: req.user._id }, { isDefault: false });
+    }
+    const acc = await PayoutAccount.create({
+      userId: req.user._id,
+      type, accountName, accountNumber,
+      walletProvider, bankName, iban,
+      isDefault: !!isDefault
+    });
+    res.status(201).json(acc);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.updatePayoutAccount = async (req, res) => {
+  try {
+    const acc = await PayoutAccount.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id },
+      req.body,
+      { returnDocument: 'after' }
+    );
+    if (!acc) return res.status(404).json({ message: 'غير موجود' });
+    res.json(acc);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.deletePayoutAccount = async (req, res) => {
+  try {
+    await PayoutAccount.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
+    res.json({ message: 'تم الحذف' });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// ═══════════════ طلبات السحب ═══════════════
+
+exports.requestWithdrawal = async (req, res) => {
+  try {
+    const { amount, payoutAccountId } = req.body;
+    const userId = req.user._id;
+
+    if (!amount || amount <= 0) return res.status(400).json({ message: 'المبلغ غير صحيح' });
+
+    const acc = await PayoutAccount.findOne({ _id: payoutAccountId, userId });
+    if (!acc) return res.status(404).json({ message: 'حساب الاستلام غير موجود' });
+
+    // التحقق من الرصيد
+    const wallet = await Wallet.findOne({ userId });
+    const balance = wallet?.balance || 0;
+    if (balance < amount) {
+      return res.status(400).json({ message: 'الرصيد غير كافٍ. المتاح: ' + balance });
+    }
+
+    const wd = await Withdrawal.create({
+      withdrawalId: genWid(),
+      userId,
+      amount,
+      payoutAccountId,
+      status: 'pending'
+    });
+
+    await AuditLog.create({
+      userId,
+      userRole: req.user.role,
+      action: 'withdrawal_request',
+      entity: 'Withdrawal',
+      entityId: wd._id,
+      description: `طلب سحب ${amount}`
+    });
+
+    res.status(201).json(wd);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.myWithdrawals = async (req, res) => {
+  try {
+    const list = await Withdrawal.find({ userId: req.user._id })
+      .populate('payoutAccountId')
+      .sort({ createdAt: -1 });
+    res.json(list);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// ═══════════════ أدمن ═══════════════
+
+exports.listAllWithdrawals = async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.status) filter.status = req.query.status;
+    const list = await Withdrawal.find(filter)
+      .populate('userId', 'name phone email role')
+      .populate('payoutAccountId')
+      .sort({ createdAt: -1 });
+    res.json(list);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.processWithdrawal = async (req, res) => {
+  try {
+    const { status, adminNote, transactionRef } = req.body;
+    const valid = ['approved', 'rejected', 'paid'];
+    if (!valid.includes(status)) return res.status(400).json({ message: 'حالة غير صحيحة' });
+
+    const wd = await Withdrawal.findById(req.params.id);
+    if (!wd) return res.status(404).json({ message: 'غير موجود' });
+
+    if (wd.status !== 'pending' && status !== 'paid') {
+      return res.status(400).json({ message: 'لا يمكن تعديل هذا الطلب' });
+    }
+
+    const update = {
+      status,
+      adminNote,
+      processedBy: req.user._id,
+      processedAt: new Date()
+    };
+    if (status === 'paid') {
+      update.paidAt = new Date();
+      update.transactionRef = transactionRef;
+      // خصم من المحفظة
+      await Wallet.findOneAndUpdate(
+        { userId: wd.userId },
+        { $inc: { balance: -wd.amount } }
+      );
+    }
+
+    const updated = await Withdrawal.findByIdAndUpdate(wd._id, update, { returnDocument: 'after' });
+
+    await AuditLog.create({
+      userId: req.user._id,
+      userRole: req.user.role,
+      action: 'withdrawal_' + status,
+      entity: 'Withdrawal',
+      entityId: wd._id,
+      description: `${status} - ${wd.amount}`
+    });
+
+    res.json(updated);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.listAllPayoutAccounts = async (req, res) => {
+  try {
+    const list = await PayoutAccount.find()
+      .populate('userId', 'name phone email role')
+      .sort({ createdAt: -1 });
+    res.json(list);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.verifyPayoutAccount = async (req, res) => {
+  try {
+    const acc = await PayoutAccount.findByIdAndUpdate(
+      req.params.id,
+      { isVerified: true },
+      { returnDocument: 'after' }
+    );
+    res.json(acc);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+
+--- FILE: server/controllers/receiptController.js ---
+
+const Receipt = require('../models/Receipt');
+
+exports.getMyReceipts = async (req, res) => {
+  try { res.json(await Receipt.find({ userId: req.user._id })); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getReceiptById = async (req, res) => {
+  try {
+    const r = await Receipt.findById(req.params.id);
+    if (!r) return res.status(404).json({ error: 'Not found' });
+    res.json(r);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getAllReceipts = async (req, res) => {
+  try { res.json(await Receipt.find({})); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.createReceipt = async (req, res) => {
+  try { res.status(201).json(await Receipt.create(req.body)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.deleteReceipt = async (req, res) => {
+  try {
+    const r = await Receipt.findByIdAndDelete(req.params.id);
+    if (!r) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+
+--- FILE: server/controllers/otpController.js ---
+
+const OtpCode = require('../models/OtpCode');
+const LoginLog = require('../models/LoginLog');
+const AuditLog = require('../models/AuditLog');
+
+function gen6() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// إرسال كود OTP
+exports.sendOtp = async (req, res) => {
+  try {
+    const { phone, purpose } = req.body;
+    if (!phone) return res.status(400).json({ message: 'رقم الجوال مطلوب' });
+
+    // حد أقصى 3 أكواد في 5 دقائق
+    const recent = await OtpCode.countDocuments({
+      phone,
+      createdAt: { $gte: new Date(Date.now() - 5 * 60 * 1000) }
+    });
+    if (recent >= 3) {
+      return res.status(429).json({ message: 'محاولات كثيرة، حاول بعد 5 دقائق' });
+    }
+
+    const code = gen6();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+    await OtpCode.create({
+      phone,
+      code,
+      purpose: purpose || 'login',
+      expiresAt,
+      ip: req.ip
+    });
+
+    // TODO: إرسال SMS حقيقي
+
+    res.json({ message: 'تم إرسال الكود', expiresIn: 300 });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// التحقق من OTP
+exports.verifyOtp = async (req, res) => {
+  try {
+    const { phone, code, purpose } = req.body;
+    if (!phone || !code) return res.status(400).json({ message: 'البيانات ناقصة' });
+
+    const otp = await OtpCode.findOne({
+      phone,
+      purpose: purpose || 'login',
+      isUsed: false,
+      expiresAt: { $gt: new Date() }
+    }).sort({ createdAt: -1 });
+
+    if (!otp) return res.status(400).json({ message: 'الكود غير صحيح أو منتهي' });
+
+    if (otp.attempts >= otp.maxAttempts) {
+      return res.status(429).json({ message: 'تجاوزت عدد المحاولات' });
+    }
+
+    if (otp.code !== code) {
+      await OtpCode.findByIdAndUpdate(otp._id, { attempts: otp.attempts + 1 });
+      return res.status(400).json({ message: 'كود خاطئ' });
+    }
+
+    await OtpCode.findByIdAndUpdate(otp._id, { isUsed: true });
+
+    await LoginLog.create({
+      phone,
+      method: 'otp',
+      success: true,
+      ip: req.ip
+    });
+
+    res.json({ message: 'OK', verified: true });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// تنظيف الأكواد المنتهية
+exports.cleanupOtps = async (req, res) => {
+  try {
+    const r = await OtpCode.deleteMany({ expiresAt: { $lt: new Date() } });
+    res.json({ deleted: r.deletedCount });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+
+--- FILE: server/controllers/invoiceController.js ---
+
+const Invoice = require('../models/Invoice');
+
+exports.getMyInvoices = async (req, res) => {
+  try { res.json(await Invoice.find({ userId: req.user._id })); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getInvoiceById = async (req, res) => {
+  try {
+    const i = await Invoice.findById(req.params.id);
+    if (!i) return res.status(404).json({ error: 'Not found' });
+    res.json(i);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getAllInvoices = async (req, res) => {
+  try { res.json(await Invoice.find({})); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.createInvoice = async (req, res) => {
+  try { res.status(201).json(await Invoice.create(req.body)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.deleteInvoice = async (req, res) => {
+  try {
+    const i = await Invoice.findByIdAndDelete(req.params.id);
+    if (!i) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+
+--- FILE: server/controllers/logController.js ---
+
+const AuditLog = require('../models/AuditLog');
+const LoginLog = require('../models/LoginLog');
+const ErrorLog = require('../models/ErrorLog');
+const NotificationLog = require('../models/NotificationLog');
+
+// ═══════════════ سجلات التدقيق ═══════════════
+
+exports.listAuditLogs = async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.userId) filter.userId = req.query.userId;
+    if (req.query.action) filter.action = req.query.action;
+    if (req.query.entity) filter.entity = req.query.entity;
+    const list = await AuditLog.find(filter)
+      .populate('userId', 'name phone email role')
+      .sort({ createdAt: -1 })
+      .limit(parseInt(req.query.limit) || 200);
+    res.json(list);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// ═══════════════ سجلات الدخول ═══════════════
+
+exports.listLoginLogs = async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.userId) filter.userId = req.query.userId;
+    if (req.query.success) filter.success = req.query.success === 'true';
+    const list = await LoginLog.find(filter)
+      .populate('userId', 'name phone email role')
+      .sort({ createdAt: -1 })
+      .limit(parseInt(req.query.limit) || 200);
+    res.json(list);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// ═══════════════ سجلات الأخطاء ═══════════════
+
+exports.listErrorLogs = async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.level) filter.level = req.query.level;
+    const list = await ErrorLog.find(filter)
+      .sort({ createdAt: -1 })
+      .limit(parseInt(req.query.limit) || 200);
+    res.json(list);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// ═══════════════ سجلات الإشعارات ═══════════════
+
+exports.listNotificationLogs = async (req, res) => {
+  try {
+    const filter = {};
+    if (req.user.role !== 'admin') filter.userId = req.user._id;
+    if (req.query.userId && req.user.role === 'admin') filter.userId = req.query.userId;
+    if (req.query.status) filter.status = req.query.status;
+    const list = await NotificationLog.find(filter)
+      .populate('userId', 'name phone email role')
+      .sort({ createdAt: -1 })
+      .limit(parseInt(req.query.limit) || 200);
+    res.json(list);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// ═══════════════ إحصائيات عامة ═══════════════
+
+exports.logsStats = async (req, res) => {
+  try {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const [audit, logins, errors, notifications] = await Promise.all([
+      AuditLog.countDocuments({ createdAt: { $gte: today } }),
+      LoginLog.countDocuments({ createdAt: { $gte: today } }),
+      ErrorLog.countDocuments({ createdAt: { $gte: today } }),
+      NotificationLog.countDocuments({ createdAt: { $gte: today } }),
+    ]);
+    res.json({ audit, logins, errors, notifications });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+
+--- FILE: server/controllers/taxiController.js ---
+
+const Trip = require('../models/Trip');
+exports.requestTrip = async (req, res) => { try { const { from, to, fare } = req.body; const trip = await Trip.create({ customerId: req.user._id, from, to, fare, status: 'requested' }); res.status(201).json(trip); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.getMyTrips = async (req, res) => { try { const trips = await Trip.find({ customerId: req.user._id }).sort({ createdAt: -1 }); res.json(trips); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.acceptTrip = async (req, res) => { try { const trip = await Trip.findByIdAndUpdate(req.params.id, { driverId: req.user._id, status: 'accepted' }, { returnDocument: 'after' }); res.json(trip); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.verifyPin = async (req, res) => { try { const { pin } = req.body; const trip = await Trip.findById(req.params.id); if (trip.pin === pin) { trip.status = 'ongoing'; await trip.save(); res.json({ success: true, trip }); } else { res.status(400).json({ success: false, message: 'Invalid PIN' }); } } catch (e) { res.status(500).json({ message: e.message }); } };
+
+
+--- FILE: server/controllers/storeController.js ---
+
+const Store = require('../models/Store');
+exports.getStores = async (req, res) => {
+  try {
+    const filter = { isActive: true };
+    if (req.query.category) filter.category = req.query.category;
+    if (req.query.merchantId) filter.merchantId = req.query.merchantId;
+    const stores = await Store.find(filter);
+    res.json(stores);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+exports.getStoresBySection = async (req, res) => {
+  try { const stores = await Store.find({ sectionId: req.params.sectionId, isActive: true }); res.json(stores); } catch (e) { res.status(500).json({ message: e.message }); }
+};
+exports.createStore = async (req, res) => {
+  try { const store = await Store.create(req.body); res.status(201).json(store); } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.getAllStoresAdmin = async (req, res) => {
+  try {
+    const stores = await Store.find().sort({ createdAt: -1 });
+    res.json(stores);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.updateStore = async (req, res) => {
+  try {
+    const store = await Store.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!store) return res.status(404).json({ message: 'Not found' });
+    res.json(store);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.deleteStore = async (req, res) => {
+  try {
+    const store = await Store.findByIdAndDelete(req.params.id);
+    if (!store) return res.status(404).json({ message: 'Not found' });
+    res.json({ message: 'Deleted' });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+
+--- FILE: server/controllers/paymentController.js ---
+
+const Transaction = require('../models/Transaction');
+const Order = require('../models/Order');
+const Wallet = require('../models/Wallet');
+const PaymentMethod = require('../models/PaymentMethod');
+const Receipt = require('../models/Receipt');
+const AuditLog = require('../models/AuditLog');
+
+// توليد رقم معاملة فريد
+function genTxId() {
+  return 'TX' + Date.now() + Math.floor(1000 + Math.random() * 9000);
+}
+
+// ═══════════════ طرق الدفع ═══════════════
+
+exports.listPaymentMethods = async (req, res) => {
+  try {
+    const onlyActive = req.query.active === 'true';
+    const filter = onlyActive ? { isActive: true } : {};
+    const methods = await PaymentMethod.find(filter).sort({ order: 1, createdAt: 1 });
+    res.json(methods);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.addPaymentMethod = async (req, res) => {
+  try {
+    const m = await PaymentMethod.create(req.body);
+    res.status(201).json(m);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.updatePaymentMethod = async (req, res) => {
+  try {
+    const m = await PaymentMethod.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
+    if (!m) return res.status(404).json({ message: 'غير موجود' });
+    res.json(m);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.deletePaymentMethod = async (req, res) => {
+  try {
+    await PaymentMethod.findByIdAndDelete(req.params.id);
+    res.json({ message: 'تم الحذف' });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// ═══════════════ إنشاء دفعة ═══════════════
+
+exports.createPayment = async (req, res) => {
+  try {
+    const { orderId, method, amount, idempotencyKey } = req.body;
+    const userId = req.user._id;
+
+    // Idempotency: لو موجود سابقاً، نرجع نفس النتيجة
+    if (idempotencyKey) {
+      const existing = await Transaction.findOne({ idempotencyKey });
+      if (existing) return res.json(existing);
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ message: 'الطلب غير موجود' });
+
+    const tx = await Transaction.create({
+      transactionId: genTxId(),
+      userId,
+      orderId,
+      type: 'payment',
+      method: method || 'cash',
+      amount: amount || order.total,
+      status: 'pending',
+      idempotencyKey
+    });
+
+    // للكاش: نعتبره مدفوع فوراً
+    if (method === 'cash') {
+      tx.status = 'success';
+      tx.paidAt = new Date();
+      await Transaction.findByIdAndUpdate(tx._id, {
+        status: 'success',
+        paidAt: new Date()
+      });
+      await Order.findByIdAndUpdate(orderId, {
+        paymentMethod: 'cash',
+        paymentStatus: 'paid',
+        paymentTransactionId: tx._id,
+        paidAt: new Date()
+      });
+      // إنشاء إيصال
+      await Receipt.create({
+        receiptNumber: 'RC' + Date.now(),
+        transactionId: tx._id,
+        orderId,
+        userId,
+        amount: tx.amount,
+        method: 'cash'
+      });
+    }
+
+    res.status(201).json(tx);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// ═══════════════ تأكيد الدفع (Webhook) ═══════════════
+
+exports.confirmPayment = async (req, res) => {
+  try {
+    const { transactionId, gatewayRef, success } = req.body;
+
+    const tx = await Transaction.findOne({ transactionId });
+    if (!tx) return res.status(404).json({ message: 'المعاملة غير موجودة' });
+
+    if (success) {
+      await Transaction.findByIdAndUpdate(tx._id, {
+        status: 'success',
+        paidAt: new Date(),
+        gatewayRef
+      });
+      if (tx.orderId) {
+        await Order.findByIdAndUpdate(tx.orderId, {
+          paymentStatus: 'paid',
+          paidAt: new Date(),
+          paymentTransactionId: tx._id
+        });
+      }
+    } else {
+      await Transaction.findByIdAndUpdate(tx._id, { status: 'failed', failureReason: gatewayRef });
+    }
+
+    res.json({ message: 'OK' });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// ═══════════════ سجل المعاملات ═══════════════
+
+exports.listTransactions = async (req, res) => {
+  try {
+    const filter = {};
+    if (req.user.role !== 'admin') filter.userId = req.user._id;
+    if (req.query.userId && req.user.role === 'admin') filter.userId = req.query.userId;
+    if (req.query.orderId) filter.orderId = req.query.orderId;
+    if (req.query.status) filter.status = req.query.status;
+    if (req.query.type) filter.type = req.query.type;
+
+    const list = await Transaction.find(filter)
+      .populate('userId', 'name phone email')
+      .sort({ createdAt: -1 })
+      .limit(parseInt(req.query.limit) || 100);
+
+    res.json(list);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.getTransaction = async (req, res) => {
+  try {
+    const tx = await Transaction.findById(req.params.id)
+      .populate('userId', 'name phone')
+      .populate('orderId');
+    if (!tx) return res.status(404).json({ message: 'غير موجودة' });
+    res.json(tx);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// ═══════════════ استرداد ═══════════════
+
+exports.refundPayment = async (req, res) => {
+  try {
+    const { transactionId, reason } = req.body;
+    const tx = await Transaction.findById(transactionId);
+    if (!tx) return res.status(404).json({ message: 'غير موجودة' });
+
+    const Refund = require('../models/Refund');
+    const refund = await Refund.create({
+      refundId: 'RF' + Date.now(),
+      transactionId: tx._id,
+      orderId: tx.orderId,
+      userId: tx.userId,
+      amount: tx.amount,
+      reason: reason || 'طلب استرداد',
+      status: 'pending',
+      requestedBy: req.user._id
+    });
+
+    await AuditLog.create({
+      userId: req.user._id,
+      userRole: req.user.role,
+      action: 'refund_request',
+      entity: 'Transaction',
+      entityId: tx._id,
+      description: 'طلب استرداد - ' + tx.amount
+    });
+
+    res.status(201).json(refund);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// ═══════════════ إحصائيات الدفع (أدمن) ═══════════════
+
+exports.paymentStats = async (req, res) => {
+  try {
+    const total = await Transaction.countDocuments();
+    const success = await Transaction.countDocuments({ status: 'success' });
+    const failed = await Transaction.countDocuments({ status: 'failed' });
+    const pending = await Transaction.countDocuments({ status: 'pending' });
+
+    const sumAgg = await Transaction.aggregate([
+      { $match: { status: 'success' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+    const totalAmount = sumAgg[0]?.total || 0;
+
+    res.json({ total, success, failed, pending, totalAmount });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+
+--- FILE: server/controllers/favoriteController.js ---
+
+const Favorite = require('../models/Favorite');
+require('../models/Store');
+require('../models/User');
+exports.toggle = async (req, res) => {
+  try {
+    const { storeId } = req.params;
+    const existing = await Favorite.findOne({ userId: req.user._id, storeId });
+    if (existing) {
+      await Favorite.deleteOne({ _id: existing._id });
+      return res.json({ favorited: false });
+    }
+    await Favorite.create({ userId: req.user._id, storeId });
+    res.status(201).json({ favorited: true });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+exports.getMyFavorites = async (req, res) => {
+  try {
+    const favs = await Favorite.find({ userId: req.user._id }).populate('storeId');
+    res.json(favs);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+
+--- FILE: server/controllers/addressController.js ---
+
+const Address = require('../models/Address');
+
+exports.getMyAddresses = async (req, res) => {
+  try { res.json(await Address.find({ userId: req.user._id })); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getAddressById = async (req, res) => {
+  try {
+    const a = await Address.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!a) return res.status(404).json({ error: 'Not found' });
+    res.json(a);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.createAddress = async (req, res) => {
+  try {
+    const a = await Address.create({ ...req.body, userId: req.user._id });
+    if (a.isDefault) {
+      await Address.updateMany({ userId: req.user._id, _id: { $ne: a._id } }, { isDefault: false });
+    }
+    res.status(201).json(a);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.updateAddress = async (req, res) => {
+  try {
+    const a = await Address.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id },
+      req.body, { returnDocument: 'after' }
+    );
+    if (!a) return res.status(404).json({ error: 'Not found' });
+    if (a.isDefault) {
+      await Address.updateMany({ userId: req.user._id, _id: { $ne: a._id } }, { isDefault: false });
+    }
+    res.json(a);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.deleteAddress = async (req, res) => {
+  try {
+    const a = await Address.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
+    if (!a) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+
+--- FILE: server/controllers/adController.js ---
+
+const Ad = require('../models/Ad');
+exports.getAds = async (req, res) => { try { const ads = await Ad.find({ isActive: true }).sort({ order: 1 }); res.json(ads); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.createAd = async (req, res) => { try { const ad = await Ad.create(req.body); res.status(201).json(ad); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.updateAd = async (req, res) => { try { const ad = await Ad.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' }); res.json(ad); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.deleteAd = async (req, res) => { try { await Ad.findByIdAndDelete(req.params.id); res.json({ message: 'Deleted' }); } catch (e) { res.status(500).json({ message: e.message }); } };
+
+
+--- FILE: server/controllers/sectionController.js ---
+
+const Section = require('../models/Section');
+
+exports.getSections = async (req, res) => {
+  try {
+    const sections = await Section.find({ isActive: true }).sort({ order: 1 });
+    res.json(sections);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.getAllSections = async (req, res) => {
+  try {
+    const sections = await Section.find().sort({ order: 1 });
+    res.json(sections);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.createSection = async (req, res) => {
+  try {
+    const section = await Section.create(req.body);
+    res.status(201).json(section);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.updateSection = async (req, res) => {
+  try {
+    const section = await Section.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!section) return res.status(404).json({ message: 'Not found' });
+    res.json(section);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.deleteSection = async (req, res) => {
+  try {
+    const section = await Section.findByIdAndDelete(req.params.id);
+    if (!section) return res.status(404).json({ message: 'Not found' });
+    res.json({ message: 'Deleted' });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+
+--- FILE: server/controllers/merchantController.js ---
+
+require('../models/User');
+const Merchant = require('../models/Merchant');
+
+exports.getAllMerchants = async (req, res) => {
+  try {
+    const list = await Merchant.find({ isActive: true });
+    res.json(list);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getMerchantById = async (req, res) => {
+  try {
+    const m = await Merchant.findById(req.params.id);
+    if (!m) return res.status(404).json({ error: 'Not found' });
+    res.json(m);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getMyMerchant = async (req, res) => {
+  try {
+    const m = await Merchant.findOne({ userId: req.user._id });
+    res.json(m);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.createMerchant = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+  const Section = require('../models/Section');
+    const body = req.body || {};
+    const existing = await Store.findOne({ merchantId: req.user._id });
+    if (existing) return res.status(400).json({ error: 'لديك متجر بالفعل' });
+  let category = body.category || '';
+  let sectionId = body.sectionId || null;
+  const catMap = {
+    '\u0633\u0648\u0628\u0631\u0645\u0627\u0631\u0643\u062a': 'supermarket',
+    '\u0645\u0637\u0627\u0639\u0645': 'restaurant',
+    '\u0645\u0637\u0639\u0645': 'restaurant',
+    '\u0635\u064a\u062f\u0644\u064a\u0627\u062a': 'pharmacy',
+    '\u0635\u064a\u062f\u0644\u064a\u0629': 'pharmacy',
+    '\u0628\u0642\u0627\u0644\u0627\u062a': 'grocery',
+    '\u0628\u0642\u0627\u0644\u0629': 'grocery',
+    '\u0645\u062a\u0627\u062c\u0631': 'mall',
+    '\u0645\u062a\u062c\u0631': 'mall',
+  };
+  const catName = catMap[body.category] ? body.category : null;
+  if (catMap[body.category]) category = catMap[body.category];
+  if (!sectionId && catName) {
+    const sec = await Section.findOne({ name: catName });
+    if (sec) sectionId = sec._id;
+  }
+  if (!sectionId && category) {
+    const nameMap = { supermarket: '\u0633\u0648\u0628\u0631\u0645\u0627\u0631\u0643\u062a', restaurant: '\u0645\u0637\u0627\u0639\u0645', pharmacy: '\u0635\u064a\u062f\u0644\u064a\u0627\u062a', grocery: '\u0628\u0642\u0627\u0644\u0627\u062a', mall: '\u0645\u062a\u0627\u062c\u0631' };
+    const sec = await Section.findOne({ name: nameMap[category] });
+    if (sec) sectionId = sec._id;
+  }
+  const store = await Store.create({
+    merchantId: req.user._id,
+    name: body.storeName || body.name || '',
+    description: body.description || '',
+    category: category,
+    subCategory: body.subCategory || '',
+    sectionId: sectionId,
+    phone: body.phone || '',
+    logoUrl: body.logoUrl || '',
+    coverUrl: body.coverUrl || '',
+    governorate: body.governorate || '',
+    city: body.city || '',
+    location: body.location || {},
+    mapUrl: body.mapUrl || '',
+    workingHours: body.workingHours || '',
+    isActive: false,
+    documents: body.documents || {},
+    documentsVerified: false,
+    commission: body.commission || 5,
+    agreedToTerms: body.agreedToTerms || false,
+    agreedToCommission: body.agreedToCommission || false,
+  });
+    res.status(201).json({ _id: store._id, store });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.updateMerchant = async (req, res) => {
+  try {
+    const m = await Merchant.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
+    if (!m) return res.status(404).json({ error: 'Not found' });
+    res.json(m);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.deleteMerchant = async (req, res) => {
+  try {
+    const m = await Merchant.findByIdAndDelete(req.params.id);
+    if (!m) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.verifyMerchant = async (req, res) => {
+  try {
+    const { action, reason } = req.body;
+    const Store = require('../models/Store');
+    const User = require('../models/User');
+    const store = await Store.findById(req.params.id);
+    if (!store) return res.status(404).json({ error: 'Not found' });
+    if (action === 'accept') {
+      store.isActive = true;
+      store.documentsVerified = true;
+      await store.save();
+      await User.findByIdAndUpdate(store.merchantId, { role: 'merchant', status: 'approved' });
+    } else if (action === 'reject') {
+      store.isActive = false;
+      await store.save();
+    } else {
+      return res.status(400).json({ error: 'Invalid action' });
+    }
+    res.json(store);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getAllMerchantsAdmin = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const User = require('../models/User');
+    const filter = {};
+    if (req.query.verificationStatus === 'pending') filter.isActive = false;
+    if (req.query.verificationStatus === 'verified') filter.isActive = true;
+    const list = await Store.find(filter)
+      .populate('merchantId', 'name phone email')
+      .sort({ createdAt: -1 });
+    res.json(list);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getMyStore = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const Order = require('../models/Order');
+    const store = await Store.findOne({ merchantId: req.user._id });
+    if (!store) return res.status(404).json({ message: 'Store not found' });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const [newCount, preparing, delivered, totalRevenue, todayOrders] = await Promise.all([
+      Order.countDocuments({ storeId: store._id, status: 'pending' }),
+      Order.countDocuments({ storeId: store._id, status: { $in: ['accepted', 'preparing', 'ready'] } }),
+      Order.countDocuments({ storeId: store._id, status: 'delivered' }),
+      Order.aggregate([
+        { $match: { storeId: store._id, status: 'delivered' } },
+        { $group: { _id: null, sum: { $sum: '$total' } } }
+      ]),
+      Order.countDocuments({ storeId: store._id, createdAt: { $gte: today } }),
+    ]);
+
+    res.json({
+      store: {
+        _id: store._id,
+        name: store.name,
+        category: store.category,
+        logoUrl: store.logoUrl,
+        coverUrl: store.coverUrl,
+        rating: store.rating,
+        isActive: store.isActive,
+      },
+      stats: {
+        newOrders: newCount,
+        preparing: preparing,
+        delivered: delivered,
+        totalRevenue: totalRevenue[0]?.sum || 0,
+        todayOrders: todayOrders,
+      },
+    });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.updateMyStore = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const Section = require('../models/Section');
+    const store = await Store.findOne({ merchantId: req.user._id });
+    if (!store) return res.status(404).json({ message: 'Store not found' });
+
+    const { name, description, phone, category, location, isActive } = req.body;
+    if (name) store.name = name;
+    if (description != null) store.description = description;
+    if (phone != null) store.phone = phone;
+    if (location != null) store.location = location;
+    if (isActive != null) store.isActive = isActive;
+    if (category) {
+      store.category = category;
+      const map = {
+        supermarket: 'سوبرماركت',
+        restaurant: 'مطاعم',
+        pharmacy: 'صيدليات',
+        grocery: 'بقالات',
+        mall: 'متاجر',
+      };
+      const secName = map[category];
+      if (secName) {
+        const sec = await Section.findOne({ name: secName });
+        if (sec) store.sectionId = sec._id;
+      }
+    }
+    await store.save();
+    res.json({ store });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+
+--- FILE: server/controllers/adminController.js ---
+
+const Admin = require('../models/Admin');
+
+exports.getAllAdmins = async (req, res) => {
+  try { res.json(await Admin.find({}).populate('userId', 'name phone email')); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getAdminById = async (req, res) => {
+  try {
+    const a = await Admin.findById(req.params.id).populate('userId', 'name phone email');
+    if (!a) return res.status(404).json({ error: 'Not found' });
+    res.json(a);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.createAdmin = async (req, res) => {
+  try {
+    const a = await Admin.create({ ...req.body, createdBy: req.user._id });
+    res.status(201).json(a);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.updateAdmin = async (req, res) => {
+  try {
+    const a = await Admin.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
+    if (!a) return res.status(404).json({ error: 'Not found' });
+    res.json(a);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.deleteAdmin = async (req, res) => {
+  try {
+    const a = await Admin.findByIdAndDelete(req.params.id);
+    if (!a) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.unlockAdmin = async (req, res) => {
+  try {
+    const a = await Admin.findByIdAndUpdate(req.params.id, { loginAttempts: 0, lockedUntil: null }, { returnDocument: 'after' });
+    if (!a) return res.status(404).json({ error: 'Not found' });
+    res.json(a);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+
+exports.getAdminMerchants = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const stores = await Store.find({ merchantId: { $exists: true, $ne: null } }).sort({ createdAt: -1 });
+    res.json({ merchants: stores, applications: [] });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.toggleMerchantStatus = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const store = await Store.findById(req.params.id);
+    if (!store) return res.status(404).json({ message: 'Store not found' });
+    store.isActive = !store.isActive;
+    await store.save();
+    res.json({ message: 'Status toggled', store });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.deleteMerchant = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    await Store.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Store deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+exports.verifyMerchant = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const { action } = req.body;
+    const store = await Store.findById(req.params.id);
+    if (!store) return res.status(404).json({ message: 'Store not found' });
+
+    if (action === 'accept') {
+      store.isVerified = true;
+      store.isActive = true;
+      store.documentsVerified = true;
+    } else if (action === 'reject') {
+      store.isVerified = false;
+      store.isActive = false;
+      store.documentsVerified = false; // تمييز المرفوض عن المعلق
+      store.rejectionReason = req.body.reason || 'بدون سبب محدد';
+    }
+    await store.save();
+    res.json({ message: 'Status updated', store });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.sendAlert = async (req, res) => {
+  try {
+    const { message } = req.body;
+    console.log(`[ALERT] To Merchant ${req.params.id}: ${message}`);
+    res.json({ success: true, message: 'Alert sent' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.updateCommission = async (req, res) => {
+  try {
+    const Store = require('../models/Store');
+    const { commission } = req.body;
+    const store = await Store.findByIdAndUpdate(req.params.id, { commission }, { new: true });
+    res.json({ success: true, store });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+--- FILE: server/controllers/officialAccountController.js ---
+
+const OfficialAccount = require('../models/OfficialAccount');
+
+exports.getAllAccounts = async (req, res) => {
+  try { res.json(await OfficialAccount.find({})); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getAccountById = async (req, res) => {
+  try {
+    const a = await OfficialAccount.findById(req.params.id);
+    if (!a) return res.status(404).json({ error: 'Not found' });
+    res.json(a);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.createAccount = async (req, res) => {
+  try { res.status(201).json(await OfficialAccount.create(req.body)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.updateAccount = async (req, res) => {
+  try {
+    const a = await OfficialAccount.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
+    if (!a) return res.status(404).json({ error: 'Not found' });
+    res.json(a);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.deleteAccount = async (req, res) => {
+  try {
+    const a = await OfficialAccount.findByIdAndDelete(req.params.id);
+    if (!a) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+
+--- FILE: server/controllers/miscController.js ---
+
+const Order = require('../models/Order');
+const User = require('../models/User');
+const Product = require('../models/Product');
+
+// عميل يلغي طلب
+exports.cancelOrder = async (req, res) => {
+  try {
+    const o = await Order.findByIdAndUpdate(req.params.id, { status: 'cancelled' }, { returnDocument: 'after' });
+    if (!o) return res.status(404).json({ message: 'الطلب غير موجود' });
+    res.json(o);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// تفاصيل طلب
+exports.getOrderById = async (req, res) => {
+  try {
+    const o = await Order.findById(req.params.id)
+      .populate('clientId', 'name phone')
+      .populate('merchantId', 'name phone address')
+      .populate('driverId', 'name phone');
+    if (!o) return res.status(404).json({ message: 'الطلب غير موجود' });
+    res.json(o);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// أدمن: قائمة المستخدمين
+exports.listUsers = async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.role) filter.role = req.query.role;
+    if (req.query.status) filter.status = req.query.status;
+    const users = await User.find(filter, 'name email phone role status createdAt').sort({ createdAt: -1 });
+    res.json(users);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// أدمن: موافقة
+exports.approveUser = async (req, res) => {
+  try {
+    const u = await User.findByIdAndUpdate(
+      req.params.id,
+      { status: 'approved' },
+      { returnDocument: 'after' }
+    );
+    if (!u) return res.status(404).json({ message: 'المستخدم غير موجود' });
+    res.json(u);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// أدمن: رفض
+exports.rejectUser = async (req, res) => {
+  try {
+    const u = await User.findByIdAndUpdate(
+      req.params.id,
+      { status: 'rejected' },
+      { returnDocument: 'after' }
+    );
+    if (!u) return res.status(404).json({ message: 'المستخدم غير موجود' });
+    res.json(u);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// أدمن: تغيير دور
+exports.changeUserRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+    if (!['client','merchant','driver','admin'].includes(role)) {
+      return res.status(400).json({ message: 'دور غير صحيح' });
+    }
+    const u = await User.findByIdAndUpdate(req.params.id, { role }, { returnDocument: 'after' });
+    res.json(u);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// منتجات: إضافة
+exports.addProduct = async (req, res) => {
+  try {
+    const { name, price, storeId, category, imageUrl } = req.body;
+    const p = await Product.create({ name, price, storeId, category, imageUrl, isAvailable: true });
+    res.status(201).json(p);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// منتجات: تعديل
+exports.updateProduct = async (req, res) => {
+  try {
+    const p = await Product.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
+    if (!p) return res.status(404).json({ message: 'المنتج غير موجود' });
+    res.json(p);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// منتجات: حذف
+exports.deleteProduct = async (req, res) => {
+  try {
+    const p = await Product.findByIdAndDelete(req.params.id);
+    if (!p) return res.status(404).json({ message: 'المنتج غير موجود' });
+    res.json({ message: 'تم الحذف', id: req.params.id });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+// أرباح المندوب
+exports.driverEarnings = async (req, res) => {
+  try {
+    const did = req.user?._id || req.query.driverId;
+    const orders = await Order.find({ driverId: did, status: 'delivered' }).sort({ deliveredAt: -1 });
+    const total = orders.reduce((s, o) => s + (o.total || 0), 0);
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayOrders = orders.filter(o => new Date(o.deliveredAt) >= today);
+    const todayTotal = todayOrders.reduce((s, o) => s + (o.total || 0), 0);
+    res.json({
+      total: total,
+      today: todayTotal,
+      count: orders.length,
+      todayCount: todayOrders.length,
+      orders: orders.slice(0, 20),
+    });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+
+--- FILE: server/controllers/adminAuthController.js ---
+
+const jwt = require('jsonwebtoken');
+
+exports.adminLogin = async (req, res) => {
+  const { phone, email, password } = req.body;
+  if (phone === 'KHALED#SJ#ADMIN' && email === 'khaled20010405@gmail.com' && password === 'SJ2026KHALED') {
+    const token = jwt.sign({ id: 'admin_master', role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    return res.json({ _id: 'admin_master', name: 'Admin', email, role: 'admin', token });
+  }
+  return res.status(401).json({ message: 'بيانات دخول الأدمن غير صحيحة' });
+};
+
+
+--- FILE: server/controllers/settingController.js ---
+
+const Setting = require('../models/Setting');
+
+exports.getAllSettings = async (req, res) => {
+  try {
+    const list = await Setting.find({ isSecret: false });
+    res.json(list);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getSettingByKey = async (req, res) => {
+  try {
+    const s = await Setting.findOne({ key: req.params.key });
+    if (!s) return res.status(404).json({ error: 'Not found' });
+    res.json(s);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getSettingsByGroup = async (req, res) => {
+  try {
+    const list = await Setting.find({ group: req.params.group, isSecret: false });
+    res.json(list);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.createSetting = async (req, res) => {
+  try {
+    const s = await Setting.create({ ...req.body, updatedBy: req.user._id });
+    res.status(201).json(s);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.updateSetting = async (req, res) => {
+  try {
+    const s = await Setting.findOneAndUpdate(
+      { key: req.params.key },
+      { ...req.body, updatedBy: req.user._id, updatedAt: new Date() },
+      { returnDocument: 'after' }
+    );
+    if (!s) return res.status(404).json({ error: 'Not found' });
+    res.json(s);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.deleteSetting = async (req, res) => {
+  try {
+    const s = await Setting.findOneAndDelete({ key: req.params.key });
+    if (!s) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+
+--- FILE: server/controllers/authController.js ---
+
+const User = require('../models/User');
+const Wallet = require('../models/Wallet');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+};
+
+exports.register = async (req, res) => {
+  try {
+    const { name, email, phone, password, role } = req.body;
+    const conditions = [];
+    if (email) conditions.push({ email });
+    if (phone) conditions.push({ phone });
+    const userExists = conditions.length > 0 ? await User.findOne({ $or: conditions }) : null;
+    if (userExists) return res.status(400).json({ message: 'المستخدم موجود مسبقاً' });
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = await User.create({ name, email, phone, password: hashedPassword, role: role || 'client' });
+    await Wallet.create({ userId: user._id, balance: 0 });
+
+    res.status(201).json({
+      _id: user._id, name: user.name, email: user.email, phone: user.phone,
+      role: user.role, token: generateToken(user._id)
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(401).json({ message: 'بيانات الدخول غير صحيحة' });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ message: 'بيانات الدخول غير صحيحة' });
+
+    if (user.status === 'rejected' || user.status === 'banned') {
+      const msg = user.status === 'rejected'
+        ? 'عذراً، تم رفض طلبك. للاستفسار: تواصل مع الدعم.'
+        : 'عذراً، هذا الحساب محظور. تواصل مع الدعم.';
+      return res.status(403).json({ message: msg, status: user.status });
+    }
+
+    res.json({
+      _id: user._id, name: user.name, email: user.email, phone: user.phone,
+      role: user.role, token: generateToken(user._id)
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+exports.firebaseLogin = async (req, res) => {
+  try {
+    const { email, uid, name, phone } = req.body;
+    if (!email) return res.status(400).json({ message: 'البريد مطلوب' });
+
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await User.create({
+        name: name || email.split('@')[0],
+        email,
+        phone: phone || uid || email,
+        password: uid || 'firebase_' + Date.now(),
+        role: 'client',
+        status: 'pending',
+      });
+    }
+
+    if (user.role !== 'client' && user.role !== 'admin' && user.status !== 'approved') {
+      const msg = user.status === 'rejected'
+        ? 'تم رفض حسابك. تواصل مع الدعم'
+        : 'حسابك قيد المراجعة. سيتم إشعارك عند الموافقة';
+      return res.status(403).json({ message: msg, status: user.status });
+    }
+
+    res.json({
+      id: user._id, name: user.name, email: user.email, phone: user.phone,
+      role: user.role, status: user.status,
+      token: generateToken(user._id),
+    });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+};
+
+exports.getMe = async (req, res) => {
+  res.json(req.user);
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, email, phone, bio } = req.body;
+    const update = {};
+    if (name) update.name = name;
+    if (email) update.email = email;
+    if (phone) update.phone = phone;
+    if (bio != null) update.bio = bio;
+    const u = await User.findByIdAndUpdate(req.user._id, update, { returnDocument: 'after' });
+    if (!u) return res.status(404).json({ message: 'Not found' });
+    res.json({ _id: u._id, name: u.name, email: u.email, phone: u.phone, role: u.role, status: u.status });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+
+--- FILE: server/controllers/districtController.js ---
+
+const District = require('../models/District');
+
+exports.getAllDistricts = async (req, res) => {
+  try { res.json(await District.find({})); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getDistrictsByCity = async (req, res) => {
+  try { res.json(await District.find({ cityId: req.params.cityId })); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getDistrictById = async (req, res) => {
+  try {
+    const d = await District.findById(req.params.id);
+    if (!d) return res.status(404).json({ error: 'Not found' });
+    res.json(d);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.createDistrict = async (req, res) => {
+  try { res.status(201).json(await District.create(req.body)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.updateDistrict = async (req, res) => {
+  try {
+    const d = await District.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
+    if (!d) return res.status(404).json({ error: 'Not found' });
+    res.json(d);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.deleteDistrict = async (req, res) => {
+  try {
+    const d = await District.findByIdAndDelete(req.params.id);
+    if (!d) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+
+--- FILE: server/controllers/notificationController.js ---
+
+const Notification = require('../models/Notification');
+exports.getMyNotifications = async (req, res) => { try { const notifs = await Notification.find({ userId: req.user._id }).sort({ createdAt: -1 }); res.json(notifs); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.markAsRead = async (req, res) => { try { await Notification.findByIdAndUpdate(req.params.id, { isRead: true }); res.json({ message: 'Marked as read' }); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.sendNotification = async (req, res) => { try { const notif = await Notification.create(req.body); res.status(201).json(notif); } catch (e) { res.status(500).json({ message: e.message }); } };
+
+
+--- FILE: server/controllers/refundController.js ---
+
+const Refund = require('../models/Refund');
+
+exports.getMyRefunds = async (req, res) => {
+  try { res.json(await Refund.find({ userId: req.user._id })); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getAllRefunds = async (req, res) => {
+  try { res.json(await Refund.find({})); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.createRefund = async (req, res) => {
+  try { res.status(201).json(await Refund.create(req.body)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.updateRefundStatus = async (req, res) => {
+  try {
+    const r = await Refund.findByIdAndUpdate(req.params.id, { status: req.body.status }, { returnDocument: 'after' });
+    if (!r) return res.status(404).json({ error: 'Not found' });
+    res.json(r);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.deleteRefund = async (req, res) => {
+  try {
+    const r = await Refund.findByIdAndDelete(req.params.id);
+    if (!r) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+
+--- FILE: server/controllers/reportController.js ---
+
+const Report = require('../models/Report');
+exports.createReport = async (req, res) => {
+  try {
+    const report = await Report.create({ ...req.body, fromUserId: req.user ? req.user._id : '000000000000000000000000' });
+    res.status(201).json(report);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+exports.getMyReports = async (req, res) => {
+  try {
+    const reports = await Report.find({ fromUserId: req.user ? req.user._id : '000000000000000000000000' });
+    res.json(reports);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+
+--- FILE: server/controllers/cityController.js ---
+
+const City = require('../models/City');
+
+exports.getAllCities = async (req, res) => {
+  try { res.json(await City.find({})); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getCityById = async (req, res) => {
+  try {
+    const c = await City.findById(req.params.id);
+    if (!c) return res.status(404).json({ error: 'Not found' });
+    res.json(c);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.createCity = async (req, res) => {
+  try { res.status(201).json(await City.create(req.body)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.updateCity = async (req, res) => {
+  try {
+    const c = await City.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
+    if (!c) return res.status(404).json({ error: 'Not found' });
+    res.json(c);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.deleteCity = async (req, res) => {
+  try {
+    const c = await City.findByIdAndDelete(req.params.id);
+    if (!c) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+
+--- FILE: server/controllers/couponController.js ---
+
+const Coupon = require('../models/Coupon');
+
+exports.getAllCoupons = async (req, res) => {
+  try { res.json(await Coupon.find({ isActive: true })); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getCouponByCode = async (req, res) => {
+  try {
+    const c = await Coupon.findOne({ code: req.params.code, isActive: true });
+    if (!c) return res.status(404).json({ error: 'Not found' });
+    res.json(c);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.createCoupon = async (req, res) => {
+  try {
+    const c = await Coupon.create({ ...req.body, createdBy: req.user._id });
+    res.status(201).json(c);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.updateCoupon = async (req, res) => {
+  try {
+    const c = await Coupon.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
+    if (!c) return res.status(404).json({ error: 'Not found' });
+    res.json(c);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.deleteCoupon = async (req, res) => {
+  try {
+    const c = await Coupon.findByIdAndDelete(req.params.id);
+    if (!c) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.validateCoupon = async (req, res) => {
+  try {
+    const c = await Coupon.findOne({ code: req.params.code, isActive: true });
+    if (!c) return res.status(404).json({ valid: false, error: 'Not found' });
+    const now = new Date();
+    if (c.startAt && now < c.startAt) return res.json({ valid: false, error: 'not_started' });
+    if (c.expireAt && now > c.expireAt) return res.json({ valid: false, error: 'expired' });
+    if (c.usageLimit > 0 && c.usedCount >= c.usageLimit) return res.json({ valid: false, error: 'used_up' });
+    res.json({ valid: true, coupon: c });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+
+--- FILE: server/controllers/ratingController.js ---
+
+const Rating = require('../models/Rating');
+const Store = require('../models/Store');
+exports.createRating = async (req, res) => {
+  try {
+    const { storeId, stars, feedback, imageUrl } = req.body;
+    const existing = await Rating.findOne({ fromUserId: req.user ? req.user._id : '000000000000000000000000', storeId });
+    if (existing) return res.status(400).json({ message: 'لقد قمت بتقييم هذا المتجر مسبقاً' });
+    const rating = await Rating.create({ fromUserId: req.user ? req.user._id : '000000000000000000000000', storeId, stars, feedback, imageUrl });
+    const all = await Rating.find({ storeId });
+    const avg = all.reduce((s, r) => s + r.stars, 0) / all.length;
+    await Store.findByIdAndUpdate(storeId, { rating: Math.round(avg * 10) / 10 });
+    res.status(201).json(rating);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+
+--- FILE: server/controllers/uploadController.js ---
+
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const uploadDir = path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => {
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, unique + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (/jpeg|jpg|png|webp/.test(file.mimetype)) cb(null, true);
+    else cb(new Error('صيغة الصورة غير مدعومة'));
+  },
+});
+
+exports.uploadSingle = upload.single('file');
+
+exports.handleUpload = (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'لم يتم رفع ملف' });
+  const url = '/uploads/' + req.file.filename;
+  res.json({ url, filename: req.file.filename });
+};
+
+
+--- FILE: server/controllers/exchangeRateController.js ---
+
+const ExchangeRate = require('../models/ExchangeRate');
+
+exports.getAllRates = async (req, res) => {
+  try { res.json(await ExchangeRate.find({})); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getRateById = async (req, res) => {
+  try {
+    const r = await ExchangeRate.findById(req.params.id);
+    if (!r) return res.status(404).json({ error: 'Not found' });
+    res.json(r);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.createRate = async (req, res) => {
+  try { res.status(201).json(await ExchangeRate.create(req.body)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.updateRate = async (req, res) => {
+  try {
+    const r = await ExchangeRate.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
+    if (!r) return res.status(404).json({ error: 'Not found' });
+    res.json(r);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.deleteRate = async (req, res) => {
+  try {
+    const r = await ExchangeRate.findByIdAndDelete(req.params.id);
+    if (!r) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+
+--- FILE: server/controllers/chatController.js ---
+
+const Chat = require('../models/Chat');
+exports.getChat = async (req, res) => { try { const chat = await Chat.findOne({ orderId: req.params.orderId }); res.json(chat || { messages: [] }); } catch (e) { res.status(500).json({ message: e.message }); } };
+exports.sendMessage = async (req, res) => { try { const { orderId, text } = req.body; let chat = await Chat.findOne({ orderId }); if (!chat) chat = new Chat({ orderId, messages: [] }); chat.messages.push({ senderId: req.user._id, text }); await chat.save(); res.json(chat); } catch (e) { res.status(500).json({ message: e.message }); } };
+
+
+--- FILE: server/controllers/orderController.js ---
+
+
+function generateSecurePin() {
+  let pin;
+  let isWeak = true;
+  const weakPatterns = ['1234','2345','3456','4567','5678','6789','9876','8765','7654','6543','5432','4321','0000','1111','2222','3333','4444','5555','6666','7777','8888','9999'];
+  
+  while (isWeak) {
+    pin = Math.floor(1000 + Math.random() * 9000).toString();
+    // نتحقق: ليس في القائمة الضعيفة، وليس به نمط مكرر مثل 1212
+    if (!weakPatterns.includes(pin) && !(pin[0] === pin[2] && pin[1] === pin[3])) {
+      isWeak = false;
+    }
+  }
+  return pin;
+}
+
+const Order = require('../models/Order');
+
+exports.createOrder = async (req, res) => {
+  try {
+    const {
+      merchantId, storeId, items, total,
+      deliveryFee, address, notes,
+      paymentMethodId, paymentMethod, receiptImage,
+    } = req.body;
+    const order = await Order.create({
+      deliveryPin: generateSecurePin(),
+
+      customerId: req.user._id,
+      merchantId,
+      storeId,
+      items,
+      total,
+      deliveryFee: typeof deliveryFee === 'number' ? deliveryFee : 0,
+      address: address != null ? String(address) : '',
+      notes: notes != null ? String(notes) : '',
+      paymentMethodId: paymentMethodId || null,
+      paymentMethod: paymentMethod || 'cash',
+      receiptImage: receiptImage || '',
+      verificationStatus: receiptImage ? 'pending' : 'none',
+      status: 'pending',
+      pin: Math.floor(1000 + Math.random() * 9000).toString(),
+    });
+    res.status(201).json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getMyOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ customerId: req.user._id })
+      .populate('storeId', 'name logoUrl rating location.address')
+      .sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const order = await Order.findByIdAndUpdate(req.params.id, { status }, { returnDocument: 'after' });
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getAllOrders = async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.status) filter.status = req.query.status;
+    if (req.query.verificationStatus) filter.verificationStatus = req.query.verificationStatus;
+    const orders = await Order.find(filter)
+      .populate('storeId', 'name logoUrl')
+      .populate('customerId', 'name phone')
+      .sort({ createdAt: -1 })
+      .limit(100);
+    res.json(orders);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.verifyOrder = async (req, res) => {
+  try {
+    const { action, reason } = req.body;
+    const update = {
+      verifiedBy: req.user._id,
+      verifiedAt: new Date(),
+    };
+    if (action === 'accept') {
+      update.verificationStatus = 'verified';
+      update.status = 'accepted';
+      update.paymentStatus = 'paid';
+      update.paidAt = new Date();
+    } else if (action === 'reject') {
+      update.verificationStatus = 'rejected';
+      update.status = 'cancelled';
+      update.rejectionReason = reason || '';
+      update.cancelledAt = new Date();
+    } else {
+      return res.status(400).json({ message: 'Invalid action' });
+    }
+    const order = await Order.findByIdAndUpdate(req.params.id, update, { new: true });
+    if (!order) return res.status(404).json({ message: 'Not found' });
+    res.json(order);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.getMerchantOrders = async (req, res) => {
+  try {
+    const Merchant = require('../models/Merchant');
+    const merchant = await Merchant.findOne({ userId: req.user._id });
+    if (!merchant) return res.status(404).json({ message: 'Merchant not found' });
+
+    const Store = require('../models/Store');
+    const stores = await Store.find({ merchantId: req.user._id, isActive: true });
+    const storeIds = stores.map(s => s._id);
+
+    const filter = {
+      storeId: { $in: storeIds },
+      status: { $in: ['accepted', 'preparing', 'ready', 'on_the_way', 'delivered'] },
+    };
+    if (req.query.status) filter.status = req.query.status;
+
+    const orders = await Order.find(filter)
+      .populate('storeId', 'name')
+      .populate('customerId', 'name phone')
+      .sort({ createdAt: -1 });
+
+    res.json(orders);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.getDriverOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({
+      $or: [
+        { driverId: req.user._id },
+        { status: 'ready', driverId: null },
+      ],
+    })
+      .populate('storeId', 'name logoUrl location.address')
+      .populate('customerId', 'name phone')
+      .sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.assignDriver = async (req, res) => {
+  try {
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { driverId: req.user._id, status: 'on_the_way' },
+      { returnDocument: 'after' }
+    );
+    if (!order) return res.status(404).json({ message: 'Not found' });
+    res.json(order);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.deliverOrder = async (req, res) => {
+  try {
+    const { pin } = req.body;
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Not found' });
+    if (order.driverId?.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not your order' });
+    }
+    if (order.pin !== pin) {
+      return res.status(400).json({ message: 'PIN \u063a\u064a\u0631 \u0635\u062d\u064a\u062d' });
+    }
+    order.status = 'delivered';
+    order.deliveredAt = new Date();
+    await order.save();
+    res.json(order);
+  } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
+exports.updateOrderStage = async (req, res) => {
+  try {
+    const { stage, pin } = req.body;
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    if (stage === 'delivered') {
+      if (!pin) return res.status(400).json({ message: 'كود التسليم مطلوب' });
+      
+      // حماية من التخمين: إذا تجاوز 3 محاولات
+      if (order.pinAttempts >= 3) {
+        return res.status(403).json({ message: 'تم قفل الطلب بسبب كثرة المحاولات الخاطئة. تواصل مع الإدارة.' });
+      }
+
+      const expectedPin = order.deliveryPin || order.pin;
+      if (expectedPin && expectedPin !== pin) {
+        order.pinAttempts = (order.pinAttempts || 0) + 1;
+        await order.save();
+        return res.status(400).json({ message: `كود التسليم غير صحيح. المحاولات المتبقية: ${3 - order.pinAttempts}` });
+      }
+      order.status = 'delivered';
+      order.deliveredAt = new Date();
+    } else {
+      order.status = stage;
+    }
+    await order.save();
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+--- FILE: server/middleware/auth.js ---
+
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+const protect = async (req, res, next) => {
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select('-password');
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: 'غير مصرح، التوكن غير صالح' });
+    }
+  } else {
+    return res.status(401).json({ message: 'غير مصرح، لا يوجد توكن' });
+  }
+};
+
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ message: 'ليس لديك صلاحية للقيام بهذا الإجراء' });
+    }
+    next();
+  };
+};
+
+module.exports = { protect, authorize };
+
+
+--- FILE: server/middleware/logging.js ---
+
+const AuditLog = require('../models/AuditLog');
+const ErrorLog = require('../models/ErrorLog');
+
+// تسجيل تلقائي للأخطاء
+exports.errorLogger = (err, req, res, next) => {
+  ErrorLog.create({
+    level: 'error',
+    message: err.message || 'Unknown error',
+    stack: err.stack,
+    endpoint: req.originalUrl,
+    method: req.method,
+    userId: req.user?._id,
+    ip: req.ip,
+    meta: { body: req.body, query: req.query }
+  }).catch(() => {});
+  next(err);
+};
+
+// تسجيل يدوي لعمليات حساسة
+exports.auditAction = (action, entity) => async (req, res, next) => {
+  const originalJson = res.json.bind(res);
+  res.json = (body) => {
+    if (res.statusCode < 400) {
+      AuditLog.create({
+        userId: req.user?._id,
+        userRole: req.user?.role,
+        action,
+        entity,
+        entityId: body?._id,
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
+        description: `${action} on ${entity}`
+      }).catch(() => {});
+    }
+    return originalJson(body);
+  };
+  next();
+};
