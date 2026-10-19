@@ -10,4 +10,7 @@ router.delete('/merchants/:id', protect, adminController.deleteMerchant);
 router.put('/merchants/:id/alert', protect, adminController.sendAlert);
 router.put('/merchants/:id/commission', protect, adminController.updateCommission);
 
+router.get('/drivers/applications', protect, adminController.getDriverApplications);
+router.put('/drivers/:id/verify', protect, adminController.verifyDriverApplication);
+
 module.exports = router;

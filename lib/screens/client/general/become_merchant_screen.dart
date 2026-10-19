@@ -279,7 +279,7 @@ class _S extends State<BecomeMerchantScreen> {
       content: Text(t('success_b'),
         style: GoogleFonts.cairo(color: Colors.grey, fontSize: 14)),
       actions: [TextButton(
-        onPressed: () { Navigator.of(c).pop(); Navigator.of(context).pop(); },
+        onPressed: () { Navigator.of(c).pop(); Navigator.pop(context, true); },
         child: Text(t('ok'), style: GoogleFonts.cairo(color: const Color(0xFF25D366), fontWeight: FontWeight.bold)))],
     ));
   }

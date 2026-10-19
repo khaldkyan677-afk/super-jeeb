@@ -30,6 +30,7 @@ const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
 app.use('/api', limiter);
 
 app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/policies', require('./routes/policyRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/driver', require('./routes/driverRoutes'));
 app.use('/api/logs', require('./routes/logRoutes'));

@@ -123,3 +123,24 @@ exports.updateCommission = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.getDriverApplications = async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const drivers = await User.find({ driverStatus: 'pending' });
+    res.json({ drivers });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+exports.verifyDriverApplication = async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const { action, reason } = req.body;
+    const updateData = action === 'accept' 
+      ? { driverStatus: 'approved', role: 'driver' }
+      : { driverStatus: 'rejected', driverRejectionReason: reason || 'بدون سبب' };
+      
+    const user = await User.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    res.json({ success: true, user });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};

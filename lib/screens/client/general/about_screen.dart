@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'policy_screen.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -24,8 +25,8 @@ class AboutScreen extends StatelessWidget {
         const SizedBox(height: 6),
         Center(child: Text('الإصدار 1.0.0', style: GoogleFonts.cairo(color: Colors.grey, fontSize: 13))),
         const SizedBox(height: 30),
-        _item('الشروط والأحكام', () {}),
-        _item('سياسة الخصوصية', () {}),
+        _item('الشروط والأحكام', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PolicyScreen(type: 'terms')))),
+        _item('سياسة الخصوصية', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PolicyScreen(type: 'privacy')))),
         _item('سياسة الاسترجاع', () {}),
         _item('شارك التطبيق', () {}),
         _item('قيّم التطبيق', () {}),

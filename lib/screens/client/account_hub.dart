@@ -261,8 +261,11 @@ class _AccountHubScreenState extends State<AccountHubScreen> {
               icon: Icons.storefront,
               title: 'افتح متجرك',
               subtitle: 'ابدأ ببيع منتجاتك',
-              color: const Color(0xFF25D366),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BecomeMerchantScreen())),
+              color: _isMerchantPending ? Colors.grey : const Color(0xFF25D366),
+              onTap: _isMerchantPending ? () {} : () async {
+                    final res = await Navigator.push(context, MaterialPageRoute(builder: (_) => const BecomeMerchantScreen()));
+                    if (res == true) setState(() => _isMerchantPending = true);
+                  },
             ),
           ),
           const SizedBox(width: 12),
@@ -270,10 +273,13 @@ class _AccountHubScreenState extends State<AccountHubScreen> {
             child: _upgradeCard(
               context,
               icon: Icons.delivery_dining,
-              title: 'كن مندوب',
+              title: _isDriverPending ? 'قيد المراجعة' : 'كن مندوب',
               subtitle: 'ابدأ بالتوصيل',
-              color: Colors.orange,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BecomeDriverScreen())),
+              color: _isDriverPending ? Colors.grey : Colors.orange,
+              onTap: _isDriverPending ? () {} : () async {
+                    final res = await Navigator.push(context, MaterialPageRoute(builder: (_) => const BecomeDriverScreen()));
+                    if (res == true) setState(() => _isDriverPending = true);
+                  },
             ),
           ),
         ],
@@ -868,7 +874,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
             color: const Color(0xFF25D366).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(icon, color: const Color(0xFF25D366), size: 22),
+          child: Icon(icon, color: _isMerchantPending ? Colors.grey : const Color(0xFF25D366), size: 22),
         ),
         title: Text(
           title,
@@ -1022,7 +1028,7 @@ class DevicesScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
         border: isCurrent
-            ? Border.all(color: const Color(0xFF25D366), width: 1.5)
+            ? Border.all(color: _isMerchantPending ? Colors.grey : const Color(0xFF25D366), width: 1.5)
             : null,
       ),
       child: Row(
