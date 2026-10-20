@@ -39,14 +39,15 @@ exports.updateProfile = async (req, res) => {
     if (birthDate) user.birthDate = birthDate;
     if (gender) user.gender = gender;
     
-    // التأكد من حفظ الصورة إذا تم إرسالها
-    if (profileImage && profileImage.startsWith('data:image')) {
+    // حفظ الصورة (بدون شروط معقدة)
+    if (profileImage && profileImage.length > 0) {
       user.profileImage = profileImage;
     }
 
     await user.save();
     res.status(200).json({ success: true, message: 'تم تحديث الملف الشخصي بنجاح', user });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };

@@ -51,7 +51,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+    // تقليل الجودة والأبعاد لتجنب انهيار التطبيق
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery, 
+      imageQuality: 30, 
+      maxWidth: 500, 
+      maxHeight: 500
+    );
     if (pickedFile != null) {
       final bytes = await pickedFile.readAsBytes();
       setState(() => _profileImage = base64Encode(bytes));
@@ -111,7 +117,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   CircleAvatar(
                     radius: 50,
                     backgroundColor: Colors.white24,
-                    backgroundImage: _profileImage != null ? MemoryImage(base64Decode(_profileImage!)) : null,
+                    backgroundImage: _profileImage != null ? MemoryImage(base64Decode(_profileImage!.replaceFirst('data:image/png;base64,', '').replaceFirst('data:image/jpeg;base64,', ''))) : null,
                     child: _profileImage == null ? const Icon(Icons.person, size: 50, color: Colors.white) : null,
                   ),
                   Container(

@@ -92,7 +92,7 @@ class _AccountHubScreenState extends State<AccountHubScreen> {
                     child: CircleAvatar(
                       radius: 35,
                       backgroundColor: Colors.white24,
-                      backgroundImage: _userImage != null ? MemoryImage(base64Decode(_userImage!)) : null,
+                      backgroundImage: _userImage != null ? MemoryImage(base64Decode(_userImage!.replaceFirst('data:image/png;base64,', '').replaceFirst('data:image/jpeg;base64,', ''))) : null,
                       child: _userImage == null ? const Icon(Icons.person, size: 40, color: Colors.white) : null,
                     ),
                   ),

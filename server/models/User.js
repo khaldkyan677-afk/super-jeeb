@@ -2,33 +2,22 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  phone: { type: String, unique: true, sparse: true },
-  bio: { type: String, default: '' },
-  password: { type: String, required: true },
-  bankName: { type: String },
-  bankAccountNumber: { type: String },
-  bankAccountName: { type: String },
-  maxDebtLimit: { type: Number, default: 10000 },
-  role: { 
-    type: String, 
-    enum: ['client', 'merchant', 'driver', 'admin'], 
-    default: 'client' 
-  },
-  wallet: { type: Number, default: 0 },
-  defaultPaymentMethod: { type: String, default: 'cash' },
-  defaultPayoutAccountId: { type: mongoose.Schema.Types.ObjectId, ref: 'PayoutAccount' },
-  phoneVerified: { type: Boolean, default: false },
-  emailVerified: { type: Boolean, default: false },
-  totalSpent: { type: Number, default: 0 },
-  totalEarned: { type: Number, default: 0 },
-  referralCode: { type: String, unique: true, sparse: true },
-  referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  loyaltyPoints: { type: Number, default: 0 },
-  loyaltyTier: { type: String, enum: ['bronze', 'silver', 'gold'], default: 'bronze' },
-  status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
-    isActive: { type: Boolean, default: true },
-  createdAt: { type: Date, default: Date.now }
-});
+  phone: { type: String, required: true, unique: true },
+  email: { type: String, sparse: true },
+  password: { type: String },
+  role: { type: String, enum: ['client', 'merchant', 'driver', 'admin'], default: 'client' },
+  walletBalance: { type: Number, default: 0 },
+  points: { type: Number, default: 0 },
+  governorate: { type: String, default: '' },
+  birthDate: { type: String, default: '' },
+  gender: { type: String, enum: ['male', 'female', ''], default: '' },
+  profileImage: { type: String, default: '' }, // <--- الحقل السحري
+  driverStatus: { type: String, enum: ['none', 'pending', 'approved', 'rejected'], default: 'none' },
+  vehicleType: { type: String },
+  vehicleModel: { type: String },
+  plateNumber: { type: String },
+  driverDocuments: { nationalId: String, license: String, vehicleRegistration: String, vehiclePhoto: String },
+  driverRejectionReason: String,
+}, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
