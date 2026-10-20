@@ -71,6 +71,14 @@ class SuperJeebApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.theme,
         home: const WelcomeScreen(),
+      // --- إعدادات إصلاح زر الرجوع في المتصفح ---
+      onGenerateRoute: (settings) {
+        return MaterialPageRoute(
+          builder: (context) => const WelcomeScreen(),
+          settings: settings,
+        );
+      },
+      // ---------------------------------------------
       ),
     );
   }

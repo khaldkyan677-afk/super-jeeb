@@ -1,3 +1,6 @@
+import '../../../../services/api_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'widgets/report_sheet.dart';
 import 'widgets/rating_sheet.dart';
 import 'package:flutter/material.dart';
@@ -33,8 +36,26 @@ class _SupermarketScreenState extends State<SupermarketScreen> {
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final s = await SupermarketService().getStoresByCategory('supermarket');
-    if (mounted) setState(() { _all = s; _loading = false; });
+    try {
+      // تحديد القسم بناءً على اسم الملف
+      String category = 'supermarket';
+
+      final res = await http.get(
+        Uri.parse('${ApiService.baseUrl}/api/stores?category=${category}'),
+        headers: {'Authorization': 'Bearer ${ApiService.authToken}'},
+      );
+      
+      if (res.statusCode == 200) {
+        final data = json.decode(res.body);
+        setState(() {
+          _all = data['stores'] ?? [];
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading stores: $e');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   List<Map<String, dynamic>> get _filtered {

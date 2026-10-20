@@ -1,12 +1,20 @@
 const Store = require('../models/Store');
 exports.getStores = async (req, res) => {
   try {
-    const filter = { isActive: true };
-    if (req.query.category) filter.category = req.query.category;
-    if (req.query.merchantId) filter.merchantId = req.query.merchantId;
+    const { category } = req.query;
+    // عرض المتاجر الموثقة والنشطة فقط
+    let filter = { isActive: true, isVerified: true };
+
+    // فلترة صارمة حسب القسم
+    if (category && category !== 'all') {
+      filter.category = category; 
+    }
+
     const stores = await Store.find(filter);
-    res.json(stores);
-  } catch (e) { res.status(500).json({ message: e.message }); }
+    res.json({ success: true, stores });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 exports.getStoresBySection = async (req, res) => {
   try { const stores = await Store.find({ sectionId: req.params.sectionId, isActive: true }); res.json(stores); } catch (e) { res.status(500).json({ message: e.message }); }

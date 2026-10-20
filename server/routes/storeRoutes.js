@@ -20,4 +20,6 @@ router.route('/:id')
   .put(protect, authorize('admin', 'merchant'), updateStore)
   .delete(protect, authorize('admin'), deleteStore);
 
+router.route('/').get(getStores);
+
 module.exports = router;
