@@ -11,11 +11,11 @@ exports.toggle = async (req, res) => {
     }
     await Favorite.create({ userId: req.user._id, storeId });
     res.status(201).json({ favorited: true });
-  } catch (e) { res.status(500).json({ message: e.message }); }
+  } catch (e) { console.error("FAV ERROR:", e); res.status(500).json({ message: e.message }); }
 };
 exports.getMyFavorites = async (req, res) => {
   try {
     const favs = await Favorite.find({ userId: req.user._id }).populate('storeId');
     res.json(favs);
-  } catch (e) { res.status(500).json({ message: e.message }); }
+  } catch (e) { console.error("FAV ERROR:", e); res.status(500).json({ message: e.message }); }
 };

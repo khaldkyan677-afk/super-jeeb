@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'favorites_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -186,7 +187,7 @@ class _AccountHubScreenState extends State<AccountHubScreen> {
               _loadUserData();
             }),
             _buildMenuItem(Icons.receipt_long, 'طلباتي', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyOrdersScreen()))),
-            _buildMenuItem(Icons.favorite, 'المفضلة', () {}),
+            _buildMenuItem(Icons.favorite, 'المفضلة', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FavoritesScreen()))),
             _buildMenuItem(Icons.location_on, 'عناويني', () {}),
 
             const SizedBox(height: 16),

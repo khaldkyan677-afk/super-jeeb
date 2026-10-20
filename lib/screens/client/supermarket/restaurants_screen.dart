@@ -28,10 +28,25 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
   @override
   void initState() { super.initState(); _load(); }
 
-  void _toggleFavorite(String id) {
+    Future<void> _toggleFavorite(String id) async {
+    final isCurrentlyFav = _favorites.contains(id);
     setState(() {
-      if (_favorites.contains(id)) { _favorites.remove(id); } else { _favorites.add(id); }
+      if (isCurrentlyFav) {
+        _favorites.remove(id);
+      } else {
+        _favorites.add(id);
+      }
     });
+    final success = await SupermarketService().toggleFavorite(id);
+    if (!success && mounted) {
+      setState(() {
+        if (isCurrentlyFav) {
+          _favorites.add(id);
+        } else {
+          _favorites.remove(id);
+        }
+      });
+    }
   }
 
   Future<void> _load() async {
@@ -68,6 +83,19 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
       list = list.where((s) => (s['name'] ?? '').toString().contains(_query)).toList();
     }
     return list;
+  }
+
+  
+  Future<void> _loadFavorites() async {
+    final svc = SupermarketService();
+    final list = await svc.getFavorites();
+    final ids = <String>[];
+    for (final item in list) {
+      final s = item['storeId'];
+      if (s is Map && s['_id'] != null) ids.add(s['_id'].toString());
+      else if (s is String) ids.add(s);
+    }
+    if (mounted) setState(() { _favorites.clear(); _favorites.addAll(ids); });
   }
 
   @override

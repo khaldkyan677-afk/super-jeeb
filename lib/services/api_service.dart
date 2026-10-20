@@ -8,12 +8,7 @@ class ApiService {
   static final ApiService instance = ApiService._();
 
   static String get baseUrl {
-    if (kIsWeb) {
-      final u = Uri.base;
-      final port = u.hasPort ? ':${u.port}' : '';
-      return '${u.scheme}://${u.host}$port';
-    }
-    return '';
+    return 'https://increasingly-sharing-numerical-registrar.trycloudflare.com';
   }
 
   static String? _authToken;

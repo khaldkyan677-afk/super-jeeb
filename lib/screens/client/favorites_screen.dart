@@ -21,9 +21,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   Future<void> _load() async {
+    if (!mounted) return;
     setState(() => _loading = true);
-    final list = await _svc.getFavorites();
-    if (mounted) setState(() { _favorites = list; _loading = false; });
+    try {
+      final list = await _svc.getFavorites();
+      if (mounted) setState(() { _favorites = list; _loading = false; });
+    } catch (e) {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   Future<void> _remove(String storeId) async {
