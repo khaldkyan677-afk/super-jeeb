@@ -26,3 +26,37 @@ exports.applyAsDriver = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, email, governorate, birthDate, gender, profileImage } = req.body;
+    const user = await User.findById(req.user._id || req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (governorate) user.governorate = governorate;
+    if (birthDate) user.birthDate = birthDate;
+    if (gender) user.gender = gender;
+    
+    // التأكد من حفظ الصورة إذا تم إرسالها
+    if (profileImage && profileImage.startsWith('data:image')) {
+      user.profileImage = profileImage;
+    }
+
+    await user.save();
+    res.status(200).json({ success: true, message: 'تم تحديث الملف الشخصي بنجاح', user });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id || req.user.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

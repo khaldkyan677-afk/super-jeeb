@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../../services/api_service.dart';
 import 'general/become_merchant_screen.dart';
 import 'general/become_driver_screen.dart';
 import 'general/policy_screen.dart';
 import 'general/edit_profile_screen.dart';
-import 'settings_screen.dart';
+import 'general/security_screen.dart';
+import 'general/my_orders_screen.dart';
+import 'general/settings_screen.dart';
 
 class AccountHubScreen extends StatefulWidget {
   const AccountHubScreen({super.key});
@@ -16,6 +21,34 @@ class AccountHubScreen extends StatefulWidget {
 class _AccountHubScreenState extends State<AccountHubScreen> {
   bool _isMerchantPending = false;
   bool _isDriverPending = false;
+  String _userName = 'مستخدم';
+  String _userEmail = '';
+  String? _userImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final res = await http.get(
+        Uri.parse('${ApiService.baseUrl}/api/users/me'),
+        headers: {'Authorization': 'Bearer ${ApiService.authToken}'},
+      );
+      if (res.statusCode == 200) {
+        final data = json.decode(res.body);
+        setState(() {
+          _userName = data['name'] ?? 'مستخدم';
+          _userEmail = data['email'] ?? '';
+          _userImage = data['profileImage'];
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading user: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +62,7 @@ class _AccountHubScreenState extends State<AccountHubScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // 0. الكارت العلوي (بيانات المستخدم)
+            // 0. التصميم الفاخر
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(24),
@@ -56,10 +89,11 @@ class _AccountHubScreenState extends State<AccountHubScreen> {
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.amber, width: 2),
                     ),
-                    child: const CircleAvatar(
+                    child: CircleAvatar(
                       radius: 35,
                       backgroundColor: Colors.white24,
-                      child: Icon(Icons.person, size: 40, color: Colors.white),
+                      backgroundImage: _userImage != null ? MemoryImage(base64Decode(_userImage!)) : null,
+                      child: _userImage == null ? const Icon(Icons.person, size: 40, color: Colors.white) : null,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -67,7 +101,9 @@ class _AccountHubScreenState extends State<AccountHubScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('مستخدم', style: GoogleFonts.cairo(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+                        Text(_userName, style: GoogleFonts.cairo(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+                        if (_userEmail.isNotEmpty)
+                          Text(_userEmail, style: GoogleFonts.cairo(color: Colors.white54, fontSize: 12)),
                         const SizedBox(height: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -128,13 +164,10 @@ class _AccountHubScreenState extends State<AccountHubScreen> {
             ),
             const SizedBox(height: 20),
 
-            // 2. كرت الإحصائيات
+            // 2. الإحصائيات
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF3D0018),
-                borderRadius: BorderRadius.circular(12),
-              ),
+              decoration: BoxDecoration(color: const Color(0xFF3D0018), borderRadius: BorderRadius.circular(12)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -148,10 +181,11 @@ class _AccountHubScreenState extends State<AccountHubScreen> {
 
             // 3. الأقسام
             _buildSectionTitle('حسابي'),
-            _buildMenuItem(Icons.person, 'الملف الشخصي', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()))),
-            _buildMenuItem(Icons.receipt_long, 'طلباتي', () {}),
-            _buildMenuItem(Icons.local_offer, 'كوبوناتي', () {}),
-            _buildMenuItem(Icons.share, 'دعوة صديق', () {}),
+            _buildMenuItem(Icons.person, 'الملف الشخصي', () async {
+              await Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()));
+              _loadUserData();
+            }),
+            _buildMenuItem(Icons.receipt_long, 'طلباتي', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyOrdersScreen()))),
             _buildMenuItem(Icons.favorite, 'المفضلة', () {}),
             _buildMenuItem(Icons.location_on, 'عناويني', () {}),
 
@@ -159,10 +193,8 @@ class _AccountHubScreenState extends State<AccountHubScreen> {
             _buildSectionTitle('الإعدادات'),
             _buildMenuItem(Icons.settings, 'الإعدادات', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()))),
             _buildMenuItem(Icons.notifications, 'الإشعارات', () {}),
-            _buildMenuItem(Icons.security, 'الأمان', () {}),
+            _buildMenuItem(Icons.security, 'الأمان', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SecurityScreen()))),
             _buildMenuItem(Icons.policy, 'الشروط والخصوصية', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PolicyScreen(type: 'terms')))),
-            _buildMenuItem(Icons.language, 'اللغة', () {}),
-            _buildMenuItem(Icons.star, 'تقييم التطبيق', () {}),
 
             const SizedBox(height: 16),
             _buildSectionTitle('المساعدة'),
@@ -175,18 +207,11 @@ class _AccountHubScreenState extends State<AccountHubScreen> {
             _buildMenuItem(Icons.delete, 'حذف الحساب', () {}, textColor: Colors.red),
 
             const SizedBox(height: 20),
-            // 4. زر تسجيل الخروج
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                onPressed: () {
-                  // كود تسجيل الخروج
-                },
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                onPressed: () {},
                 icon: const Icon(Icons.logout, color: Colors.white),
                 label: const Text('تسجيل الخروج', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
               ),
@@ -198,22 +223,12 @@ class _AccountHubScreenState extends State<AccountHubScreen> {
     );
   }
 
-  Widget _buildUpgradeCard({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
+  Widget _buildUpgradeCard({required String title, required String subtitle, required IconData icon, required Color color, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
-        ),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: color.withValues(alpha: 0.3))),
         child: Column(
           children: [
             Icon(icon, color: color, size: 32),

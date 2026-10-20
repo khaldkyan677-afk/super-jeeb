@@ -29,4 +29,6 @@ router.route('/:id/status')
 
 router.route('/:id/stage').patch(protect, authorize('driver', 'admin', 'merchant'), require('../controllers/orderController').updateOrderStage);
 
+router.get('/my-orders', protect, require('../controllers/orderController').getMyOrders);
+
 module.exports = router;
