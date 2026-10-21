@@ -3,6 +3,7 @@ const { errorLogger } = require('./middleware/logging');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 
@@ -16,7 +17,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Disable all caching for development
 app.use((req, res, next) => {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
   next();
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 
 app.use(express.json({ limit: '10mb', type: ["application/json", "text/plain"] }));
 app.use(cors());
+app.use(compression());
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
