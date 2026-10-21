@@ -28,29 +28,39 @@ class SupermarketService {
     return [];
   }
 
-  Future<bool> toggleFavorite(String storeId) async {
+  Future<bool> addFavorite(String storeId) async {
     try {
       final token = ApiService.authToken;
       final r = await http.post(
-        Uri.parse('${ApiService.baseUrl}/api/favorites/$storeId'),
+        Uri.parse('${ApiService.baseUrl}/api/favorites/$storeId?t=${DateTime.now().millisecondsSinceEpoch}'),
         headers: { if (token != null) 'Authorization': 'Bearer $token' },
       );
       return r.statusCode == 200 || r.statusCode == 201;
     } catch (_) { return false; }
   }
 
-  Future<List<Map<String, dynamic>>> getFavorites() async {
+  Future<bool> removeFavorite(String storeId) async {
     try {
       final token = ApiService.authToken;
-      final r = await http.get(
-        Uri.parse('${ApiService.baseUrl}/api/favorites'),
+      final r = await http.delete(
+        Uri.parse('${ApiService.baseUrl}/api/favorites/$storeId?t=${DateTime.now().millisecondsSinceEpoch}'),
         headers: { if (token != null) 'Authorization': 'Bearer $token' },
       );
-      if (r.statusCode == 200) {
-        final d = jsonDecode(r.body) as List;
-        return d.cast<Map<String, dynamic>>();
-      }
-    } catch (_) {}
-    return [];
+      return r.statusCode == 200;
+    } catch (_) { return false; }
+  }
+
+  Future<List<Map<String, dynamic>>> getFavorites() async {
+    final token = ApiService.authToken;
+    final r = await http.get(
+      Uri.parse('${ApiService.baseUrl}/api/favorites?t=${DateTime.now().millisecondsSinceEpoch}'),
+      headers: { if (token != null) 'Authorization': 'Bearer $token' },
+    );
+    if (r.statusCode == 200) {
+      final d = jsonDecode(r.body) as List;
+      return d.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Failed to load favorites: ${r.statusCode}');
+    }
   }
 }

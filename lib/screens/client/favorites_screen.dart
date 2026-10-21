@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../services/auth_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'supermarket/services/supermarket_service.dart';
 import 'supermarket/store_detail_screen.dart';
@@ -17,7 +18,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   void initState() {
     super.initState();
-    _load();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _load();
+    });
   }
 
   Future<void> _load() async {
@@ -32,16 +35,16 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   Future<void> _remove(String storeId) async {
-    await _svc.toggleFavorite(storeId);
+    await _svc.removeFavorite(storeId);
     _load();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: const Color(0xFF1A0B0B),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2B2D42),
+        backgroundColor: const Color(0xFF1A0B0B),
         leading: const BackButton(color: Colors.white),
         title: Row(
           children: [
@@ -64,9 +67,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.favorite_border, size: 80, color: Colors.grey),
+                  const Icon(Icons.favorite_border, size: 80, color: Colors.white54),
                   const SizedBox(height: 15),
-                  Text('لا توجد متاجر في المفضلة', style: GoogleFonts.cairo(color: Colors.grey, fontSize: 14)),
+                  Text('لا توجد متاجر في المفضلة', style: GoogleFonts.cairo(color: Colors.white54, fontSize: 14)),
                 ],
               ),
             )
@@ -81,51 +84,57 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     );
   }
 
-  Widget _card(Map<String, dynamic> s) {
+    Widget _card(Map<String, dynamic> s) {
     final store = s['storeId'] is Map ? s['storeId'] as Map<String, dynamic> : s;
     final name = (store['name'] ?? '').toString();
     final rating = (store['rating'] ?? 4.5).toString();
     final id = (store['_id'] ?? s['storeId'] ?? '').toString();
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8)],
+
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => StoreDetailScreen(store: store)),
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 70, height: 70,
-            decoration: BoxDecoration(color: const Color(0xFFF8F9FA), borderRadius: BorderRadius.circular(12)),
-            child: const Icon(Icons.storefront, color: Color(0xFF2B2D42), size: 32),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name, style: GoogleFonts.cairo(color: const Color(0xFF2B2D42), fontSize: 15, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
-                Row(children: [
-                  const Icon(Icons.star, color: Color(0xFFFFE233), size: 14),
-                  const SizedBox(width: 4),
-                  Text(rating, style: GoogleFonts.cairo(color: Colors.grey, fontSize: 12)),
-                ]),
-              ],
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2B1010),
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8)],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 70, height: 70,
+              decoration: BoxDecoration(color: const Color(0xFFF8F9FA), borderRadius: BorderRadius.circular(12)),
+              child: const Icon(Icons.storefront, color: Color(0xFF2B2D42), size: 32),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.red),
-            onPressed: () => _remove(id),
-          ),
-          IconButton(
-            icon: const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 14),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(
-              builder: (_) => StoreDetailScreen(store: store))),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: GoogleFonts.cairo(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Row(children: [
+                    const Icon(Icons.star, color: Color(0xFFFFE233), size: 14),
+                    const SizedBox(width: 4),
+                    Text(rating, style: GoogleFonts.cairo(color: Colors.white54, fontSize: 12)),
+                  ]),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete_outline, color: Colors.red),
+              onPressed: () => _remove(id),
+            ),
+            IconButton(
+              icon: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 14),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => StoreDetailScreen(store: store))),
+            ),
+          ],
+        ),
       ),
     );
   }

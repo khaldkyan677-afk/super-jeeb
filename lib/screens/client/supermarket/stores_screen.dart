@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'widgets/report_sheet.dart';
 import 'widgets/rating_sheet.dart';
 import 'package:flutter/material.dart';
+import '../../../services/auth_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'widgets/search_bar.dart';
 import 'widgets/category_chips.dart';
@@ -22,37 +23,61 @@ class _StoresScreenState extends State<StoresScreen> {
   String _query = '';
   List<Map<String, dynamic>> _all = [];
   bool _loading = true;
-  final Set<String> _favorites = {};
+  Set<String> _favoriteStoreIds = {};
   final List<String> _cats = ['الكل', 'قريب منك', 'مواد غذائية', 'تجميل وعطور', 'ملابس', 'أدوات منزلية', 'مفروشات', 'إلكترونيات', 'مواد بناء', 'أحذية', 'مكتبات وقرطاسية', 'نظارات وساعات', 'صحة ولياقة', 'مستلزمات حيوانات', 'اتصالات'];
 
   @override
-  void initState() { super.initState(); _load(); }
+  void initState() { super.initState(); _load(); 
+    _loadFavorites();}
 
-  Future<void> _toggleFavorite(String id) async {
-    if (id.isEmpty) return;
-    final svc = SupermarketService();
-    await svc.toggleFavorite(id);
-    if (mounted) {
+      Future<void> _toggleFavorite(String id) async {
+    final isCurrentlyFav = _favoriteStoreIds.contains(id);
+    setState(() {
+      if (isCurrentlyFav) {
+        _favoriteStoreIds.remove(id);
+      } else {
+        _favoriteStoreIds.add(id);
+      }
+    });
+
+    final success = isCurrentlyFav 
+        ? await SupermarketService().removeFavorite(id) 
+        : await SupermarketService().addFavorite(id);
+
+    if (!success && mounted) {
       setState(() {
-        if (_favorites.contains(id)) {
-          _favorites.remove(id);
+        if (isCurrentlyFav) {
+          _favoriteStoreIds.add(id);
         } else {
-          _favorites.add(id);
+          _favoriteStoreIds.remove(id);
         }
       });
     }
   }
 
-  Future<void> _loadFavorites() async {
-    final svc = SupermarketService();
-    final list = await svc.getFavorites();
-    final ids = <String>{};
-    for (final item in list) {
-      final s = item['storeId'];
-      if (s is Map && s['_id'] != null) ids.add(s['_id'].toString());
-      else if (s is String) ids.add(s);
+    
+    
+  bool _favLoading = false;
+    Future<void> _loadFavorites() async {
+    if (_favLoading) return;
+    _favLoading = true;
+    try {
+      await AuthService.instance.syncAfterLogin();
+      final svc = SupermarketService();
+      final list = await svc.getFavorites();
+    debugPrint('⭐ FAVORITES FROM API: $list');
+      final ids = <String>{};
+      for (final item in list) {
+        final s = item['storeId'];
+        if (s is Map && s['_id'] != null) ids.add(s['_id'].toString());
+        else if (s is String) ids.add(s);
+      }
+      if (mounted) setState(() { _favoriteStoreIds = ids; });
+    } catch (e) {
+      debugPrint('Error loading favorites: $e');
+    } finally {
+      _favLoading = false;
     }
-    if (mounted) setState(() { _favorites.clear(); _favorites.addAll(ids); });
   }
 
   Future<void> _load() async {
@@ -110,14 +135,18 @@ class _StoresScreenState extends State<StoresScreen> {
           ? const Center(child: CircularProgressIndicator(color: Color(0xFFEF233C)))
           : _filtered.isEmpty
             ? Center(child: Text('لا توجد نتائج', style: GoogleFonts.cairo(color: Colors.grey)))
-            : ListView.builder(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            : ListView.builder(
+          key: ValueKey(_favoriteStoreIds.join(',')),padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 itemCount: _filtered.length,
                 itemBuilder: (c, i) { final s = _filtered[i];
                   return StoreCard(storeId: s['_id'] ?? '', isNew: s['createdAt'] != null && (DateTime.now().difference(DateTime.parse(s['createdAt'])).inDays < 3), name: s['name'] ?? '', imageUrl: s['coverUrl'] ?? s['imageUrl'] ?? '',
                     isOpen: s['isActive'] ?? true, deliveryFee: (s['deliveryFee'] ?? 0).toDouble(), minimumOrder: (s['minimumOrder'] ?? 0).toDouble(),
                     location: (s['location'] is Map) ? (s['location']['address'] ?? '') : '',
                     rating: (s['rating'] ?? 5).toDouble(),
-                    isFavorite: _favorites.contains(s['_id']), onFavorite: () => _toggleFavorite(s['_id']), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => StoreDetailScreen(store: s))), onReport: () => showReportSheet(context, s['_id'] ?? '', s['name'] ?? ''), onRate: () => showRatingSheet(context, s['_id'] ?? '', s['name'] ?? '', () {})); })),
+                    isFavorite: _favoriteStoreIds.contains(s['_id'].toString()), onFavorite: () => _toggleFavorite(s['_id'].toString()), onTap: () async {
+                await Navigator.push(context, MaterialPageRoute(builder: (_) => StoreDetailScreen(store: s)));
+                _loadFavorites();
+              }, onReport: () => showReportSheet(context, s['_id'] ?? '', s['name'] ?? ''), onRate: () => showRatingSheet(context, s['_id'] ?? '', s['name'] ?? '', () {})); })),
       ]));
   }
 }
