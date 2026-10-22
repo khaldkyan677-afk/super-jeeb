@@ -1,11 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/userController');
-const { protect } = require('../middleware/auth');
+const { listUsers, approveUser, rejectUser, changeUserRole } = require('../controllers/miscController');
+const { getMe, updateProfile } = require('../controllers/authController');
+const { protect, authorize } = require('../middleware/auth');
 
-router.post('/apply-driver', protect, userController.applyAsDriver);
+// مسارات الملف الشخصي المطلوبة من فلاتر
+router.get('/me', protect, getMe);
+router.put('/me', protect, updateProfile);
+router.put('/profile', protect, updateProfile);
 
-router.get('/me', protect, userController.getMe);
-router.put('/profile', protect, userController.updateProfile);
+// مسارات إدارة المستخدمين
+router.get('/', protect, authorize('admin'), listUsers);
+router.patch('/:id/approve', protect, authorize('admin'), approveUser);
+router.patch('/:id/reject', protect, authorize('admin'), rejectUser);
+router.patch('/:id/role', protect, authorize('admin'), changeUserRole);
 
 module.exports = router;
