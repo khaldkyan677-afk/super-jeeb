@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
+
 const storeSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  merchantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Merchant' },
+  merchantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   logoUrl: { type: String },
   coverUrl: { type: String },
   rating: { type: Number, default: 5 },
@@ -37,4 +38,5 @@ const storeSchema = new mongoose.Schema({
   agreedToTerms: { type: Boolean, default: false },
   agreedToCommission: { type: Boolean, default: false },
 });
+
 module.exports = mongoose.model('Store', storeSchema);
