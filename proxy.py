@@ -10,7 +10,6 @@ SKIP_HEADERS = ["transfer-encoding", "connection", "content-encoding", "content-
                 "access-control-allow-origin", "access-control-allow-methods",
                 "access-control-allow-headers", "access-control-max-age"]
 
-
 class Handler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, fmt, *args):
         sys.stderr.write("[proxy] " + (fmt % args) + "\n")
@@ -20,8 +19,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", origin)
         self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
         req_h = self.headers.get("Access-Control-Request-Headers", "")
-        self.send_header("Access-Control-Allow-Headers",
-                         req_h if req_h else "Content-Type, Authorization, X-Device-Id, Accept, Accept-Language")
+        self.send_header("Access-Control-Allow-Headers", req_h if req_h else "Content-Type, Authorization, X-Device-Id, Accept, Accept-Language")
         self.send_header("Access-Control-Max-Age", "86400")
         self.send_header("Vary", "Origin")
 
@@ -65,7 +63,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(('{"error":"' + str(e).replace('"', "'") + '"}').encode())
 
     def do_GET(self):
-        if self.path.startswith("/api/"):
+        # تمرير كل من الـ API والصور /uploads/ مباشرة إلى السيرفر
+        if self.path.startswith("/api/") or self.path.startswith("/uploads/"):
             self._fwd()
         else:
             for h in ["If-Modified-Since", "If-None-Match", "If-Match", "If-Unmodified-Since"]:
@@ -76,7 +75,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             super().do_GET()
 
     def end_headers(self):
-        if not self.path.startswith("/api/"):
+        if not self.path.startswith("/api/") and not self.path.startswith("/uploads/"):
             self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
             self.send_header("Pragma", "no-cache")
             self.send_header("Expires", "0")
@@ -87,11 +86,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_PATCH(self): self._fwd()
     def do_DELETE(self): self._fwd()
 
-
 class ThreadingServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     allow_reuse_address = True
     daemon_threads = True
-
 
 if __name__ == "__main__":
     with ThreadingServer(("", PORT), Handler) as httpd:

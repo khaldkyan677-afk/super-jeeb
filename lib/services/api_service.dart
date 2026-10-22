@@ -8,7 +8,7 @@ class ApiService {
   static final ApiService instance = ApiService._();
 
   static String get baseUrl {
-    return 'https://applicable-readings-pepper-ash.trycloudflare.com';
+    return Uri.base.origin;
   }
 
   static String? _authToken;
