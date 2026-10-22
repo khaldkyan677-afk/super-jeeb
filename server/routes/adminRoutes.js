@@ -1,16 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
-router.get('/merchants', protect, adminController.getAdminMerchants);
-router.put('/merchants/:id/toggle', protect, adminController.toggleMerchantStatus);
-router.put('/merchants/:id/verify', protect, adminController.verifyMerchant);
-router.delete('/merchants/:id', protect, adminController.deleteMerchant);
-router.put('/merchants/:id/alert', protect, adminController.sendAlert);
-router.put('/merchants/:id/commission', protect, adminController.updateCommission);
-
-router.get('/drivers/applications', protect, adminController.getDriverApplications);
-router.put('/drivers/:id/verify', protect, adminController.verifyDriverApplication);
+router.get('/merchants', protect, authorize('admin'), adminController.getAdminMerchants);
+router.put('/merchants/:id/toggle', protect, authorize('admin'), adminController.toggleMerchantStatus);
+router.put('/merchants/:id/verify', protect, authorize('admin'), adminController.verifyMerchant);
+router.delete('/merchants/:id', protect, authorize('admin'), adminController.deleteMerchant);
+router.put('/merchants/:id/alert', protect, authorize('admin'), adminController.sendAlert);
+router.put('/merchants/:id/commission', protect, authorize('admin'), adminController.updateCommission);
 
 module.exports = router;
